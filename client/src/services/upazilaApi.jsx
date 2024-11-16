@@ -15,6 +15,16 @@ export const upazilaApi = createApi({
                     ]
                     : [{ type: 'Upazilas', id: 'LIST' }],
         }),
+        getAllUpazilas: build.query({
+            query: () => `upazilas`, // Corrected the query string to include '/' between 'upazilas' and 'upazilaId'
+            providesTags: (result) =>
+                Array.isArray(result)
+                    ? [
+                        ...result.map(({ id }) => ({ type: 'Upazilas', id })), // Each upazila gets a tag
+                        { type: 'Upazilas', id: 'LIST' }, // Virtual list id for invalidation
+                    ]
+                    : [{ type: 'Upazilas', id: 'LIST' }],
+        }),
         getUpazila: build.query({
             query: (id) => `upazila/${id}`, // Endpoint to get a single upazila by ID
             providesTags: (result, error, id) => [{ type: 'Upazilas', id }],
@@ -22,7 +32,7 @@ export const upazilaApi = createApi({
         addUpazila: build.mutation({
             query(body) {
                 return {
-                    url: `upazila`, // Endpoint to add a new upazila
+                    url: `upazilas`, // Endpoint to add a new upazila
                     method: 'POST',
                     body,
                 };
@@ -33,7 +43,7 @@ export const upazilaApi = createApi({
             query(data) {
                 const { id, ...body } = data;
                 return {
-                    url: `upazila/${id}`, // Endpoint to update an upazila by ID
+                    url: `upazilas/${id}`, // Endpoint to update an upazila by ID
                     method: 'PUT',
                     body,
                 };
@@ -43,7 +53,7 @@ export const upazilaApi = createApi({
         deleteUpazila: build.mutation({
             query(id) {
                 return {
-                    url: `upazila/${id}`, // Endpoint to delete an upazila by ID
+                    url: `upazilas/${id}`, // Endpoint to delete an upazila by ID
                     method: 'DELETE',
                 };
             },
@@ -54,6 +64,7 @@ export const upazilaApi = createApi({
 
 export const {
     useGetUpazilasQuery,
+    useGetAllUpazilasQuery,
     useGetUpazilaQuery,
     useAddUpazilaMutation,
     useUpdateUpazilaMutation,

@@ -68,11 +68,7 @@ const getAllUsers = async (req, res) => {
                     { name: new RegExp(search, 'i') },
                     { email: new RegExp(search, 'i') },
                     { phone: new RegExp(search, 'i') },
-                    // { division: new RegExp(search, 'i') },
-                    // { district: new RegExp(search, 'i') },
-                    // { upazila: new RegExp(search, 'i') },
-                    // { union: new RegExp(search, 'i') },
-                    // { village: new RegExp(search, 'i') },
+                   
                 ]
             }
             : {};

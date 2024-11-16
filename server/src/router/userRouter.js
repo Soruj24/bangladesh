@@ -1,5 +1,5 @@
 const { getAllUsers, registerUser, getSingalUser, updateUser, userDelete, handelAdminUpdateUser } = require('../controller/userController')
-const { isLoggedOut } = require('../middleware/auth')
+const { isLoggedOut, isSuperAdmin } = require('../middleware/auth')
 const { runValidation } = require('../validators')
 const { validateUserRegister } = require('../validators/auth')
 
@@ -10,7 +10,8 @@ userRouter.post('/register', isLoggedOut, validateUserRegister, runValidation, r
 userRouter.get('/', getAllUsers)
 userRouter.get('/:id', getSingalUser)
 userRouter.put('/:id', updateUser)
-userRouter.put('/manage-state/:id', handelAdminUpdateUser)
+userRouter.put('/manage-state/:id',isSuperAdmin, handelAdminUpdateUser)
+
 
 
 module.exports = userRouter

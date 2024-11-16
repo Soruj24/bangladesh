@@ -5,10 +5,10 @@ const { validateName } = require('../validators/division')
 
 const divisionRoutes = require('express').Router()
 
-divisionRoutes.post('/',  handelCreateDivision)
+divisionRoutes.post('/',validateName, runValidation, isLoggedIn, isSuperAdmin,  handelCreateDivision)
 divisionRoutes.get('/', handelGetAllDivisions)
-divisionRoutes.delete('/:id',  handelDeleteDivision)
-divisionRoutes.put('/:id', handelUpdateDivision)
+divisionRoutes.delete('/:id', validateName, runValidation, isLoggedIn, isSuperAdmin, handelDeleteDivision)
+divisionRoutes.put('/:id',validateName, runValidation, isLoggedIn, isSuperAdmin, handelUpdateDivision)
 divisionRoutes.get('/:id',  handelGetSingleDivision)
 
 

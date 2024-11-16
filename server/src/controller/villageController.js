@@ -59,8 +59,81 @@ const getVillagesInUnion = async (req, res) => {
     }
 };
 
+const handelGetAllVillage = async (req, res) => {
+    try {
+        const villages = await Village.find({});
+        if (!villages) {
+            return res.status(404).json({ message: 'Villages not found' });
+        }
+
+        return res.status(200).json({
+            message: 'Villages fetched successfully',
+            villages,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
+
+const handelUpdateVillage = async (req, res) => {
+    try {
+        const villageId = req.params.id;
+        const { name } = req.body;
+        const village = await Village.findByIdAndUpdate(villageId, { name }, { new: true });
+        if (!village) {
+            return res.status(404).json({ message: 'Village not found' });
+        }
+        return res.status(200).json({ message: 'Village updated successfully', village });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
+
+const handelDeleteVillage = async (req, res) => {
+    try {
+        const villageId = req.params.id; // Ensure this matches the route parameter
+        console.log("Village ID:", villageId);
+
+        // Find the village using the ID
+        const village = await Village.findOne({ _id: villageId }); // Use _id if it's the MongoDB ObjectId
+        console.log("Village found:", village);
+
+        if (!village) {
+            return res.status(404).json({
+                message: "Village not found",
+            });
+        }
+
+        // Delete the village by ID
+        const villageDelete = await Village.findByIdAndDelete(villageId); // Pass ID directly
+        if (!villageDelete) {
+            return res.status(404).json({
+                message: "Village not deleted",
+            });
+        }
+
+        return res.status(200).json({
+            message: "Village deleted successfully",
+            village: villageDelete, // Include the deleted village details
+        });
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).json({
+            message: "Server error",
+        });
+    }
+};
 
 
 
 
-module.exports = { createVillage, getVillagesInUnion };
+
+module.exports = {
+    createVillage,
+    getVillagesInUnion,
+    handelGetAllVillage,
+    handelDeleteVillage,
+    handelUpdateVillage
+};

@@ -44,7 +44,7 @@ const DivisionShow = () => {
     if (error) return <p className="text-center text-red-500">Error loading divisions.</p>;
 
   return (
-    <div>
+    <div className="w-full h-96  overflow-auto touch-auto ">
          <div className="p-6 max-w-md mx-auto bg-white rounded-lg shadow-lg">
             <ToastContainer position="top-center" autoClose={3000} />
             <h1 className="text-2xl font-bold text-gray-800 mb-4">Divisions</h1>

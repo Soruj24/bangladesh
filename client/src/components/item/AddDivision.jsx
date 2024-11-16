@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { useAddDivisionsMutation } from '../../services/divisionApi';
 import { toast, ToastContainer } from 'react-toastify';
+import { z } from 'zod';
 import 'react-toastify/dist/ReactToastify.css';
+
+// Define the Zod schema
+const divisionSchema = z.object({
+    name: z.string().min(2, "Division name must be at least 2 characters").max(50, "Division name must not exceed 50 characters"),
+});
 
 const AddDivision = () => {
     const [divisionName, setDivisionName] = useState('');
@@ -13,13 +19,23 @@ const AddDivision = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Validate input using Zod
+        const validationResult = divisionSchema.safeParse({ name: divisionName });
+
+        if (!validationResult.success) {
+            const errorMessage = validationResult.error.errors[0]?.message;
+            toast.error(errorMessage || 'Invalid input');
+            return;
+        }
+
         try {
             await addDivision({ name: divisionName }).unwrap();
             toast.success('Division added successfully!');
             setDivisionName(''); // Clear the input field after submission
         } catch (error) {
-            console.log(error)
-            toast.error('Failed to add division. Please try again.');
+            console.error(error.data.message);
+            toast.error( error?.data?.message);
         }
     };
 

@@ -62,9 +62,9 @@ const getSingleDistrict = async (divisionId, districtId) => {
     }
 }
 
-const districtDelete = async (divisionId, districtId) => {
+const districtDelete = async ( districtId) => {
     try {
-        const district = await District.findByIdAndDelete({ _id: districtId, division: divisionId });
+        const district = await District.findByIdAndDelete({ _id: districtId });
         if (!district) {
             return res.status(404).json({ message: 'District not found' });
         }
@@ -77,9 +77,9 @@ const districtDelete = async (divisionId, districtId) => {
     }
 }
 
-const districtUpdated = async (divisionId, districtId, name) => {
+const districtUpdated = async ( districtId, name) => {
     try {
-        const district = await District.findByIdAndUpdate({ _id: districtId, division: divisionId }, { name }, { new: true });
+        const district = await District.findByIdAndUpdate({ _id: districtId }, { name }, { new: true });
         if (!district) {
             return res.status(404).json({ message: 'District not found' });
         }

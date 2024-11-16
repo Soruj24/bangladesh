@@ -24,12 +24,30 @@ export const villageApi = createApi({
                 return [{ type: 'Villages', id: 'LIST' }];
             }
         }),
+        handelGetVillages: build.query({
+            query: () => `villages`, // Update the endpoint to 'villages'
+            providesTags: (result) => {
+                // Check if result is an array or an object with data property
+                if (Array.isArray(result)) {
+                    return [
+                        ...result.map(({ id }) => ({ type: 'Villages', id })),
+                        { type: 'Villages', id: 'LIST' }
+                    ];
+                } else if (result?.data) {
+                    return [
+                        ...result.data.map(({ id }) => ({ type: 'Villages', id })),
+                        { type: 'Villages', id: 'LIST' }
+                    ];
+                }
+                return [{ type: 'Villages', id: 'LIST' }];
+            }
+        }),
 
         // Add a new village
         addVillage: build.mutation({
             query(body) {
                 return {
-                    url: 'village', // Change 'post' to 'village' in the URL
+                    url: 'villages', // Change 'post' to 'village' in the URL
                     method: 'POST',
                     body,
                 };
@@ -48,7 +66,7 @@ export const villageApi = createApi({
             query(data) {
                 const { id, ...body } = data;
                 return {
-                    url: `village/${id}`, // Update URL to 'village/{id}'
+                    url: `villages/${id}`, // Update URL to 'village/{id}'
                     method: 'PUT',
                     body,
                 };
@@ -60,7 +78,7 @@ export const villageApi = createApi({
         deleteVillage: build.mutation({
             query(id) {
                 return {
-                    url: `village/${id}`, // Update URL to 'village/{id}'
+                    url: `villages/${id}`,
                     method: 'DELETE',
                 };
             },
@@ -71,6 +89,7 @@ export const villageApi = createApi({
 
 export const {
     useGetVillagesQuery,
+    useHandelGetVillagesQuery,
     useAddVillageMutation,
     useGetVillageQuery,
     useUpdateVillageMutation,

@@ -58,10 +58,29 @@ const singalDistrict = async (req, res) => {
     }
 };
 
+const handelGetDistrict = async (req, res) => {
+    try {
+
+        const districts = await District.find();
+        if (!districts) {
+            return res.status(404).json({ message: 'District not found' });
+        }
+
+        return res.status(200).json({
+            message: 'District fetched successfully',
+            districts,
+        });
+
+    } catch (error) {
+        return res.status(500).json({ message: 'Server error' });
+    }
+}
+
 const handelDistrictDelete = async (req, res) => {
     try {
-        const { divisionId, districtId } = req.params;
-        const district = await districtDelete(divisionId, districtId)
+        const {  districtId } = req.params;
+        const district = await districtDelete(districtId)
+        console.log(district)
 
         return res.status(200).json({
             message: 'District deleted successfully',
@@ -75,10 +94,11 @@ const handelDistrictDelete = async (req, res) => {
 
 const handelDistrictUpdate = async (req, res) => {
     try {
-        const { divisionId, districtId } = req.params;
+        const {  districtId } = req.params;
         const { name } = req.body;
 
-        const district = await districtUpdated(divisionId, districtId, name)
+        const district = await districtUpdated( districtId, name)
+
 
         return res.status(200).json({
             message: 'District updated successfully',
@@ -91,4 +111,11 @@ const handelDistrictUpdate = async (req, res) => {
 
 
 
-module.exports = { createDistrict, getDistrictsInDivision, singalDistrict, handelDistrictDelete, handelDistrictUpdate };
+module.exports = {
+    createDistrict,
+    getDistrictsInDivision,
+    singalDistrict,
+    handelDistrictDelete,
+    handelDistrictUpdate,
+    handelGetDistrict
+};

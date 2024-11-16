@@ -24,15 +24,13 @@ const Register = () => {
     const { data: villages, isLoading: villagesLoading } = useGetVillagesQuery(unionId, { skip: !unionId });
     const { data: unions, isLoading: unionsLoading } = useGetUnionsQuery(upazilaId, { skip: !upazilaId });
     const { data: upazilas, isLoading: upazilasLoading } = useGetUpazilasQuery(districtId, { skip: !districtId });
-    const { data: districts, isLoading: districtsLoading, } = useGetDistrictsQuery(divisionId, {
-        skip: !divisionId, // Only fetch districts if divisionId is set
-    });
+    const { data: districts, isLoading: districtsLoading, } = useGetDistrictsQuery(divisionId, { skip: !divisionId });
     const { data: divisions, isLoading: divisionsLoading } = useGetDivisionsQuery();
 
 
     const onSubmit = async (data) => {
         try {
-            const formData = {...data, village:villageId}
+            const formData = { ...data, village: villageId }
             console.log(formData);
             await addUser(formData);
             toast.success('User added successfully');

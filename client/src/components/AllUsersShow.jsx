@@ -10,7 +10,6 @@ const AllUsersShow = () => {
     const usersPerPage = 9;
 
     const user = useSelector((state) => state?.user?.user);
-    console.log(user);
 
     // Fetch users with search and pagination
     const { data, isLoading, isError, error, refetch } = useGetUsersQuery({

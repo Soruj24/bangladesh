@@ -1,13 +1,13 @@
 
 const jwt = require('jsonwebtoken');
 const { jwtAccessKey } = require('../secret');
-const isLoggedIn = (req, res ,next) => {
+const isLoggedIn = (req, res, next) => {
     try {
         const token = req.cookies.accessToken;
         if (!token) {
             return res.status(401).json({
                 success: false,
-                message: "Access token not found. Please Login first"
+                message: " Please Login first"
             })
         }
         const decoded = jwt.verify(token, jwtAccessKey);
