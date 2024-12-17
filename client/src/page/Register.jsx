@@ -27,7 +27,11 @@ const Register = () => {
     const { data: districts, isLoading: districtsLoading, } = useGetDistrictsQuery(divisionId, { skip: !divisionId });
     const { data: divisions, isLoading: divisionsLoading } = useGetDivisionsQuery();
 
+    if (villagesLoading || unionsLoading || upazilasLoading || districtsLoading || divisionsLoading) {
+        return <div>Loading...</div>;
+    }
 
+    console.log(districtId)
     const onSubmit = async (data) => {
         try {
             const formData = { ...data, village: villageId }
