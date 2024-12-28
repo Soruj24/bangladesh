@@ -1,9 +1,12 @@
-import { useGetUsersQuery } from "@/services/userApi"
+import { useSelector } from "react-redux";
 
+ 
 
 const Home = () => {
-  const { data } = useGetUsersQuery()
-  console.log(data)
+  
+  const user = useSelector((state: { auth: { user: any } }) => state.auth.user);
+  console.log(user)
+
   return (
     <div>Home</div>
   )

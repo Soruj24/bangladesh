@@ -1,7 +1,10 @@
+import Division from "./DivisionAdd"
 
 const SuparProfile = () => {
     return (
-        <div>SuparProfile</div>
+        <div className="mt-2">
+            <Division />
+        </div>
     )
 }
 

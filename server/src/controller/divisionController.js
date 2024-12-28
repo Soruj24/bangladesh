@@ -10,17 +10,26 @@ const handelCreateDivision = async (req, res) => {
     try {
         const { name } = req.body;
 
-        const division = await divisionCreated(name)
+        // Check if division name already exists
+        const nameExists = await Division.findOne({ name });
+        if (nameExists) {
+            return res.status(400).json({ message: 'Division already exists' });
+        }
 
+        // Create new division
+        const division = await Division.create({ name });
+
+        // Return successful response
         return res.status(201).json({
             message: 'Division created successfully',
             division,
         });
     } catch (error) {
-        console.error(error);
+        console.log(error);
         return res.status(500).json({ message: 'Server error' });
     }
 };
+
 
 // Get all Divisions with Districts 
 

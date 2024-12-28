@@ -36,16 +36,15 @@ const getDivision = async (name) => {
 }
 
 const divisionCreated = async (name) => {
-    try {
+    
         const nameExists = await Division.findOne({ name })
+        console.log(nameExists)
         if (nameExists) {
             return createError(400, 'Division already exists')
         }
         const division = await Division.create({ name })
         return division
-    } catch (error) {
-        return createError(400, 'division not found')
-    }
+   
 }
 
 const singleDivision = async (id) => {

@@ -1,7 +1,8 @@
 import { userApi } from '@/services/userApi'
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
-import  authReducer  from '../features/userSlice'
+import authReducer from '../features/userSlice'
+import { divisionApi } from '@/services/dividionApi'
 
 export const store = configureStore({
     reducer: {
@@ -9,9 +10,12 @@ export const store = configureStore({
         auth: authReducer,
 
         [userApi.reducerPath]: userApi.reducer,
+        [divisionApi.reducerPath]: divisionApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(userApi.middleware),
+        getDefaultMiddleware()
+            .concat(userApi.middleware)
+            .concat(divisionApi.middleware)
 })
 
 export type RootState = ReturnType<typeof store.getState>

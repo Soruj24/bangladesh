@@ -12,6 +12,7 @@ import AdminAllUser from "@/components/admin/AdminAllUser";
 import SuparAdminRoute from "./SuparAdminRoute";
 import SuparProfile from "@/components/suparAdmin/SuparProfile";
 import ErrorPage from "@/page/ErrorPage";
+import DivisionShow from "@/components/suparAdmin/DivisionShow";
 
 const router = createBrowserRouter([
     {
@@ -65,6 +66,10 @@ const router = createBrowserRouter([
                         path: "profile",
                         element: <SuparProfile />,
                     },
+                    {
+                        path: 'division-show-all',
+                        element: <DivisionShow />
+                    }
 
 
                 ],
