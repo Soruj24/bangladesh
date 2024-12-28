@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAddUserMutation } from "@/services/userApi";
 
 const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 
@@ -17,7 +18,7 @@ const schema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
     password: z
         .string()
-        .min(8, { message: "Password must be at least 6 characters" })
+        .min(6, { message: "Password must be at least 6 characters" })
         .regex(passwordRegex, {
             message:
                 "Password must include uppercase, lowercase, number, and special character",
@@ -30,6 +31,9 @@ type FormData = z.infer<typeof schema>;
 const SignUp: React.FC = () => {
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const navigate = useNavigate()
+
+    const [addUser] = useAddUserMutation()
 
     const {
         register,
@@ -52,13 +56,32 @@ const SignUp: React.FC = () => {
         }
     };
 
-    const onSubmit = (data: FormData) => {
-        toast({
-            title: "Sign-Up Successful",
-            description: `Welcome, ${data.name}!`,
-            variant: "default",
-        });
-        console.log(data);
+    const onSubmit = async (data: FormData) => {
+
+        try {
+            const res = await addUser(data)
+            console.log('res', res)
+
+            if (res.error) {
+                toast({
+                    title: "Sign-Up Failed",
+                    description: res.error?.data?.message,
+                    variant: "destructive",
+                });
+                return
+            }
+
+            toast({
+                title: "Sign-Up Successful",
+                description: `Welcome, ${data.name}!`,
+                variant: "default",
+            });
+            navigate('/sign-in')
+
+        } catch (error) {
+            console.log('error', error)
+        }
+
     };
 
     return (

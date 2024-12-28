@@ -10,7 +10,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useLoginUserMutation } from "@/services/userApi";
+import { setUser } from "@/features/userSlice";
+import { useDispatch } from "react-redux";
 
 // Define Zod schema
 const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -31,6 +34,13 @@ type SignInFormData = z.infer<typeof signInSchema>;
 const SignIn = () => {
     const [passwordVisible, setPasswordVisible] = useState(false); // State to toggle password visibility
     const { toast } = useToast();
+
+    const dispatch = useDispatch()
+
+    const navigate = useNavigate()
+
+    const [loginUser] = useLoginUserMutation()
+
     const {
         register,
         handleSubmit,
@@ -39,16 +49,43 @@ const SignIn = () => {
         resolver: zodResolver(signInSchema),
     });
 
-    const onSubmit = (data: SignInFormData) => {
+    const onSubmit = async (data: SignInFormData) => {
         // Mock Sign-In Process
-        setTimeout(() => {
+
+        const res = await loginUser(data)
+        console.log(res?.data?.user)
+
+        dispatch(setUser(res?.data?.user));
+        if (res.error) {
             toast({
-                title: "Success",
-                description: "You have signed in successfully!",
-                variant: "default",
-            });
-        }, 1000);
-        console.log("Sign-In Data:", data);
+                title: "Error",
+                description: res?.error?.data?.message,
+                variant: "destructive",
+            })
+            return
+        }
+
+
+
+        const user = res?.data?.user;
+
+        let path = '';
+
+        if (user.isAdmin) {
+            path = '/dashboard/admin/profile';
+        } else if (user.isSuperAdmin) {  // Example of a third condition
+            path = '/dashboard/supar-admin/profile';
+        } else {
+            path = '/';
+        }
+
+        navigate(path);
+        toast({
+            title: "Success",
+            description: "You have signed in successfully!",
+            variant: "default",
+        });
+
     };
 
     return (

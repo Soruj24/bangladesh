@@ -1,5 +1,4 @@
 const User = require("../model/userModel");
-const { isAdmin } = require("../middleware/auth");
 
 const registerUser = async (req, res) => {
     try {
@@ -29,7 +28,7 @@ const registerUser = async (req, res) => {
                 id: savedUser._id,
                 name: savedUser.name,
                 email: savedUser.email,
-              
+
             }
         });
     } catch (error) {
@@ -59,12 +58,6 @@ const getAllUsers = async (req, res) => {
 
         // Fetch users with search and pagination
         const users = await User.find(searchQuery)
-            // .populate('division', 'name')
-            // .populate('district', 'name')
-            // .populate('upazila', 'name')
-            // .populate('union', 'name')
-            // .populate('village', 'name')
-            // .select('name email phone tag image division district upazila union village')
             .skip((pageNumber - 1) * limitNumber)
             .limit(limitNumber);
 
@@ -99,12 +92,6 @@ const getSingalUser = async (req, res) => {
     try {
         const userId = req.params.id;
         const user = await User.findById(userId)
-            .populate('division', 'name')
-            .populate('district', 'name')
-            .populate('upazila', 'name')
-            .populate('union', 'name')
-            .populate('village', 'name')
-            .select('name email phone tag image division district upazila union village');
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -114,14 +101,7 @@ const getSingalUser = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                phone: user.phone,
-                tag: user.tag,
-                image: user.image,
-                division: user.division?.name,
-                district: user.district?.name,
-                upazila: user.upazila?.name,
-                union: user.union?.name,
-                village: user.village?.name
+
             }
         });
 
