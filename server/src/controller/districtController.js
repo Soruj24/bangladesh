@@ -20,6 +20,7 @@ const createDistrict = async (req, res) => {
             message: 'District created successfully',
             district,
         });
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Server error' });
@@ -44,9 +45,9 @@ const getDistrictsInDivision = async (req, res) => {
 
 const singalDistrict = async (req, res) => {
     try {
-        const { divisionId, districtId } = req.params;
+        const {  districtId } = req.params;
 
-        const district = await getSingleDistrict(divisionId, districtId)
+        const district = await getSingleDistrict( districtId)
 
         return res.status(200).json({
             message: 'District fetched successfully',

@@ -1,30 +1,22 @@
-const { cloudinary_js_config } = require("../helper/cloudImageUploading");
 const User = require("../model/userModel");
-const cloudinary = require('../helper/cloudImageUploading');
 const { isAdmin } = require("../middleware/auth");
 
 const registerUser = async (req, res) => {
     try {
-        const { name, email, password, phone, tag, village, union, upazila, district, division } = req.body;
+        const { name, email, password } = req.body;
 
         // Check if the user already exists by email or phone
-        const userExists = await User.findOne({ $or: [{ email }, { phone }] });
+        const userExists = await User.findOne({ email });
         if (userExists) {
-            return res.status(400).json({ message: "User already exists with this email or phone number" });
+            return res.status(400).json({ message: "User already exists with this email" });
         }
 
         // Create the new user object with hashed password
         const newUser = new User({
             name,
             email,
-            password, // Assume password hashing is handled in a middleware or schema pre-save hook
-            phone,
-            tag,
-            village,
-            union,
-            upazila,
-            district,
-            division
+            password,
+
         });
 
         // Save the new user to the database
@@ -37,13 +29,7 @@ const registerUser = async (req, res) => {
                 id: savedUser._id,
                 name: savedUser.name,
                 email: savedUser.email,
-                phone: savedUser.phone,
-                tag: savedUser.tag,
-                village: savedUser.village,
-                union: savedUser.union,
-                upazila: savedUser.upazila,
-                district: savedUser.district,
-                division: savedUser.division
+              
             }
         });
     } catch (error) {
@@ -67,20 +53,18 @@ const getAllUsers = async (req, res) => {
                 $or: [
                     { name: new RegExp(search, 'i') },
                     { email: new RegExp(search, 'i') },
-                    { phone: new RegExp(search, 'i') },
-                   
                 ]
             }
             : {};
 
         // Fetch users with search and pagination
         const users = await User.find(searchQuery)
-            .populate('division', 'name')
-            .populate('district', 'name')
-            .populate('upazila', 'name')
-            .populate('union', 'name')
-            .populate('village', 'name')
-            .select('name email phone tag image division district upazila union village')
+            // .populate('division', 'name')
+            // .populate('district', 'name')
+            // .populate('upazila', 'name')
+            // .populate('union', 'name')
+            // .populate('village', 'name')
+            // .select('name email phone tag image division district upazila union village')
             .skip((pageNumber - 1) * limitNumber)
             .limit(limitNumber);
 
@@ -91,19 +75,7 @@ const getAllUsers = async (req, res) => {
         // Return the list of users
         return res.status(200).json({
             message: "Users fetched successfully",
-            users: users.map(user => ({
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                phone: user.phone,
-                tag: user.tag,
-                image: user.image,
-                division: user.division?.name,
-                district: user.district?.name,
-                upazila: user.upazila?.name,
-                union: user.union?.name,
-                village: user.village?.name
-            })),
+            users,
             pagination: {
                 totalUsers,
                 currentPage: pageNumber,
@@ -180,6 +152,7 @@ const userDelete = async (req, res) => {
 
         // Find and delete the user by ID
         const deletedUser = await User.findByIdAndDelete(id);
+        console.log(deletedUser)
 
         // Check if the user was found and deleted
         if (!deletedUser) {

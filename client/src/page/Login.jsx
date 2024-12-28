@@ -23,10 +23,10 @@ const Login = () => {
     const [login, { isLoading }] = useLoginMutation();
 
     const onSubmit = async (data) => {
-        console.log(data); // Check the form data
         try {
             // Passing the data object directly to the login mutation
             const response = await login(data).unwrap();
+            console.log(response)
             dispatch(setUser({
                 user: response.user,
                 accessToken: response.accessToken

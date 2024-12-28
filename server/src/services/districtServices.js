@@ -18,6 +18,7 @@ const districtCreated = async (name, divisionId) => {
         await Division.findByIdAndUpdate(divisionId, { $push: { districts: district._id } });
 
         return district
+
     } catch (error) {
         return createError(400, 'division not found')
     }
@@ -33,6 +34,7 @@ const getAllDivisionsInDistrict = async (divisionId) => {
         }
 
         return allDistrict
+        
     } catch (error) {
         if (!mongoose.Types.ObjectId.isValid(divisionId)) {
             return createError(400, 'Invalid division ID')
@@ -44,7 +46,7 @@ const getSingleDistrict = async (divisionId, districtId) => {
     try {
 
         // Find the district by ID and ensure it matches the division
-        const district = await District.findOne({ _id: districtId, division: divisionId })
+        const district = await District.findOne({ _id: districtId })
             .populate('upazilas');
 
         if (!district) {

@@ -27,14 +27,7 @@ const validateUserRegister = [
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/)
     .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number and one special character'),
 
-    body('phone')
-    .trim()
-    .notEmpty()
-    .withMessage('Phone number is required. Enter a valid phone number')
-    .isMobilePhone()
-    .withMessage('Please enter a valid phone number'),
-
- 
+   
 
 ]
 const validateUserLogin = [

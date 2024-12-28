@@ -13,8 +13,8 @@ const Header = () => {
     const [logoutApi] = useLogoutMutation();
 
     // Select the user slice from the Redux state
-    const user = useSelector((state) => state?.user?.user);
-    console.log(user)
+    const user = useSelector((state) => state.user.user);
+    console.log(user?.isSuperAdmin);
     const handleLogout = async () => {
         try {
             // First, logout using the RTK Query API
@@ -42,29 +42,37 @@ const Header = () => {
                     >
                         Home
                     </Link>
-                    <Link
-                        to="/item"
-                        className="text-gray-300 hover:text-white transition duration-200"
-                    >
-                        Items
-                    </Link>
-                    <Link
-                        to="/login"
-                        className="text-gray-300 hover:text-white transition duration-200"
-                    >
-                        Add User
-                    </Link>
+
+                    {
+                        user?.isSuperAdmin && (<Link
+                            to="/item"
+                            className="text-gray-300 hover:text-white transition duration-200"
+                        >
+                            Items
+                        </Link>)
+                    }
+
                 </nav>
 
                 {/* User Actions */}
                 <div className="flex items-center gap-5">
+                    {user ?
 
-                    <button
-                        onClick={handleLogout}
-                        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-200"
-                    >
-                        Logout
-                    </button>
+                        <button
+                            onClick={handleLogout}
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-200"
+                        >
+                            Logout
+                        </button>
+
+                        :
+                        <Link
+                            to="/login"
+                            className="text-gray-300 hover:text-white transition duration-200"
+                        >
+                            Add User
+                        </Link>
+                    }
                 </div>
             </div>
         </header>

@@ -11,15 +11,15 @@ const isLoggedIn = (req, res, next) => {
             })
         }
         const decoded = jwt.verify(token, jwtAccessKey);
-        console.log("decoded", decoded)
         if (!decoded) {
             return res.status(401).json({
                 success: false,
                 message: "user not verified"
             })
         }
+        console.log("decoded", decoded.userExists)
         //! isAdmin Check 
-        req.user = decoded.user
+        req.user = decoded.userExists
         next();
 
     } catch (error) {
