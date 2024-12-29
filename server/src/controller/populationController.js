@@ -1,11 +1,10 @@
 const User = require("../model/userModel");
-const { isAdmin } = require("../middleware/auth");
 const Population = require("../model/populationModel");
 
-const registerUser = async (req, res) => {
+const addUser = async (req, res) => {
     try {
 
-        const { name, email, password, phone, tag, village, union, upazila, district, division } = req.body;
+        const { name, email, phone, tag, bio, village, union, upazila, district, division } = req.body;
 
         // Check if the user already exists by email or phone
         const userExists = await Population.findOne({ $or: [{ email }, { phone }] });
@@ -14,12 +13,12 @@ const registerUser = async (req, res) => {
         }
 
         // Create the new user object with hashed password
-        const newUser = new User({
+        const newUser = new Population({
             name,
             email,
-            password, 
             phone,
             tag,
+            bio,
             village,
             union,
             upazila,
@@ -69,7 +68,7 @@ const getAllUsers = async (req, res) => {
                     { name: new RegExp(search, 'i') },
                     { email: new RegExp(search, 'i') },
                     { phone: new RegExp(search, 'i') },
-                   
+
                 ]
             }
             : {};
@@ -86,13 +85,13 @@ const getAllUsers = async (req, res) => {
             .limit(limitNumber);
 
         // Get the total number of users for pagination calculations
-        const totalUsers = await User.countDocuments(searchQuery);
+        const totalUsers = await Population.countDocuments(searchQuery);
         const totalPages = Math.ceil(totalUsers / limitNumber);
 
         // Return the list of users
         return res.status(200).json({
             message: "Users fetched successfully",
-            users: users.map(user => ({
+            users: Population.map(user => ({
                 id: user._id,
                 name: user.name,
                 email: user.email,
@@ -227,7 +226,7 @@ const handelAdminUpdateUser = async (req, res) => {
 
 
 module.exports = {
-    registerUser,
+    addUser,
     getAllUsers,
     getSingalUser,
     handelAdminUpdateUser,

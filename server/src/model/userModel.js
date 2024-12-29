@@ -26,11 +26,7 @@ const userSchema = new mongoose.Schema(
         },
 
 
-        // division: { type: mongoose.Schema.Types.ObjectId, ref: 'Division', required: true },
-        // district: { type: mongoose.Schema.Types.ObjectId, ref: 'District', required: true },
-        // upazila: { type: mongoose.Schema.Types.ObjectId, ref: 'Upazila', required: true },
-        // union: { type: mongoose.Schema.Types.ObjectId, ref: 'Union', required: true },
-        // village: { type: mongoose.Schema.Types.ObjectId, ref: 'Village' },
+      
         isAdmin: {
             type: Boolean,
             default: false

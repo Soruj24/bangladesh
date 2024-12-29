@@ -16,17 +16,7 @@ const validateUserRegister = [
     .isEmail()
     .withMessage('Please enter a valid email'),
 
-    body('password')
-    .trim()
-    .notEmpty()
-    .withMessage('Password is required. Enter a valid password')
-    .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters')
-    .isLength({ max: 20 })
-    .withMessage('Password must be at most 20 characters')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/)
-    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number and one special character'),
-
+  
    
 
 ]

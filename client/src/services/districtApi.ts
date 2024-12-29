@@ -9,13 +9,13 @@ type DistrictsResponse = District[]
 
 export const districtApi = createApi({
     reducerPath: 'districtsApi',
-    baseQuery: fetchBaseQuery({ baseUrl: '/' }),
+    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api' }),
     tagTypes: ['Districts'],
     endpoints: (build) => ({
         getDistricts: build.query<DistrictsResponse, void>({
             query: () => 'districts',
             providesTags: (result) =>
-                result
+                Array.isArray(result)
                     ? [
                         ...result.map(({ id }) => ({ type: 'Districts', id }) as const),
                         { type: 'Districts', id: 'LIST' },
@@ -25,7 +25,7 @@ export const districtApi = createApi({
         addDistrict: build.mutation<District, Partial<District>>({
             query(body) {
                 return {
-                    url: `district`,
+                    url: `districts`,
                     method: 'POST',
                     body,
                 }
@@ -40,17 +40,18 @@ export const districtApi = createApi({
             query(data) {
                 const { id, ...body } = data
                 return {
-                    url: `district/${id}`,
+                    url: `districts/${id}`,
                     method: 'PUT',
                     body,
                 }
             },
+
             invalidatesTags: (result, error, { id }) => [{ type: 'Districts', id }],
         }),
         deleteDistrict: build.mutation<{ success: boolean; id: number }, number>({
             query(id) {
                 return {
-                    url: `district/${id}`,
+                    url: `districts/${id}`,
                     method: 'DELETE',
                 }
             },

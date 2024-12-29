@@ -5,7 +5,6 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
-    DropdownMenuShortcut,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { logout } from "@/features/userSlice"
@@ -58,26 +57,57 @@ const UserProfile = () => {
                                 <Link to='/dashboard/supar-admin/profile'>
                                     <DropdownMenuItem>
                                         Super Admin
-                                        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                                     </DropdownMenuItem>
                                 </Link>
+                                <DropdownMenuSeparator />
                                 <Link to='/dashboard/supar-admin/division-show-all'>
                                     <DropdownMenuItem>
                                         Division Show All
-                                        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                                    </DropdownMenuItem>
+                                </Link>
+                                <DropdownMenuSeparator />
+                                <Link to='/dashboard/supar-admin/district-show-all'>
+                                    <DropdownMenuItem>
+                                        District Show All
+                                    </DropdownMenuItem>
+                                </Link>
+                                <DropdownMenuSeparator />
+                                <Link to='/dashboard/supar-admin/upazila-show-all'>
+                                    <DropdownMenuItem>
+                                        Upazila Show All
+                                    </DropdownMenuItem>
+                                </Link>
+                                <DropdownMenuSeparator />
+                                <Link to='/dashboard/supar-admin/union-show-all'>
+                                    <DropdownMenuItem>
+                                        Union Show All
+                                    </DropdownMenuItem>
+                                </Link>
+                                <DropdownMenuSeparator />
+                                <Link to='/dashboard/supar-admin/village-show-all'>
+                                    <DropdownMenuItem>
+                                        Village Show All
                                     </DropdownMenuItem>
                                 </Link>
                             </div>
                         )
                     }
+                    <DropdownMenuSeparator />
                     {
                         user?.isAdmin && (
-                            <Link to='dashboard/admin/profile'>
-                                <DropdownMenuItem>
-                                    Admin
-                                    <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                                </DropdownMenuItem>
-                            </Link>
+                            <div>
+                                <Link to='dashboard/admin/profile'>
+                                    <DropdownMenuItem>
+                                        Admin
+                                    </DropdownMenuItem>
+                                </Link>
+                                <DropdownMenuSeparator />
+                                <Link to='dashboard/admin/add-admin-users'>
+                                    <DropdownMenuItem>
+                                        Add Users
+                                    </DropdownMenuItem>
+                                </Link>
+                            </div>
                         )
                     }
 
@@ -85,21 +115,16 @@ const UserProfile = () => {
                         user ? (<div onClick={handelLogout}>
                             <DropdownMenuItem>
                                 <LogOut className="mr-2 h-4 w-4" />   Log out
-                                <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
                             </DropdownMenuItem>
                         </div>) : (<Link to='/sign-in'>
                             <DropdownMenuItem>
                                 Sign In
-                                <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                             </DropdownMenuItem>
                         </Link>)
                     }
 
 
                 </DropdownMenuGroup>
-
-
-
 
             </DropdownMenuContent>
         </DropdownMenu>

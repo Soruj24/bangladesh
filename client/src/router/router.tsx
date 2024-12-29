@@ -13,6 +13,11 @@ import SuparAdminRoute from "./SuparAdminRoute";
 import SuparProfile from "@/components/suparAdmin/SuparProfile";
 import ErrorPage from "@/page/ErrorPage";
 import DivisionShow from "@/components/suparAdmin/DivisionShow";
+import DistrictShow from "@/components/suparAdmin/DistrictShow";
+import UpazilaShow from "@/components/suparAdmin/UpazilaShow";
+import UnionShow from "@/components/suparAdmin/UnionShow";
+import VillageShow from "@/components/suparAdmin/VillageShow";
+import AddAdminUsers from "@/components/admin/AddAdminUsers";
 
 const router = createBrowserRouter([
     {
@@ -56,6 +61,10 @@ const router = createBrowserRouter([
                         path: "users",
                         element: <AdminAllUser />,
                     },
+                    {
+                        path: 'add-admin-users',
+                        element: <AddAdminUsers />
+                    }
                 ],
             },
             {
@@ -69,6 +78,22 @@ const router = createBrowserRouter([
                     {
                         path: 'division-show-all',
                         element: <DivisionShow />
+                    },
+                    {
+                        path: "district-show-all",
+                        element: <DistrictShow />
+                    },
+                    {
+                        path: "upazila-show-all",
+                        element: <UpazilaShow />
+                    },
+                    {
+                        path: "union-show-all",
+                        element: <UnionShow />
+                    },
+                    {
+                        path: 'village-show-all',
+                        element: <VillageShow />
                     }
 
 

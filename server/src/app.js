@@ -9,6 +9,7 @@ const unionRoutes = require('./router/unionRoutes');
 const villageRoutes = require('./router/villageRoutes');
 const userRouter = require('./router/userRouter');
 const authRouter = require('./router/authRouter');
+const populationRoute = require('./router/populationRoute');
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/users', userRouter)
+app.use('/api/population', populationRoute)
 app.use('/api/auth', authRouter)
 app.use('/api/divisions', divisionRoutes);
 app.use('/api/districts', districtRoutes);

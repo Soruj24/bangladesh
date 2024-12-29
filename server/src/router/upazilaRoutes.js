@@ -6,10 +6,10 @@ const { validateName } = require('../validators/division')
 const upazilaRoutes = require('express').Router()
 
 
-upazilaRoutes.post('/', validateName, runValidation, isLoggedIn, isSuperAdmin,  handelCreateUpazila)
+upazilaRoutes.post('/',   handelCreateUpazila)
 upazilaRoutes.get('/', handelGetAllUpazila)
 upazilaRoutes.get('/:id', handelGetSingleUpazila)
-upazilaRoutes.put('/:id',validateName, runValidation, isLoggedIn, isSuperAdmin, handelUpdateUpazila)
-upazilaRoutes.delete('/:id',validateName, runValidation, isLoggedIn, isSuperAdmin, handelDeleteUpazila)
+upazilaRoutes.put('/:id', handelUpdateUpazila)
+upazilaRoutes.delete('/:id', handelDeleteUpazila)
 
 module.exports = upazilaRoutes

@@ -7,11 +7,11 @@ const villageRoutes = require('express').Router()
 
 
 
-villageRoutes.post('/',  validateName, runValidation, isLoggedIn, isSuperAdmin, createVillage)
+villageRoutes.post('/', createVillage)
 villageRoutes.get('/:id', getVillagesInUnion)
 villageRoutes.get('/', handelGetAllVillage)
-villageRoutes.delete('/:id', validateName, runValidation, isLoggedIn, isSuperAdmin, handelDeleteVillage)
-villageRoutes.put('/:id',validateName, runValidation, isLoggedIn, isSuperAdmin, handelUpdateVillage)
+villageRoutes.delete('/:id', handelDeleteVillage)
+villageRoutes.put('/:id', handelUpdateVillage)
 
 
 module.exports = villageRoutes

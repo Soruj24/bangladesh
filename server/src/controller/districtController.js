@@ -14,7 +14,21 @@ const createDistrict = async (req, res) => {
     try {
         const { name, divisionId } = req.body;
 
-        const district = await districtCreated(name, divisionId);
+        const nameExists = await District.findOne({ name })
+        if (nameExists) {
+            return res.status(400).json({
+                message: 'District already exists'
+            })
+        }
+        const division = await Division.findById(divisionId);
+        if (!division) {
+            return res.status(400).json({
+                message: 'Division not found'
+            })
+        }
+        const district = await District.create({ name, division: divisionId });
+        // Update Division with new District ID
+        await Division.findByIdAndUpdate(divisionId, { $push: { districts: district._id } });
 
         return res.status(201).json({
             message: 'District created successfully',
@@ -22,7 +36,7 @@ const createDistrict = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
+        console.log(error);
         return res.status(500).json({ message: 'Server error' });
     }
 };
@@ -45,9 +59,9 @@ const getDistrictsInDivision = async (req, res) => {
 
 const singalDistrict = async (req, res) => {
     try {
-        const {  districtId } = req.params;
+        const { districtId } = req.params;
 
-        const district = await getSingleDistrict( districtId)
+        const district = await getSingleDistrict(districtId)
 
         return res.status(200).json({
             message: 'District fetched successfully',
@@ -79,7 +93,7 @@ const handelGetDistrict = async (req, res) => {
 
 const handelDistrictDelete = async (req, res) => {
     try {
-        const {  districtId } = req.params;
+        const { districtId } = req.params;
         const district = await districtDelete(districtId)
         console.log(district)
 
@@ -95,10 +109,10 @@ const handelDistrictDelete = async (req, res) => {
 
 const handelDistrictUpdate = async (req, res) => {
     try {
-        const {  districtId } = req.params;
+        const { districtId } = req.params;
         const { name } = req.body;
 
-        const district = await districtUpdated( districtId, name)
+        const district = await districtUpdated(districtId, name)
 
 
         return res.status(200).json({
