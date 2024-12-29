@@ -58,24 +58,24 @@ const AddAdminUsers = () => {
     const { data: villageData } = useGetVillagesQuery(selectedUnion);
 
     const onSubmit = async (data: any) => {
-        console.log("Form Data Submitted:", {
-            ...data,
-            selectedDivision,
-            selectedDistrict,
-            selectedUpazila,
-            selectedUnion,
-            selectedVillage,
-        });
+
 
         try {
-            const res = await addPopulation({
+
+            const newPopulation = {
                 ...data,
-                selectedDivision,
-                selectedDistrict,
-                selectedUpazila,
-                selectedUnion,
-                selectedVillage,
-            })
+                division: selectedDivision,
+                district: selectedDistrict,
+                upazila: selectedUpazila,
+                union: selectedUnion,
+                village: selectedVillage
+            };
+
+            const res = await addPopulation(
+                newPopulation
+            )
+
+            console.log(res)
 
             if (res.error) {
                 toast({

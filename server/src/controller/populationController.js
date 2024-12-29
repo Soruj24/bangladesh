@@ -12,22 +12,23 @@ const addUser = async (req, res) => {
             return res.status(400).json({ message: "User already exists with this email or phone number" });
         }
 
-        // Create the new user object with hashed password
-        const newUser = new Population({
+        // Create a new population entry
+        const newPopulation = new Population({
             name,
             email,
             phone,
             tag,
             bio,
-            village,
-            union,
-            upazila,
+
+
+            division,
             district,
-            division
+            upazila,
+            union,
+            village,
         });
 
-        // Save the new user to the database
-        const savedUser = await newUser.save();
+        const savedUser = await newPopulation.save();
 
         // Return a success message
         return res.status(201).json({
@@ -47,13 +48,13 @@ const addUser = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Error during user registration:", error);
+        console.log(error)
         return res.status(500).json({ message: "Failed to register user" });
     }
 };
 
 
-const getAllUsers = async (req, res) => {
+const populationGetAllUsers = async (req, res) => {
     try {
         const { search = '', page = 1, limit = 9 } = req.query;
 
@@ -68,7 +69,6 @@ const getAllUsers = async (req, res) => {
                     { name: new RegExp(search, 'i') },
                     { email: new RegExp(search, 'i') },
                     { phone: new RegExp(search, 'i') },
-
                 ]
             }
             : {};
@@ -91,7 +91,7 @@ const getAllUsers = async (req, res) => {
         // Return the list of users
         return res.status(200).json({
             message: "Users fetched successfully",
-            users: Population.map(user => ({
+            users: users.map(user => ({
                 id: user._id,
                 name: user.name,
                 email: user.email,
@@ -123,7 +123,7 @@ const getAllUsers = async (req, res) => {
 
 
 
-const getSingalUser = async (req, res) => {
+const populationGetSingalUser = async (req, res) => {
     try {
         const userId = req.params.id;
         const user = await Population.findById(userId)
@@ -162,7 +162,7 @@ const getSingalUser = async (req, res) => {
 }
 
 
-const updateUser = async (req, res) => {
+const populationUpdateUser = async (req, res) => {
     try {
         const userId = req.params.id;
         const updatedUser = await Population.findByIdAndUpdate(userId, req.body, { new: true });
@@ -176,7 +176,7 @@ const updateUser = async (req, res) => {
     }
 };
 
-const userDelete = async (req, res) => {
+const populationUserDelete = async (req, res) => {
     try {
         // Extract the user ID from the request parameters
         const { id } = req.params;
@@ -197,7 +197,7 @@ const userDelete = async (req, res) => {
     }
 };
 
-const handelAdminUpdateUser = async (req, res) => {
+const populationHandelAdminUpdateUser = async (req, res) => {
     try {
         const userId = req.params.id;
         const action = req.body.role
@@ -227,9 +227,9 @@ const handelAdminUpdateUser = async (req, res) => {
 
 module.exports = {
     addUser,
-    getAllUsers,
-    getSingalUser,
-    handelAdminUpdateUser,
-    updateUser,
-    userDelete
+    populationGetAllUsers,
+    populationGetSingalUser,
+    populationUpdateUser,
+    populationUserDelete,
+    populationHandelAdminUpdateUser
 };

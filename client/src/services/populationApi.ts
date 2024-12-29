@@ -18,13 +18,18 @@ export const populationApi = createApi({
                 url: 'population',
                 params: { populate: 'relatedData' }, // Request population for related fields
             }),
-            providesTags: (result) =>
-                result
-                    ? [
+            providesTags: (result) => {
+                // Check if result is an array before calling map
+                if (Array.isArray(result)) {
+                    return [
                         ...result.map(({ id }) => ({ type: 'Population', id }) as const),
                         { type: 'Population', id: 'LIST' },
-                    ]
-                    : [{ type: 'Population', id: 'LIST' }],
+                    ];
+                } else {
+                    // If it's not an array, just return the LIST tag
+                    return [{ type: 'Population', id: 'LIST' }];
+                }
+            }
         }),
         addPopulation: build.mutation<Population, Partial<Population>>({
             query(body) {
