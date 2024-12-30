@@ -61,8 +61,12 @@ const singalDistrict = async (req, res) => {
     try {
         const { districtId } = req.params;
 
-        const district = await getSingleDistrict(districtId)
+        const district = await District.findOne({ _id: districtId })
+            .populate('upazilas');
 
+        if (!district) {
+            return res.status(404).json({ message: 'District not found' });
+        }
         return res.status(200).json({
             message: 'District fetched successfully',
             district,

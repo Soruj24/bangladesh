@@ -37,9 +37,8 @@ const districtSchema = z.object({
 type DistrictFormValues = z.infer<typeof districtSchema>;
 
 const UpozilaAdd = () => {
-    const { data, error } = useGetDistrictsQuery();
+    const { data } = useGetDistrictsQuery();
     const [addUpozila] = useAddUpozilaMutation();
-    console.log(data?.districts)
     const {
         register,
         handleSubmit,
@@ -52,7 +51,6 @@ const UpozilaAdd = () => {
     const onSubmit = async (formData: DistrictFormValues) => {
         try {
             const response = await addUpozila({ ...formData, districtId: formData.division }).unwrap();
-            console.log("API Response:", response);
             toast({
                 title: "Success",
                 description: "District created successfully.",
@@ -77,7 +75,7 @@ const UpozilaAdd = () => {
     };
 
     return (
-        <Card className="w-[350px]">
+        <Card className=" ">
             <CardHeader>
                 <CardTitle>Create Upozila</CardTitle>
             </CardHeader>

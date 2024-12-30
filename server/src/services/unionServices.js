@@ -25,7 +25,7 @@ const createUnion = async (name, upazilaId) => {
 
 const getUnionsInUpazila = async (upazilaId) => {
     try {
-        const upazila = await Upazila.findById(upazilaId).populate('unions', null, null, { strictPopulate: false });
+        const upazila = await Upazila.findById(upazilaId).populate('unions');
         if (!upazila) {
             return res.status(404).json({ message: 'Upazila not found' });
         }

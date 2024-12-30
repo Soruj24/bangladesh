@@ -39,7 +39,6 @@ type DistrictFormValues = z.infer<typeof districtSchema>;
 const VillageAdd = () => {
     const { data, error } = useGetUnionsQuery();
     const [addVillage] = useAddVillageMutation();
-    console.log(data?.union)
     const {
         register,
         handleSubmit,
@@ -52,7 +51,6 @@ const VillageAdd = () => {
     const onSubmit = async (formData: DistrictFormValues) => {
         try {
             const response = await addVillage({ ...formData, unionId: formData.division }).unwrap();
-            console.log("API Response:", response);
             toast({
                 title: "Success",
                 description: "District created successfully.",
@@ -77,7 +75,7 @@ const VillageAdd = () => {
     };
 
     return (
-        <Card className="w-[350px]">
+        <Card className=" ">
             <CardHeader>
                 <CardTitle>Create Village</CardTitle>
             </CardHeader>

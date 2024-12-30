@@ -23,19 +23,70 @@ const handelCreateUnion = async (req, res) => {
 
 
 // Get all Unions in an Upazila
-const handelGetUnionsInUpazila = async (req, res) => {
+const handelGetSingleUnion = async (req, res) => {
     try {
-        const upazilaId = req.params.upazilaId;
+        const { divisionId, districtId, upazilaId, unionId } = req.params;
 
-        const upazila = await getUnionsInUpazila(upazilaId);
+        // Validate required parameters
+        if (!divisionId || !districtId || !upazilaId || !unionId) {
+            return res.status(400).json({ message: "Missing required parameters." });
+        }
 
+        // Validate ObjectId format
+        if (
+            !mongoose.Types.ObjectId.isValid(divisionId) ||
+            !mongoose.Types.ObjectId.isValid(districtId) ||
+            !mongoose.Types.ObjectId.isValid(upazilaId) ||
+            !mongoose.Types.ObjectId.isValid(unionId)
+        ) {
+            return res.status(400).json({ message: "Invalid ID format." });
+        }
+
+        // Find Division
+        const division = await Division.findById(divisionId).populate({
+            path: "districts",
+            match: { _id: districtId },
+            populate: {
+                path: "upazilas",
+                match: { _id: upazilaId },
+                populate: {
+                    path: "unions",
+                    match: { _id: unionId },
+                },
+            },
+        });
+
+        // Validate Division
+        if (!division) {
+            return res.status(404).json({ message: "Division not found." });
+        }
+
+        // Validate District
+        const district = division.districts[0];
+        if (!district) {
+            return res.status(404).json({ message: "District not found in this division." });
+        }
+
+        // Validate Upazila
+        const upazila = district.upazilas[0];
+        if (!upazila) {
+            return res.status(404).json({ message: "Upazila not found in this district." });
+        }
+
+        // Validate Union
+        const union = upazila.unions[0];
+        if (!union) {
+            return res.status(404).json({ message: "Union not found in this upazila." });
+        }
+
+        // Return the found Union
         return res.status(200).json({
-            message: 'Unions fetched successfully',
-            unions: upazila.unions,
+            message: "Union fetched successfully.",
+            union,
         });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Server error' });
+        console.error("Error fetching union:", error);
+        return res.status(500).json({ message: "Server error." });
     }
 };
 
@@ -105,4 +156,4 @@ const handleUpdateUnion = async (req, res) => {
 
 
 
-module.exports = { handelCreateUnion, handleUpdateUnion, handelGetUnionsInUpazila, handelUnionDelete, handelGetUnions };
+module.exports = { handelCreateUnion, handleUpdateUnion, handelGetSingleUnion, handelUnionDelete, handelGetUnions };

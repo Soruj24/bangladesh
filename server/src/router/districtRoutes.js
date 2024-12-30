@@ -8,9 +8,9 @@ const districtRoutes = require('express').Router()
 districtRoutes.post('/',    createDistrict)
 districtRoutes.get('/:divisionId', getDistrictsInDivision)
 districtRoutes.get('/', handelGetDistrict)
-districtRoutes.get('/:districtId', singalDistrict)
-districtRoutes.delete('/:districtId',  handelDistrictDelete)
-districtRoutes.put('/:districtId',  handelDistrictUpdate)
+districtRoutes.get('/:division/:districtId', singalDistrict)
+districtRoutes.delete('/:division/:districtId',  handelDistrictDelete)
+districtRoutes.put('/:division/:districtId',  handelDistrictUpdate)
 
 module.exports = districtRoutes
 

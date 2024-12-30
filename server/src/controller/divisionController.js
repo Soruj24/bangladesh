@@ -1,7 +1,6 @@
 // controllers/divisionController.js
 const createError = require('http-errors');
 
-const { default: mongoose } = require("mongoose");
 const Division = require("../model/Division");
 const { getDivision, divisionCreated, singleDivision, divisionDeleted, divisionUpdated } = require("../services/divisonServices");
 
@@ -24,6 +23,7 @@ const handelCreateDivision = async (req, res) => {
             message: 'Division created successfully',
             division,
         });
+        
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: 'Server error' });

@@ -70,6 +70,7 @@ const handelGetAllVillage = async (req, res) => {
             message: 'Villages fetched successfully',
             villages,
         });
+        
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Server error' });

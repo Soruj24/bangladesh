@@ -1,15 +1,15 @@
-const { handelCreateUnion, handelGetUnionsInUpazila, handelGetUnions, handleUpdateUnion, handelUnionDelete } = require('../controller/unionController')
+const { handelCreateUnion, handelGetUnionsInUpazila, handelGetUnions, handleUpdateUnion, handelUnionDelete, handelGetSingleUnion } = require('../controller/unionController')
 const { isLoggedIn, isSuperAdmin } = require('../middleware/auth')
 const { runValidation } = require('../validators')
 const { validateName } = require('../validators/division')
 
 const unionRoutes = require('express').Router()
 
-unionRoutes.post('/',validateName,    handelCreateUnion)
-unionRoutes.get("/:upazilaId", handelGetUnionsInUpazila)
+unionRoutes.post('/', handelCreateUnion)
 unionRoutes.get("/", handelGetUnions)
-unionRoutes.delete("/:id", handelUnionDelete)
-unionRoutes.put("/:id", handleUpdateUnion)
+unionRoutes.get("/:divisionId/:districtId/:upazilaId/:upazilaId", handelGetSingleUnion)
+unionRoutes.delete("/:divisionId/:districtId/:upazilaId/:upazilaId", handelUnionDelete)
+unionRoutes.put("/:divisionId/:districtId/:upazilaId/:upazilaId", handleUpdateUnion)
 
 
 

@@ -56,7 +56,7 @@ const Division = () => {
     };
 
     return (
-        <Card className="w-[350px]">
+        <Card className=" ">
             <CardHeader>
                 <CardTitle>Create Division</CardTitle>
             </CardHeader>

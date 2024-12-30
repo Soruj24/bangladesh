@@ -37,8 +37,9 @@ const districtSchema = z.object({
 type DistrictFormValues = z.infer<typeof districtSchema>;
 
 const DistrictAdd = () => {
-    const { data: divisionData, error: divisionError } = useGetDivisionsQuery();
+    const { data: divisionData } = useGetDivisionsQuery();
     const [addDistrict] = useAddDistrictMutation();
+    console.log(divisionData?.divisions);
 
     const {
         register,
@@ -51,8 +52,13 @@ const DistrictAdd = () => {
 
     const onSubmit = async (formData: DistrictFormValues) => {
         try {
-            const response = await addDistrict({ ...formData, divisionId: formData.division }).unwrap();
-            console.log("API Response:", response);
+            const payload = {
+                divisionId: formData.division,
+                name: formData.name,
+            };
+            console.log("Payload:", payload);
+            await addDistrict(payload).unwrap();
+         
             toast({
                 title: "Success",
                 description: "District created successfully.",
@@ -77,7 +83,7 @@ const DistrictAdd = () => {
     };
 
     return (
-        <Card className="w-[350px]">
+        <Card className=" ">
             <CardHeader>
                 <CardTitle>Create District</CardTitle>
             </CardHeader>
@@ -96,7 +102,7 @@ const DistrictAdd = () => {
                                     <SelectValue placeholder="Select a division" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {divisionData?.divisions?.map((division) => (
+                                    {divisionData?.divisions?.map((division: { _id: string; name: string }) => (
                                         <SelectItem
                                             key={division._id}
                                             value={division._id}
