@@ -5,11 +5,11 @@ const { validateName } = require('../validators/division')
 
 const unionRoutes = require('express').Router()
 
-unionRoutes.post('/', handelCreateUnion)
-unionRoutes.get("/", handelGetUnions)
-unionRoutes.get("/:divisionId/:districtId/:upazilaId/:upazilaId", handelGetSingleUnion)
-unionRoutes.delete("/:divisionId/:districtId/:upazilaId/:upazilaId", handelUnionDelete)
-unionRoutes.put("/:divisionId/:districtId/:upazilaId/:upazilaId", handleUpdateUnion)
+unionRoutes.post('/:divisionId/:districtId/:upazilaId', handelCreateUnion)
+unionRoutes.get("/:divisionId/:districtId/:upazilaId", handelGetUnions)
+unionRoutes.get("/:divisionId/:districtId/:upazilaId/:unionId", handelGetSingleUnion)
+unionRoutes.delete("/:divisionId/:districtId/:upazilaId/:unionId", handelUnionDelete)
+unionRoutes.put("/:divisionId/:districtId/:upazilaId/:unionId", handleUpdateUnion)
 
 
 

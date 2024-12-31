@@ -6,11 +6,7 @@ const villageSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please provide a Village name'],
     },
-    union: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Union',
-        required: true,
-    },
+  
 }, { timestamps: true });
 
 const Village = mongoose.model('Village', villageSchema);

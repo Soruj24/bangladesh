@@ -6,8 +6,8 @@ const { validateName } = require('../validators/division')
 const upazilaRoutes = require('express').Router()
 
 
-upazilaRoutes.post('/', handelCreateUpazila)
-upazilaRoutes.get('/', handelGetAllUpazila)
+upazilaRoutes.post('/:divisionId/:districtId', handelCreateUpazila)
+upazilaRoutes.get('/:divisionId/:districtId', handelGetAllUpazila)
 upazilaRoutes.get('/:divisionId/:districtId/:upazilaId', handelGetSingleUpazila)
 upazilaRoutes.put('/:divisionId/:districtId/:upazilaId', handelUpdateUpazila)
 upazilaRoutes.delete('/:divisionId/:districtId/:upazilaId', handelDeleteUpazila)

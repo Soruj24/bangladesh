@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const District = require("../model/District");
 const Division = require("../model/Division");
 const {
@@ -12,20 +13,35 @@ const {
 // Create a District
 const createDistrict = async (req, res) => {
     try {
-        const { name, divisionId } = req.body;
+        const { name } = req.body;
 
+        const { divisionId } = req.params;
+
+        // Check if all required parameters are present
+        if (!divisionId) {
+            return res.status(400).json({ message: "Missing required parameters." });
+        }
+
+        if (
+            !mongoose.Types.ObjectId.isValid(divisionId)
+
+        ) {
+            return res.status(400).json({ message: "Invalid ID format." });
+        }
+
+        // Check if Division exists
+        const division = await Division.findById(divisionId);
+
+        if (!division) {
+            return res.status(404).json({ message: "Division not found" });
+        }
         const nameExists = await District.findOne({ name })
         if (nameExists) {
             return res.status(400).json({
                 message: 'District already exists'
             })
         }
-        const division = await Division.findById(divisionId);
-        if (!division) {
-            return res.status(400).json({
-                message: 'Division not found'
-            })
-        }
+
         const district = await District.create({ name, division: divisionId });
         // Update Division with new District ID
         await Division.findByIdAndUpdate(divisionId, { $push: { districts: district._id } });
@@ -42,11 +58,34 @@ const createDistrict = async (req, res) => {
 };
 
 // Get Districts in a Division
-const getDistrictsInDivision = async (req, res) => {
+const handelGetAllDistricts = async (req, res) => {
     try {
-        const divisionId = req.params.divisionId;
-        const division = await getAllDivisionsInDistrict(divisionId)
+        const { divisionId } = req.params;
 
+        // Check if all required parameters are present
+        if (!divisionId) {
+            return res.status(400).json({ message: "Missing required parameters." });
+        }
+
+        if (
+            !mongoose.Types.ObjectId.isValid(divisionId)
+
+        ) {
+            return res.status(400).json({ message: "Invalid ID format." });
+        }
+
+        // Check if Division exists
+        const division = await Division.findById(divisionId);
+
+        if (!division) {
+            return res.status(404).json({ message: "Division not found" });
+        }
+
+        const allDistrict = await Division.findById(divisionId).populate('districts');
+
+        if (!allDistrict) {
+            return res.status(404).json({ message: 'Division not found' });
+        }
         return res.status(200).json({
             message: 'Districts fetched successfully',
             districts: division,
@@ -57,9 +96,70 @@ const getDistrictsInDivision = async (req, res) => {
     }
 };
 
-const singalDistrict = async (req, res) => {
+const handelSingalDistrict = async (req, res) => {
     try {
-        const { districtId } = req.params;
+        const { divisionId, districtId } = req.params;
+
+        // Check if all required parameters are present
+        if (!divisionId || !districtId) {
+            return res.status(400).json({ message: "Missing required parameters." });
+        }
+
+        if (
+            !mongoose.Types.ObjectId.isValid(divisionId) ||
+            !mongoose.Types.ObjectId.isValid(districtId)
+
+        ) {
+            return res.status(400).json({ message: "Invalid ID format." });
+        }
+
+        // Check if Division exists
+        const division = await Division.findById(divisionId);
+
+        if (!division) {
+            return res.status(404).json({ message: "Division not found" });
+        }
+
+        const district = await District.findOne({ _id: districtId })
+            .populate('upazilas');
+
+
+        return res.status(200).json({
+            message: 'District fetched successfully',
+            district,
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
+
+const handelDistrictDelete = async (req, res) => {
+    try {
+        const { divisionId, districtId } = req.params;
+
+        // Check if all required parameters are present
+        if (!divisionId || !districtId) {
+            return res.status(400).json({ message: "Missing required parameters." });
+        }
+
+        if (
+            !mongoose.Types.ObjectId.isValid(divisionId) ||
+            !mongoose.Types.ObjectId.isValid(districtId)
+
+        ) {
+            return res.status(400).json({ message: "Invalid ID format." });
+        }
+
+        // Check if Division exists
+        const division = await Division.findById(divisionId);
+
+        if (!division) {
+            return res.status(404).json({ message: "Division not found" });
+        }
 
         const district = await District.findOne({ _id: districtId })
             .populate('upazilas');
@@ -67,43 +167,16 @@ const singalDistrict = async (req, res) => {
         if (!district) {
             return res.status(404).json({ message: 'District not found' });
         }
-        return res.status(200).json({
-            message: 'District fetched successfully',
-            district,
-        });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Server error' });
-    }
-};
 
-const handelGetDistrict = async (req, res) => {
-    try {
-
-        const districts = await District.find();
-        if (!districts) {
+        const districtDelete = await District.findByIdAndDelete({ _id: districtId });
+        if (!districtDelete) {
             return res.status(404).json({ message: 'District not found' });
         }
 
-        return res.status(200).json({
-            message: 'District fetched successfully',
-            districts,
-        });
-
-    } catch (error) {
-        return res.status(500).json({ message: 'Server error' });
-    }
-}
-
-const handelDistrictDelete = async (req, res) => {
-    try {
-        const { districtId } = req.params;
-        const district = await districtDelete(districtId)
-        console.log(district)
 
         return res.status(200).json({
             message: 'District deleted successfully',
-            district,
+            districtDelete,
         });
 
     } catch (error) {
@@ -113,12 +186,42 @@ const handelDistrictDelete = async (req, res) => {
 
 const handelDistrictUpdate = async (req, res) => {
     try {
-        const { districtId } = req.params;
         const { name } = req.body;
 
-        const district = await districtUpdated(districtId, name)
+        const { divisionId, districtId } = req.params;
 
+        // Check if all required parameters are present
+        if (!divisionId || !districtId) {
+            return res.status(400).json({ message: "Missing required parameters." });
+        }
 
+        if (
+            !mongoose.Types.ObjectId.isValid(divisionId) ||
+            !mongoose.Types.ObjectId.isValid(districtId)
+
+        ) {
+            return res.status(400).json({ message: "Invalid ID format." });
+        }
+
+        // Check if Division exists
+        const division = await Division.findById(divisionId);
+
+        if (!division) {
+            return res.status(404).json({ message: "Division not found" });
+        }
+
+        const district = await District.findOne({ _id: districtId })
+            .populate('upazilas');
+
+        if (!district) {
+            return res.status(404).json({ message: 'District not found' });
+        }
+
+        const districtUpdated = await District.findByIdAndUpdate({ _id: districtId }, { name }, { new: true });
+        if (!districtUpdated) {
+            return res.status(404).json({ message: 'District not found' });
+        }
+        
         return res.status(200).json({
             message: 'District updated successfully',
             district,
@@ -132,9 +235,9 @@ const handelDistrictUpdate = async (req, res) => {
 
 module.exports = {
     createDistrict,
-    getDistrictsInDivision,
-    singalDistrict,
+    handelGetAllDistricts,
+    handelSingalDistrict,
     handelDistrictDelete,
-    handelDistrictUpdate,
-    handelGetDistrict
+    handelDistrictUpdate
+
 };

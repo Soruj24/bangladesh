@@ -47,12 +47,12 @@ const divisionCreated = async (name) => {
    
 }
 
-const singleDivision = async (id) => {
+const singleDivision = async (divisionId) => {
     try {
-        const division = await Division.findById(id)
+        const division = await Division.findById(divisionId)
         return division
     } catch (error) {
-        if (!mongoose.Types.ObjectId.isValid(id)) {
+        if (!mongoose.Types.ObjectId.isValid(divisionId)) {
             return createError(400, 'Invalid division ID')
         }
         return createError(400, 'division not found')

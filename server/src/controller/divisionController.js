@@ -9,6 +9,10 @@ const handelCreateDivision = async (req, res) => {
     try {
         const { name } = req.body;
 
+        if (!name || name.trim() === '') {
+            return res.status(400).json({ message: "Division name is required" });
+        }
+
         // Check if division name already exists
         const nameExists = await Division.findOne({ name });
         if (nameExists) {
@@ -23,7 +27,7 @@ const handelCreateDivision = async (req, res) => {
             message: 'Division created successfully',
             division,
         });
-        
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: 'Server error' });
@@ -52,7 +56,7 @@ const handelGetAllDivisions = async (req, res) => {
 
 const handelGetSingleDivision = async (req, res) => {
     try {
-        const divisionId = req.params.id;
+        const divisionId = req.params.divisionId;
         const division = await singleDivision(divisionId)
 
         res.status(200).json({
@@ -68,7 +72,7 @@ const handelGetSingleDivision = async (req, res) => {
 
 const handelDeleteDivision = async (req, res) => {
     try {
-        const divisionId = req.params.id;
+        const divisionId = req.params.divisionId;
 
         const division = await divisionDeleted(divisionId)
 
@@ -84,7 +88,7 @@ const handelDeleteDivision = async (req, res) => {
 
 const handelUpdateDivision = async (req, res) => {
     try {
-        const divisionId = req.params.id;
+        const divisionId = req.params.divisionId;
         const { name } = req.body;
 
         // Call divisionUpdated with the correct order of arguments

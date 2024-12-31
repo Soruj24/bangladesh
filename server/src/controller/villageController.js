@@ -1,24 +1,66 @@
+const { default: mongoose } = require("mongoose");
+const District = require("../model/District");
+const Division = require("../model/Division");
 const Union = require("../model/Union");
+const Upazila = require("../model/Upazila");
 const Village = require("../model/Village");
 
 
 // Create a Village
 const createVillage = async (req, res) => {
     try {
-        const { name, unionId } = req.body;
+        const { name } = req.body;
+
+        const { divisionId, districtId, upazilaId, unionId } = req.params;
+
+        // Check if all required parameters are present
+        if (!divisionId || !districtId || !upazilaId || !unionId) {
+            return res.status(400).json({ message: "Missing required parameters." });
+        }
+
+        if (
+            !mongoose.Types.ObjectId.isValid(divisionId) ||
+            !mongoose.Types.ObjectId.isValid(districtId) ||
+            !mongoose.Types.ObjectId.isValid(upazilaId) ||
+            !mongoose.Types.ObjectId.isValid(unionId)
+        ) {
+            return res.status(400).json({ message: "Invalid ID format." });
+        }
+
+        // Check if Division exists
+        const division = await Division.findById(divisionId);
+        if (!division) {
+            return res.status(404).json({ message: "Division not found" });
+        }
+
+        // Check if District exists
+        const district = await District.findById(districtId);
+        if (!district) {
+            return res.status(404).json({ message: "District not found" });
+        }
+
+        // Check if Upazila exists
+        const upazila = await Upazila.findById(upazilaId);
+        if (!upazila) {
+            return res.status(404).json({ message: "Upazila not found" });
+        }
+
+
 
         const nameExists = await Village.findOne({ name })
+        console.log("nameExists", nameExists)
         if (nameExists) {
             return res.status(409).json({ message: 'Village already exists' });
         }
 
         // Validate input
-        if (!name || !unionId) {
-            return res.status(400).json({ message: 'Village name and Union ID are required' });
+        if (!name || name.trim() === '') {
+            return res.status(400).json({ message: 'Village name  are required' });
         }
 
         // Create the Village
-        const village = await Village.create({ name, union: unionId });
+        const village = await Village.create({ name });
+
 
         // Update the Union with the new Village ID
         await Union.findByIdAndUpdate(unionId, { $push: { villages: village._id } });
@@ -27,26 +69,68 @@ const createVillage = async (req, res) => {
             message: 'Village created successfully',
             village,
         });
+
     } catch (error) {
-        console.error(error);
+        console.log(error);
         return res.status(500).json({ message: 'Server error' });
     }
 };
 
 // Get all Villages in a Union
-const getVillagesInUnion = async (req, res) => {
+const handelSinglalVillage = async (req, res) => {
     try {
-        const unionId = req.params.id;
+        const { divisionId, districtId, upazilaId, unionId, villageId } = req.params;
 
-        const union = await Union.findById(unionId).populate('villages');
-        if (!union) {
-            return res.status(404).json({ message: 'Union not found' });
+        // Check if all required parameters are present
+        if (!divisionId || !districtId || !upazilaId || !unionId || !villageId) {
+            return res.status(400).json({ message: "Missing required parameters." });
         }
+
+        if (
+            !mongoose.Types.ObjectId.isValid(divisionId) ||
+            !mongoose.Types.ObjectId.isValid(districtId) ||
+            !mongoose.Types.ObjectId.isValid(upazilaId) ||
+            !mongoose.Types.ObjectId.isValid(unionId) ||
+            !mongoose.Types.ObjectId.isValid(villageId)
+        ) {
+            return res.status(400).json({ message: "Invalid ID format." });
+        }
+
+        // Check if Division exists
+        const division = await Division.findById(divisionId);
+        if (!division) {
+            return res.status(404).json({ message: "Division not found" });
+        }
+
+        // Check if District exists
+        const district = await District.findById(districtId);
+        if (!district) {
+            return res.status(404).json({ message: "District not found" });
+        }
+
+        // Check if Upazila exists
+        const upazila = await Upazila.findById(upazilaId);
+        if (!upazila) {
+            return res.status(404).json({ message: "Upazila not found" });
+        }
+
+        const union = await Union.findById(unionId);
+        if (!union) {
+            return res.status(404).json({ message: "Union not found" });
+        }
+
+        const village = await Village.findById(villageId)
+        if (!village) {
+            return res.status(404).json({ message: "Village not found" });
+        }
+
+
+
 
         return res.status(200).json({
             success: true,
             message: 'Villages fetched successfully',
-            villages: union.villages,
+            village
         });
     } catch (error) {
         console.error(error);
@@ -61,6 +145,47 @@ const getVillagesInUnion = async (req, res) => {
 
 const handelGetAllVillage = async (req, res) => {
     try {
+
+        const { divisionId, districtId, upazilaId, unionId } = req.params;
+
+        // Check if all required parameters are present
+        if (!divisionId || !districtId || !upazilaId || !unionId) {
+            return res.status(400).json({ message: "Missing required parameters." });
+        }
+
+        if (
+            !mongoose.Types.ObjectId.isValid(divisionId) ||
+            !mongoose.Types.ObjectId.isValid(districtId) ||
+            !mongoose.Types.ObjectId.isValid(upazilaId) ||
+            !mongoose.Types.ObjectId.isValid(unionId)
+        ) {
+            return res.status(400).json({ message: "Invalid ID format." });
+        }
+
+        // Check if Division exists
+        const division = await Division.findById(divisionId);
+        if (!division) {
+            return res.status(404).json({ message: "Division not found" });
+        }
+
+        // Check if District exists
+        const district = await District.findById(districtId);
+        if (!district) {
+            return res.status(404).json({ message: "District not found" });
+        }
+
+        // Check if Upazila exists
+        const upazila = await Upazila.findById(upazilaId);
+        if (!upazila) {
+            return res.status(404).json({ message: "Upazila not found" });
+        }
+
+        const union = await Union.findById(unionId);
+        if (!union) {
+            return res.status(404).json({ message: "Union not found" });
+        }
+
+
         const villages = await Village.find({});
         if (!villages) {
             return res.status(404).json({ message: 'Villages not found' });
@@ -70,22 +195,71 @@ const handelGetAllVillage = async (req, res) => {
             message: 'Villages fetched successfully',
             villages,
         });
-        
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Server error' });
     }
+
 };
 
 const handelUpdateVillage = async (req, res) => {
     try {
-        const villageId = req.params.id;
         const { name } = req.body;
+        const { divisionId, districtId, upazilaId, unionId, villageId } = req.params;
+
+        // Check if all required parameters are present
+        if (!divisionId || !districtId || !upazilaId || !unionId || !villageId) {
+            return res.status(400).json({ message: "Missing required parameters." });
+        }
+
+        if (
+            !mongoose.Types.ObjectId.isValid(divisionId) ||
+            !mongoose.Types.ObjectId.isValid(districtId) ||
+            !mongoose.Types.ObjectId.isValid(upazilaId) ||
+            !mongoose.Types.ObjectId.isValid(unionId) ||
+            !mongoose.Types.ObjectId.isValid(villageId)
+        ) {
+            return res.status(400).json({ message: "Invalid ID format." });
+        }
+
+        // Check if Division exists
+        const division = await Division.findById(divisionId);
+        if (!division) {
+            return res.status(404).json({ message: "Division not found" });
+        }
+
+        // Check if District exists
+        const district = await District.findById(districtId);
+        if (!district) {
+            return res.status(404).json({ message: "District not found" });
+        }
+
+        // Check if Upazila exists
+        const upazila = await Upazila.findById(upazilaId);
+        if (!upazila) {
+            return res.status(404).json({ message: "Upazila not found" });
+        }
+
+        const union = await Union.findById(unionId);
+        if (!union) {
+            return res.status(404).json({ message: "Union not found" });
+        }
+
+        const villageE = await Village.findById(villageId)
+
+        if (!villageE) {
+            return res.status(404).json({ message: "Village not found" });
+        }
+
         const village = await Village.findByIdAndUpdate(villageId, { name }, { new: true });
+        
         if (!village) {
             return res.status(404).json({ message: 'Village not found' });
         }
+
         return res.status(200).json({ message: 'Village updated successfully', village });
+        
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Server error' });
@@ -94,17 +268,49 @@ const handelUpdateVillage = async (req, res) => {
 
 const handelDeleteVillage = async (req, res) => {
     try {
-        const villageId = req.params.id; // Ensure this matches the route parameter
-        console.log("Village ID:", villageId);
+        const { divisionId, districtId, upazilaId, unionId, villageId } = req.params;
 
-        // Find the village using the ID
-        const village = await Village.findOne({ _id: villageId }); // Use _id if it's the MongoDB ObjectId
-        console.log("Village found:", village);
+        // Check if all required parameters are present
+        if (!divisionId || !districtId || !upazilaId || !unionId || !villageId) {
+            return res.status(400).json({ message: "Missing required parameters." });
+        }
 
+        if (
+            !mongoose.Types.ObjectId.isValid(divisionId) ||
+            !mongoose.Types.ObjectId.isValid(districtId) ||
+            !mongoose.Types.ObjectId.isValid(upazilaId) ||
+            !mongoose.Types.ObjectId.isValid(unionId) ||
+            !mongoose.Types.ObjectId.isValid(villageId)
+        ) {
+            return res.status(400).json({ message: "Invalid ID format." });
+        }
+
+        // Check if Division exists
+        const division = await Division.findById(divisionId);
+        if (!division) {
+            return res.status(404).json({ message: "Division not found" });
+        }
+
+        // Check if District exists
+        const district = await District.findById(districtId);
+        if (!district) {
+            return res.status(404).json({ message: "District not found" });
+        }
+
+        // Check if Upazila exists
+        const upazila = await Upazila.findById(upazilaId);
+        if (!upazila) {
+            return res.status(404).json({ message: "Upazila not found" });
+        }
+
+        const union = await Union.findById(unionId);
+        if (!union) {
+            return res.status(404).json({ message: "Union not found" });
+        }
+
+        const village = await Village.findById(villageId)
         if (!village) {
-            return res.status(404).json({
-                message: "Village not found",
-            });
+            return res.status(404).json({ message: "Village not found" });
         }
 
         // Delete the village by ID
@@ -133,7 +339,7 @@ const handelDeleteVillage = async (req, res) => {
 
 module.exports = {
     createVillage,
-    getVillagesInUnion,
+    handelSinglalVillage,
     handelGetAllVillage,
     handelDeleteVillage,
     handelUpdateVillage

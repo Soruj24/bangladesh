@@ -2,21 +2,46 @@ const { default: mongoose } = require("mongoose");
 const District = require("../model/District");
 const Upazila = require("../model/Upazila");
 const { upazilaFindById } = require("../services/serviceUpazila");
+const Division = require("../model/Division");
 
 
 
 const handelCreateUpazila = async (req, res) => {
     try {
-        const { name, districtId } = req.body;
+        const { name } = req.body;
+        const { divisionId, districtId, upazilaId } = req.params;
+
+        if (!divisionId || !districtId) {
+            return res.status(400).json({ message: "Missing required parameters." });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(divisionId) ||
+            !mongoose.Types.ObjectId.isValid(districtId)) {
+            return res.status(400).json({ message: "Invalid ID format." });
+        }
+
+        // Check if Division exists
+        const division = await Division.findById(divisionId);
+        if (!division) {
+            return res.status(404).json({ message: "Division not found" });
+        }
+
+        // Check if District exists
+        const districtExists = await District.findById(districtId);
+        if (!districtExists) {
+            return res.status(404).json({ message: "District not found" });
+        }
+
+
+
+
 
         const nameExists = await Upazila.findOne({ name, district: districtId });
         if (nameExists) {
             return res.status(400).json({ message: 'Upazila already exists' });
         }
-        const district = await District.findById(districtId);
-        if (!district) {
-            return res.status(400).json({ message: 'District not found' });
-        }
+
+
         const upazila = await Upazila.create({ name, district: districtId });
         await District.findByIdAndUpdate(districtId, { $push: { upazilas: upazila._id } });
 
@@ -52,11 +77,41 @@ const handelGetAllUpazila = async (req, res) => {
 
 const handelGetSingleUpazila = async (req, res) => {
     try {
+
         const { divisionId, districtId, upazilaId } = req.params;
-        const upazila = await upazilaFindById(res, divisionId, districtId, upazilaId);
-        if (!upazila) {
-            return res.status(404).json({ message: 'Upazila not found' });
+
+        // Check if all required parameters are present
+        if (!divisionId || !districtId || !upazilaId) {
+            return res.status(400).json({ message: "Missing required parameters." });
         }
+
+        if (
+            !mongoose.Types.ObjectId.isValid(divisionId) ||
+            !mongoose.Types.ObjectId.isValid(districtId) ||
+            !mongoose.Types.ObjectId.isValid(upazilaId)
+
+        ) {
+            return res.status(400).json({ message: "Invalid ID format." });
+        }
+
+        // Check if Division exists
+        const division = await Division.findById(divisionId);
+        if (!division) {
+            return res.status(404).json({ message: "Division not found" });
+        }
+
+        // Check if District exists
+        const district = await District.findById(districtId);
+        if (!district) {
+            return res.status(404).json({ message: "District not found" });
+        }
+
+        // Check if Upazila exists
+        const upazila = await Upazila.findById(upazilaId)
+        if (!upazila) {
+            return res.status(404).json({ message: "Upazila not found" });
+        }
+
 
         return res.status(200).json({
             message: "Upazila fetched successfully",
@@ -74,30 +129,60 @@ const handelUpdateUpazila = async (req, res) => {
     try {
         const { divisionId, districtId, upazilaId } = req.params;
         const { name } = req.body;
-        await upazilaFindById(res, divisionId, districtId, upazilaId);
-
-
         // Validate if name is provided
         if (!name || name.trim() === "") {
             return res.status(400).json({ message: "Upazila name is required." });
         }
+        // Check if all required parameters are present
+        if (!divisionId || !districtId || !upazilaId) {
+            return res.status(400).json({ message: "Missing required parameters." });
+        }
+
+        if (
+            !mongoose.Types.ObjectId.isValid(divisionId) ||
+            !mongoose.Types.ObjectId.isValid(districtId) ||
+            !mongoose.Types.ObjectId.isValid(upazilaId)
+
+        ) {
+            return res.status(400).json({ message: "Invalid ID format." });
+        }
+
+        // Check if Division exists
+        const division = await Division.findById(divisionId);
+        if (!division) {
+            return res.status(404).json({ message: "Division not found" });
+        }
+
+        // Check if District exists
+        const district = await District.findById(districtId);
+        if (!district) {
+            return res.status(404).json({ message: "District not found" });
+        }
+
+        // Check if Upazila exists
+        const upazila = await Upazila.findById(upazilaId)
+        if (!upazila) {
+            return res.status(404).json({ message: "Upazila not found" });
+        }
+
+
 
         // Update the upazila by ID
-        const upazila = await Upazila.findByIdAndUpdate(
+        const upazilaUpdate = await Upazila.findByIdAndUpdate(
             upazilaId,
             { name },
             { new: true }
         );
 
         // Check if the upazila exists
-        if (!upazila) {
-            return res.status(404).json({ message: "Upazila not found." });
+        if (!upazilaUpdate) {
+            return res.status(404).json({ message: "Upazila not Updated." });
         }
 
         // Return success response
         return res.status(200).json({
             message: "Upazila updated successfully.",
-            upazila,
+            upazilaUpdate,
         });
     } catch (error) {
         console.log(error)
@@ -110,8 +195,8 @@ const handelDeleteUpazila = async (req, res) => {
     try {
 
         const { divisionId, districtId, upazilaId } = req.params;
-        const re = await upazilaFindById(res, divisionId, districtId, upazilaId);
-        console.log('re--------------', re)
+        console.log("divisionId", districtId, divisionId, upazilaId)
+        await upazilaFindById(res, divisionId, districtId, upazilaId);
         const upazila = await Upazila.findByIdAndDelete(upazilaId);
 
         if (!upazila) {
