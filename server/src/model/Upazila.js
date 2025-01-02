@@ -11,6 +11,7 @@ const upazilaSchema = new mongoose.Schema({
         ref: 'District',
         required: true,
     },
+    upazila: { type: mongoose.Schema.Types.ObjectId, ref: 'Upazila', required: true },
     unions: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Union',

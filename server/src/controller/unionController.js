@@ -49,7 +49,10 @@ const handelCreateUnion = async (req, res) => {
         if (nameExists) {
             return res.status(400).json({ message: 'Union already exists' });
         }
-        const union = await Union.create({ name })
+        const union = await Union.create({ 
+            name ,
+            upazila: upazilaId
+        })
         if (!union) {
             return res.status(400).json({ message: 'Union not found' });
         }
@@ -61,6 +64,7 @@ const handelCreateUnion = async (req, res) => {
 
 
     } catch (error) {
+        console.log(error)
         console.error('Error creating union:', error);
         return res.status(500).json({ message: 'Server error' });
     }
@@ -123,13 +127,47 @@ const handelGetSingleUnion = async (req, res) => {
 
 const handelGetUnions = async (req, res) => {
     try {
-        const union = await Union.find({});
-        console.log(union)
-        if (!union) {
-            return res.status(404).json({ message: 'Union not found' });
+
+        const { divisionId, districtId, upazilaId } = req.params;
+
+        // Check if all required parameters are present
+        if (!divisionId || !districtId || !upazilaId) {
+            return res.status(400).json({ message: "Missing required parameters." });
         }
 
-        return res.status(200).json({ message: 'Union fetched successfully', union });
+        if (
+            !mongoose.Types.ObjectId.isValid(divisionId) ||
+            !mongoose.Types.ObjectId.isValid(districtId) ||
+            !mongoose.Types.ObjectId.isValid(upazilaId)
+        ) {
+            return res.status(400).json({ message: "Invalid ID format." });
+        }
+
+        // Check if Division exists
+        const division = await Division.findById(divisionId);
+        if (!division) {
+            return res.status(404).json({ message: "Division not found" });
+        }
+
+        // Check if District exists
+        const district = await District.findById(districtId);
+        if (!district) {
+            return res.status(404).json({ message: "District not found" });
+        }
+
+        // Check if Upazila exists
+        const upazila = await Upazila.findById(upazilaId).populate('unions');
+        if (!upazila) {
+            return res.status(404).json({ message: "Upazila not found" });
+        }
+
+        
+
+
+        return res.status(200).json({
+            message: 'Union fetched successfully',
+            unions: upazila.unions
+        });
 
     } catch (error) {
         console.error(error);

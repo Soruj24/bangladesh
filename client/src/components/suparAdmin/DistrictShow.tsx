@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { useDeleteDivisionMutation, useUpdateDivisionMutation } from "@/services/dividionApi"
 import { Button } from "../ui/button"
 import { Skeleton } from "../ui/skeleton"
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card"

@@ -8,11 +8,22 @@ import { upozilaApi } from '@/services/upozilaApi'
 import { unionApi } from '@/services/unionsApi'
 import { villageApi } from '@/services/villageApi'
 import { populationApi } from '@/services/populationApi'
+import districtSlice from '../features/districtSlice'
+import divisionSlice from '../features/divisionSlice'
+import upazilaSlice from '../features/upazilaSlice'
+import unionSlice from '../features/unionSlice'
+import villageSlice from '../features/villageSlice'
+
 
 export const store = configureStore({
     reducer: {
 
         auth: authReducer,
+        districtIdData: districtSlice,
+        divisionIdData: divisionSlice,
+        upazilaIdData: upazilaSlice,
+        unionIdData: unionSlice,
+        villageIdData: villageSlice,
 
         [userApi.reducerPath]: userApi.reducer,
         [divisionApi.reducerPath]: divisionApi.reducer,

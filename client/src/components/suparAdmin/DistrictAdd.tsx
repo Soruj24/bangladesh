@@ -1,5 +1,3 @@
-import * as React from "react";
-import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,6 +22,8 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { useGetDivisionsQuery } from "@/services/dividionApi";
 import { useAddDistrictMutation } from "@/services/districtApi";
+import { setDivisionId } from "@/features/divisionSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 // Zod Schema Definition
 const districtSchema = z.object({
@@ -39,7 +39,9 @@ type DistrictFormValues = z.infer<typeof districtSchema>;
 const DistrictAdd = () => {
     const { data: divisionData } = useGetDivisionsQuery();
     const [addDistrict] = useAddDistrictMutation();
-    console.log(divisionData?.divisions);
+    const dispatch = useDispatch();
+    const divisionId = useSelector((state) => (state?.divisionIdData.divisionId));
+    console.log("divisionId", divisionId)
 
     const {
         register,
@@ -53,18 +55,19 @@ const DistrictAdd = () => {
     const onSubmit = async (formData: DistrictFormValues) => {
         try {
             const payload = {
-                divisionId: formData.division,
+                divisionId,
                 name: formData.name,
             };
-            console.log("Payload:", payload);
+
             await addDistrict(payload).unwrap();
-         
+
             toast({
                 title: "Success",
                 description: "District created successfully.",
             });
+
         } catch (err) {
-            console.error("Error creating district:", err?.data?.message);
+            console.error("Error creating district:", err);
             toast({
                 title: "Error",
                 description: err?.data?.message || "Failed to create district. Please try again.",
@@ -83,7 +86,7 @@ const DistrictAdd = () => {
     };
 
     return (
-        <Card className=" ">
+        <Card>
             <CardHeader>
                 <CardTitle>Create District</CardTitle>
             </CardHeader>
@@ -96,13 +99,14 @@ const DistrictAdd = () => {
                             <Select
                                 onValueChange={(value) => {
                                     setValue("division", value); // Sync with form state
+                                    dispatch(setDivisionId(value)); // Update Redux store with selected division ID
                                 }}
                             >
                                 <SelectTrigger id="division">
                                     <SelectValue placeholder="Select a division" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {divisionData?.divisions?.map((division: { _id: string; name: string }) => (
+                                    {divisionData?.divisions?.map((division) => (
                                         <SelectItem
                                             key={division._id}
                                             value={division._id}

@@ -1,64 +1,62 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export interface District {
-    id: number
-    name: string
+    id: number;
+    name: string;
 }
 
-type DistrictsResponse = District[]
+type DistrictsResponse = District[];
 
 export const districtApi = createApi({
     reducerPath: 'districtsApi',
     baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api' }),
     tagTypes: ['Districts'],
     endpoints: (build) => ({
-        getDistricts: build.query<DistrictsResponse, void>({
-            query: () => 'districts',
+        getDistricts: build.query<DistrictsResponse, { divisionId: number }>({
+            query: (divisionId) => `districts/${divisionId}`,
             providesTags: (result) =>
-                Array.isArray(result)
+                Array.isArray(result) && result.length > 0 // চেক করছি যে result একটি অ্যারে কিনা
                     ? [
-                        ...result.map(({ id }) => ({ type: 'Districts', id }) as const),
+                        ...result.map(({ id }) => ({ type: 'Districts', id } as const)),
                         { type: 'Districts', id: 'LIST' },
                     ]
                     : [{ type: 'Districts', id: 'LIST' }],
+
         }),
-        addDistrict: build.mutation<District, Partial<District>>({
-            query(body) {
-                return {
-                    url: `districts`,
-                    method: 'POST',
-                    body,
-                }
-            },
+        addDistrict: build.mutation<District, { name: string; divisionId: number }>({
+            query: ({ name, divisionId }) => ({
+                url: `districts/${divisionId}`,
+                method: 'POST',
+                body: { name },
+            }),
             invalidatesTags: [{ type: 'Districts', id: 'LIST' }],
         }),
-        getDistrict: build.query<District, number>({
-            query: (id) => `district/${id}`,
-            providesTags: (result, error, id) => [{ type: 'Districts', id }],
+        getDistrict: build.query<District, { divisionId: number; districtId: number }>({
+            query: ({ divisionId, districtId }) => `district/${divisionId}/${districtId}`,
+            providesTags: (result, error, { districtId }) => [{ type: 'Districts', id: districtId }],
         }),
-        updateDistrict: build.mutation<District, Partial<District>>({
-            query(data) {
-                const { id, ...body } = data
-                return {
-                    url: `districts/${id}`,
-                    method: 'PUT',
-                    body,
-                }
-            },
-
-            invalidatesTags: (result, error, { id }) => [{ type: 'Districts', id }],
+        updateDistrict: build.mutation<
+            District,
+            { divisionId: number; districtId: number; name: string }
+        >({
+            query: ({ divisionId, districtId, ...body }) => ({
+                url: `districts/${divisionId}/${districtId}`,
+                method: 'PUT',
+                body,
+            }),
+            invalidatesTags: (result, error, { districtId }) => [{ type: 'Districts', id: districtId }],
         }),
-        deleteDistrict: build.mutation<{ success: boolean; id: number }, number>({
-            query(id) {
-                return {
-                    url: `districts/${id}`,
+        deleteDistrict: build.mutation<{ success: boolean }, { divisionId: number; districtId: number }>(
+            {
+                query: ({ divisionId, districtId }) => ({
+                    url: `districts/${divisionId}/${districtId}`,
                     method: 'DELETE',
-                }
-            },
-            invalidatesTags: (result, error, id) => [{ type: 'Districts', id }],
-        }),
+                }),
+                invalidatesTags: (result, error, { districtId }) => [{ type: 'Districts', id: districtId }],
+            }
+        ),
     }),
-})
+});
 
 export const {
     useGetDistrictsQuery,
@@ -66,4 +64,4 @@ export const {
     useGetDistrictQuery,
     useUpdateDistrictMutation,
     useDeleteDistrictMutation,
-} = districtApi
+} = districtApi;

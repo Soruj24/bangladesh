@@ -60,12 +60,15 @@ const createDistrict = async (req, res) => {
 // Get Districts in a Division
 const handelGetAllDistricts = async (req, res) => {
     try {
+
         const { divisionId } = req.params;
+        console.log("divisionId", divisionId)
 
         // Check if all required parameters are present
         if (!divisionId) {
             return res.status(400).json({ message: "Missing required parameters." });
         }
+
 
         if (
             !mongoose.Types.ObjectId.isValid(divisionId)
@@ -75,21 +78,21 @@ const handelGetAllDistricts = async (req, res) => {
         }
 
         // Check if Division exists
-        const division = await Division.findById(divisionId);
+        const division = await Division.findById(divisionId).populate('districts');
 
         if (!division) {
             return res.status(404).json({ message: "Division not found" });
         }
+        console.log("division", division)
 
-        const allDistrict = await Division.findById(divisionId).populate('districts');
 
-        if (!allDistrict) {
-            return res.status(404).json({ message: 'Division not found' });
-        }
         return res.status(200).json({
             message: 'Districts fetched successfully',
-            districts: division,
+            division
         });
+
+        
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Server error' });
@@ -221,7 +224,7 @@ const handelDistrictUpdate = async (req, res) => {
         if (!districtUpdated) {
             return res.status(404).json({ message: 'District not found' });
         }
-        
+
         return res.status(200).json({
             message: 'District updated successfully',
             district,

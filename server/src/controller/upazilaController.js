@@ -9,7 +9,7 @@ const Division = require("../model/Division");
 const handelCreateUpazila = async (req, res) => {
     try {
         const { name } = req.body;
-        const { divisionId, districtId, upazilaId } = req.params;
+        const { divisionId, districtId } = req.params;
 
         if (!divisionId || !districtId) {
             return res.status(400).json({ message: "Missing required parameters." });
@@ -59,15 +59,35 @@ const handelCreateUpazila = async (req, res) => {
 };
 const handelGetAllUpazila = async (req, res) => {
     try {
-        const upazilas = await Upazila.find({})
 
-        if (!upazilas) {
-            return res.status(404).json({ message: 'Upazilas not found' });
+        const { divisionId, districtId } = req.params;
+
+        if (!divisionId || !districtId) {
+            return res.status(400).json({ message: "Missing required parameters." });
         }
 
+        if (!mongoose.Types.ObjectId.isValid(divisionId) ||
+            !mongoose.Types.ObjectId.isValid(districtId)) {
+            return res.status(400).json({ message: "Invalid ID format." });
+        }
+
+        // Check if Division exists
+        const division = await Division.findById(divisionId);
+        if (!division) {
+            return res.status(404).json({ message: "Division not found" });
+        }
+
+        // Check if District exists
+        const districtExists = await District.findById(districtId).populate('upazilas');
+        if (!districtExists) {
+            return res.status(404).json({ message: "District not found" });
+        }
+
+
+         
         return res.status(200).json({
             message: 'Upazilas fetched successfully',
-            upazilas,
+            upazilas: districtExists.upazilas
         });
     } catch (error) {
         console.error(error);

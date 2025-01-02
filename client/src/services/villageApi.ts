@@ -1,66 +1,74 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export interface Village {
-    id: number
-    name: string
+    id: number;
+    name: string;
 }
 
-type VillagesResponse = Village[]
+type VillagesResponse = Village[];
+
+// Input type for fetching villages based on hierarchical IDs
+interface GetVillagesParams {
+    divisionId: number;
+    districtId: number;
+    upazilaId: number;
+    unionId: number;
+}
+
+// Input type for adding a new village
+interface AddVillageParams {
+    divisionId: number;
+    districtId: number;
+    upazilaId: number;
+    unionId: number;
+    name: string;
+}
 
 export const villageApi = createApi({
     reducerPath: 'villagesApi',
     baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api' }), // Adjust base URL if necessary
     tagTypes: ['Villages'],
     endpoints: (build) => ({
-        getVillages: build.query<VillagesResponse, void>({
-            query: () => 'villages', // Adjust endpoint to 'villages'
-            providesTags: (result) => {
-                if (Array.isArray(result)) {
-                    return [
-                        ...result.map(({ id }) => ({ type: 'Villages', id }) as const),
+        getVillages: build.query<VillagesResponse, GetVillagesParams>({
+            query: ({ divisionId, districtId, upazilaId, unionId }) =>
+                `villages/${divisionId}/${districtId}/${upazilaId}/${unionId}`,
+            providesTags: (result) =>
+                result
+                    ? [
+                        ...result.map(({ id }) => ({ type: 'Villages', id } as const)),
                         { type: 'Villages', id: 'LIST' },
                     ]
-                }
-                // If the result is not an array, return just the LIST tag
-                return [{ type: 'Villages', id: 'LIST' }]
-            },
+                    : [{ type: 'Villages', id: 'LIST' }],
         }),
-        addVillage: build.mutation<Village, Partial<Village>>({
-            query(body) {
-                return {
-                    url: 'villages', // Adjust endpoint to 'village'
-                    method: 'POST',
-                    body,
-                }
-            },
+        addVillage: build.mutation<Village, AddVillageParams>({
+            query: ({ divisionId, districtId, upazilaId, unionId, name }) => ({
+                url: `villages/${divisionId}/${districtId}/${upazilaId}/${unionId}`,
+                method: 'POST',
+                body: { name },
+            }),
             invalidatesTags: [{ type: 'Villages', id: 'LIST' }],
         }),
         getVillage: build.query<Village, number>({
-            query: (id) => `village/${id}`, // Adjust endpoint to 'village/{id}'
+            query: (id) => `village/${id}`,
             providesTags: (result, error, id) => [{ type: 'Villages', id }],
         }),
         updateVillage: build.mutation<Village, Partial<Village>>({
-            query(data) {
-                const { id, ...body } = data
-                return {
-                    url: `villages/${id}`, // Adjust endpoint to 'village/{id}'
-                    method: 'PUT',
-                    body,
-                }
-            },
+            query: ({ id, ...body }) => ({
+                url: `village/${id}`,
+                method: 'PUT',
+                body,
+            }),
             invalidatesTags: (result, error, { id }) => [{ type: 'Villages', id }],
         }),
         deleteVillage: build.mutation<{ success: boolean; id: number }, number>({
-            query(id) {
-                return {
-                    url: `villages/${id}`, // Adjust endpoint to 'village/{id}'
-                    method: 'DELETE',
-                }
-            },
+            query: (id) => ({
+                url: `village/${id}`,
+                method: 'DELETE',
+            }),
             invalidatesTags: (result, error, id) => [{ type: 'Villages', id }],
         }),
     }),
-})
+});
 
 export const {
     useGetVillagesQuery,
@@ -68,4 +76,4 @@ export const {
     useGetVillageQuery,
     useUpdateVillageMutation,
     useDeleteVillageMutation,
-} = villageApi
+} = villageApi;

@@ -17,6 +17,7 @@ const unionSchema = new mongoose.Schema({
     }],
 }, { timestamps: true });
 
+
 const Union = mongoose.model('Union', unionSchema);
 
 module.exports = Union;

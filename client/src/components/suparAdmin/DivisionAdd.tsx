@@ -81,7 +81,7 @@ const Division = () => {
             </CardContent>
             <CardFooter className="flex justify-between">
                 <Button type="submit" form="divisionForm">
-                    Deploy
+                    Division
                 </Button>
             </CardFooter>
         </Card>

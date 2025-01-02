@@ -1,5 +1,4 @@
-import * as React from "react";
-import { useState } from "react";
+
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,6 +24,9 @@ import { toast } from "@/hooks/use-toast";
 import { useGetDistrictsQuery } from "@/services/districtApi";
 import { useAddUpozilaMutation } from "@/services/upozilaApi";
 
+import { useDispatch, useSelector } from "react-redux";
+import { setDistrictId } from "@/features/districtSlice";
+
 // Zod Schema Definition
 const districtSchema = z.object({
     division: z.string().nonempty("Division is required"),
@@ -34,11 +36,22 @@ const districtSchema = z.object({
         .min(2, "Name must be at least 2 characters"),
 });
 
+
 type DistrictFormValues = z.infer<typeof districtSchema>;
 
 const UpozilaAdd = () => {
-    const { data } = useGetDistrictsQuery();
+    const dispatch = useDispatch();
+
+
+    const divisionId = useSelector((state) => (state?.divisionIdData?.divisionId));
+    const districtId = useSelector((state) => (state?.districtIdData?.districtId));
+    const { data: districtData } = useGetDistrictsQuery(divisionId);
+    console.log("districtData", districtData?.division?.districts)
+
     const [addUpozila] = useAddUpozilaMutation();
+
+
+
     const {
         register,
         handleSubmit,
@@ -48,15 +61,25 @@ const UpozilaAdd = () => {
         resolver: zodResolver(districtSchema),
     });
 
+
+
     const onSubmit = async (formData: DistrictFormValues) => {
         try {
-            const response = await addUpozila({ ...formData, districtId: formData.division }).unwrap();
+            const response = await addUpozila({
+                body: formData,
+                divisionId,
+                districtId,
+            }).unwrap();
+
+            console.log('Response:', response);
+
             toast({
                 title: "Success",
                 description: "District created successfully.",
             });
-        } catch (err) {
+        } catch (err: any) {
             console.error("Error creating district:", err?.data?.message);
+
             toast({
                 title: "Error",
                 description: err?.data?.message || "Failed to create district. Please try again.",
@@ -84,22 +107,23 @@ const UpozilaAdd = () => {
                     <div className="grid w-full items-center gap-4">
                         {/* Division Field */}
                         <div className="flex flex-col space-y-1.5">
-                            <Label htmlFor="division">Division</Label>
+                            <Label htmlFor="division">District</Label>
                             <Select
                                 onValueChange={(value) => {
                                     setValue("division", value); // Sync with form state
+                                    dispatch(setDistrictId(value));
                                 }}
                             >
                                 <SelectTrigger id="division">
-                                    <SelectValue placeholder="Select a division" />
+                                    <SelectValue placeholder="Select a district" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {data?.districts?.map((division) => (
+                                    {districtData?.division?.districts?.map((district) => (
                                         <SelectItem
-                                            key={division._id}
-                                            value={division._id}
+                                            key={district._id}
+                                            value={district._id}
                                         >
-                                            {division.name}
+                                            {district.name}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>

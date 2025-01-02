@@ -22,9 +22,10 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { useGetDistrictsQuery } from "@/services/districtApi";
-import { useAddUpozilaMutation, useGetUpazilasQuery } from "@/services/upozilaApi";
+import { useGetUpazilasQuery } from "@/services/upozilaApi";
 import { useAddUnionMutation } from "@/services/unionsApi";
+import { useDispatch, useSelector } from "react-redux";
+import { setUpazilaId } from "@/features/upazilaSlice";
 
 // Zod Schema Definition
 const districtSchema = z.object({
@@ -38,8 +39,13 @@ const districtSchema = z.object({
 type DistrictFormValues = z.infer<typeof districtSchema>;
 
 const UnionAdd = () => {
-    const { data, error } = useGetUpazilasQuery();
+    const dispatch = useDispatch();
     const [addUnion] = useAddUnionMutation();
+    const divisionId = useSelector((state: { divisionIdData: { divisionId: string } }) => (state?.divisionIdData?.divisionId));
+    const districtId = useSelector((state: { districtIdData: { districtId: string } }) => (state?.districtIdData?.districtId));
+    const upazilaId = useSelector((state: { upazilaIdData: { upazilaId: string } }) => (state?.upazilaIdData?.upazilaId?.districtId));
+    const { data: unionData } = useGetUpazilasQuery({ divisionId, districtId });
+    console.log('upazila', unionData)
     const {
         register,
         handleSubmit,
@@ -51,7 +57,13 @@ const UnionAdd = () => {
 
     const onSubmit = async (formData: DistrictFormValues) => {
         try {
-            const response = await addUnion({ ...formData, upazilaId: formData.division }).unwrap();
+            const response = await addUnion({
+                body: formData,
+                divisionId,
+                districtId,
+                upazilaId,
+            }).unwrap();
+            console.log('response', response)
             toast({
                 title: "Success",
                 description: "District created successfully.",
@@ -85,20 +97,22 @@ const UnionAdd = () => {
                     <div className="grid w-full items-center gap-4">
                         {/* Division Field */}
                         <div className="flex flex-col space-y-1.5">
-                            <Label htmlFor="division">Division</Label>
+                            <Label htmlFor="division">Upozila</Label>
                             <Select
                                 onValueChange={(value) => {
                                     setValue("division", value); // Sync with form state
+                                    dispatch(setUpazilaId({ districtId: value }));
                                 }}
                             >
                                 <SelectTrigger id="division">
                                     <SelectValue placeholder="Select a division" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {data?.upazilas?.map((division) => (
+                                    {unionData?.upazilas?.map((division) => (
                                         <SelectItem
                                             key={division._id}
                                             value={division._id}
+
                                         >
                                             {division.name}
                                         </SelectItem>

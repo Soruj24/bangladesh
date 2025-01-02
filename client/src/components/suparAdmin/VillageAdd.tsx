@@ -24,6 +24,8 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { useGetUnionsQuery } from "@/services/unionsApi";
 import { useAddVillageMutation } from "@/services/villageApi";
+import { useDispatch, useSelector } from "react-redux";
+import { setVillageId } from "@/features/villageSlice";
 
 // Zod Schema Definition
 const districtSchema = z.object({
@@ -37,7 +39,14 @@ const districtSchema = z.object({
 type DistrictFormValues = z.infer<typeof districtSchema>;
 
 const VillageAdd = () => {
-    const { data, error } = useGetUnionsQuery();
+
+    const dispatch = useDispatch()
+    const divisionId = useSelector((state: { divisionIdData: { divisionId: string } }) => (state?.divisionIdData?.divisionId));
+    const districtId = useSelector((state: { districtIdData: { districtId: string } }) => (state?.districtIdData?.districtId));
+    const upazilaId = useSelector((state: { upazilaIdData: { upazilaId: string } }) => (state?.upazilaIdData?.upazilaId?.districtId));
+    const unionId = useSelector((state: { villageIdData: { villageId: string } }) => (state.villageIdData.villageId))
+    const { data: unionData } = useGetUnionsQuery({ divisionId, districtId, upazilaId });
+
     const [addVillage] = useAddVillageMutation();
     const {
         register,
@@ -50,16 +59,29 @@ const VillageAdd = () => {
 
     const onSubmit = async (formData: DistrictFormValues) => {
         try {
-            const response = await addVillage({ ...formData, unionId: formData.division }).unwrap();
+            // Combine all necessary data into a single object
+            const payload = {
+                ...formData,
+                divisionId,
+                districtId,
+                upazilaId,
+                unionId,
+            };
+
+            // Call the mutation with the combined payload
+            const response = await addVillage(payload).unwrap();
+
+            console.log('response', response);
+
             toast({
                 title: "Success",
-                description: "District created successfully.",
+                description: "Village created successfully.",
             });
         } catch (err) {
-            console.error("Error creating district:", err?.data?.message);
+            console.error("Error creating village:", err?.data?.message);
             toast({
                 title: "Error",
-                description: err?.data?.message || "Failed to create district. Please try again.",
+                description: err?.data?.message || "Failed to create village. Please try again.",
                 variant: "destructive",
             });
         }
@@ -84,17 +106,18 @@ const VillageAdd = () => {
                     <div className="grid w-full items-center gap-4">
                         {/* Division Field */}
                         <div className="flex flex-col space-y-1.5">
-                            <Label htmlFor="division">Division</Label>
+                            <Label htmlFor="division">Union</Label>
                             <Select
                                 onValueChange={(value) => {
                                     setValue("division", value); // Sync with form state
+                                    dispatch(setVillageId(value))
                                 }}
                             >
                                 <SelectTrigger id="division">
                                     <SelectValue placeholder="Select a division" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {data?.union?.map((division) => (
+                                    {unionData?.unions?.map((division) => (
                                         <SelectItem
                                             key={division._id}
                                             value={division._id}
