@@ -48,7 +48,6 @@ const UserProfile = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-52 mt-6 ">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
                 <DropdownMenuGroup>
 
                     {

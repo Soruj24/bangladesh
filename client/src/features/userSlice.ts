@@ -1,9 +1,18 @@
-import { createSlice, } from '@reduxjs/toolkit';
-// Define the User type
+import { createSlice } from '@reduxjs/toolkit';
 
+// Helper function to safely parse JSON
+const safeParseJSON = (value: string | null) => {
+    try {
+        return value ? JSON.parse(value) : null;
+    } catch (error) {
+        console.error("Error parsing JSON from localStorage:", error);
+        return null;
+    }
+};
 
+// Define the initial state
 const initialState = {
-    user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null,
+    user: safeParseJSON(localStorage.getItem('user')),
     isAuthenticated: !!localStorage.getItem('token'), // Check if a token exists
 };
 
@@ -14,12 +23,12 @@ const userSlice = createSlice({
         setUser: (state, action) => {
             state.user = action.payload;
             state.isAuthenticated = true;
-            localStorage.setItem('token', state.user.accessToken);
-            localStorage.setItem('accessToken', state.user.accessToken);
-            localStorage.setItem('refreshToken', state.user.refreshToken);
-            localStorage.setItem('user', JSON.stringify(state.user)); // Store user in localStorage
+            localStorage.setItem('token', state.user?.accessToken || '');
+            localStorage.setItem('accessToken', state.user?.accessToken || '');
+            localStorage.setItem('refreshToken', state.user?.refreshToken || '');
+            localStorage.setItem('user', JSON.stringify(state.user || {})); // Store user in localStorage
         },
-
+        
         logout: (state) => {
             state.user = null;
             state.isAuthenticated = false;
