@@ -33,13 +33,15 @@ import {
 import { useState } from "react";
 
 type Division = {
-  id: string;
+  _id: string;
   value: string;
-  label: string;
+  name: string;
 };
 
+
+
+
 const districtSchema = z.object({
-  divisionError: z.string().nonempty("Division is required"),
   name: z
     .string()
     .nonempty("Name is required")
@@ -49,25 +51,29 @@ const districtSchema = z.object({
 type DistrictFormValues = z.infer<typeof districtSchema>;
 
 const DistrictAdd: React.FC = () => {
-  const { data: divisionData } = useGetDivisionsQuery();
+  const { data: divisionData, isLoading, refetch } = useGetDivisionsQuery();
   const [addDistrict] = useAddDistrictMutation();
   const [divisionId, setDivisionId] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
   const [value, setValue] = useState<string>("");
-console.log(divisionData)
+
+  console.log(divisionId);
+
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<DistrictFormValues>({
     resolver: zodResolver(districtSchema),
   });
 
+  const divisionItem = divisionData?.divisions
+
   const onSubmit = async (formData: DistrictFormValues) => {
-    const payload = { divisionId, name: formData.name };
+    const payload = { divisionId: String(divisionId), name: formData.name };
 
     try {
-      
       await addDistrict(payload).unwrap();
 
       toast({
@@ -75,6 +81,11 @@ console.log(divisionData)
         description: "District created successfully.",
       });
 
+      // Refetch division data and reset form
+      refetch();
+      reset();
+      setValue("");
+      setDivisionId("");
     } catch (err) {
       toast({
         title: "Error",
@@ -86,8 +97,12 @@ console.log(divisionData)
     }
   };
 
-  if (!divisionData) {
+  if (isLoading) {
     return <p>Loading divisions...</p>;
+  }
+
+  if (!divisionData) {
+    return <p>No divisions available. Please try again later.</p>;
   }
 
   return (
@@ -99,6 +114,7 @@ console.log(divisionData)
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid w-full items-center gap-4">
             {/* Division Field */}
+            <p className="text-sm font-medium leading-none">Select Division</p>
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -108,7 +124,7 @@ console.log(divisionData)
                   className="justify-between"
                 >
                   {value
-                    ? divisionData?.divisions?.find(
+                    ? divisionItem?.find(
                         (division: Division) => division.value === value
                       )?.label
                     : "Select Division..."}
@@ -124,15 +140,15 @@ console.log(divisionData)
                   <CommandList>
                     <CommandEmpty>No division found.</CommandEmpty>
                     <CommandGroup>
-                      {  divisionData.divisions.length > 0 &&   divisionData?.divisions?.map((division: Division) => (
+                      {divisionItem?.map((division: Division) => (
                         <CommandItem
-                          key={division.value}
-                          value={division.label}
+                          key={division._id}
+                          value={division.name}
                           onSelect={(currentValue) => {
                             setValue(
                               currentValue === value ? "" : currentValue
                             );
-                            setDivisionId(division?.id);
+                            setDivisionId(division._id);
                             setOpen(false);
                           }}
                         >
@@ -144,7 +160,7 @@ console.log(divisionData)
                                 : "opacity-0"
                             )}
                           />
-                          {division.label}
+                          {division.name}
                         </CommandItem>
                       ))}
                     </CommandGroup>
@@ -152,11 +168,8 @@ console.log(divisionData)
                 </Command>
               </PopoverContent>
             </Popover>
-            {errors.divisionError && (
-              <p className="text-sm text-red-600">
-                {errors.divisionError.message}
-              </p>
-            )}
+
+           
 
             {/* Name Field */}
             <div className="flex flex-col space-y-1.5">
@@ -172,7 +185,9 @@ console.log(divisionData)
             </div>
           </div>
           <CardFooter className="flex justify-end mt-4">
-            <Button type="submit">Add District</Button>
+            <Button type="submit" >
+              Add District
+            </Button>
           </CardFooter>
         </form>
       </CardContent>

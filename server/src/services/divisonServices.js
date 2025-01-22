@@ -4,11 +4,7 @@ const createError = require('http-errors');
 
 const getDivision = async (name) => {
     try {
-        const nameExists = await Division.findOne({ name })
         
-        if (nameExists) {
-            return createError(409, 'Division already exists')
-        }
 
         const divisions = await Division.find()
             .populate({

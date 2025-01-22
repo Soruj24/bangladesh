@@ -29,15 +29,22 @@ const DivisionShow = () => {
             description: 'Division deleted successfully',
             variant: 'default',
         })
+        
         refetch()
     }
 
-    const handleUpdate = (division: any) => {
+    interface Division {
+        _id: number;
+        name: string;
+        // Add other properties if needed
+    }
+
+    const handleUpdate = (division: Division) => {
         setCurrentDivision(division)
         setIsDialogOpen(true)
     }
 
-    const handleUpdateSubmit = async (updatedDivision: any) => {
+    const handleUpdateSubmit = async (updatedDivision: Division) => {
         console.log("Updated Division:", updatedDivision);
         if (!updatedDivision?.name?.trim()) {
             toast({
@@ -93,15 +100,15 @@ const DivisionShow = () => {
     }
 
     if (isError) {
-        return <h1>Error</h1>
+        return <h1>Error </h1>
     }
 
     return (
         <div className="mt-4 sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {
-                data?.divisions.map((division) => {
+                data?.divisions.map((division: Division) => {
                     return (
-                        <Card key={division.id} className="max-w-xs p-4 border shadow-lg">
+                        <Card key={division._id} className="max-w-xs p-4 border shadow-lg">
                             <CardHeader>
                                 <h2 className="text-lg font-semibold">{division.name}</h2>
                             </CardHeader>

@@ -6,11 +6,17 @@ const upazilaSchema = new mongoose.Schema(
             type: String,
             required: [true, 'Please provide an Upazila name'],
         },
+        upazilas: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Upazila',
+            },
+        ],
         value: {
-            type: String, // value ফিল্ড সংজ্ঞায়িত
+            type: String, 
         },
         label: {
-            type: String, // label ফিল্ড সংজ্ঞায়িত
+            type: String,  
         },
         district: {
             type: mongoose.Schema.Types.ObjectId,
@@ -27,14 +33,12 @@ const upazilaSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Pre-save middleware: value এবং label ফিল্ড সেট করা
 upazilaSchema.pre('save', function (next) {
-    this.value = this.name; // value ফিল্ডে name এর মান সেট
-    this.label = this.name; // label ফিল্ডে name এর মান সেট
+    this.value = this.name; 
+    this.label = this.name; 
     next();
 });
 
-// Upazila মডেল তৈরি
 const Upazila = mongoose.model('Upazila', upazilaSchema);
 
 module.exports = Upazila;

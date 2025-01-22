@@ -8,7 +8,7 @@ const { getDivision, divisionCreated, singleDivision, divisionDeleted, divisionU
 const handelCreateDivision = async (req, res) => {
     try {
         const { name } = req.body;
-
+        console.log("name", name)
         if (!name || name.trim() === '') {
             return res.status(400).json({ message: "Division name is required" });
         }
@@ -40,9 +40,28 @@ const handelCreateDivision = async (req, res) => {
 const handelGetAllDivisions = async (req, res) => {
 
     try {
-        const { name } = req.body
 
-        const divisions = await getDivision(name)
+        const divisions = await Division.find()
+            .populate({
+                path: 'districts',
+                model: 'District',
+                populate: {
+                    path: 'upazila',
+                    model: 'Upazila',
+                    populate: {
+                        path: 'unions',
+                        model: 'Union',
+                        populate: {
+                            path: 'villages',
+                            model: 'Village',
+                        },
+                    },
+                },
+            })
+
+        if (!divisions || divisions.length === 0) {
+            return res.status(404).json({ message: 'Divisions not found' });
+        }
 
         return res.status(200).json({
             message: 'Divisions fetched successfully',
@@ -50,7 +69,8 @@ const handelGetAllDivisions = async (req, res) => {
         });
 
     } catch (error) {
-        return createError(400, 'division not found')
+        console.log(error)
+        return res.status(500).json({ message: 'Server error' });
     }
 };
 
