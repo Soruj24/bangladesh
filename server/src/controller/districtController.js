@@ -24,7 +24,6 @@ const createDistrict = async (req, res) => {
 
         if (
             !mongoose.Types.ObjectId.isValid(divisionId)
-
         ) {
             return res.status(400).json({ message: "Invalid ID format." });
         }
@@ -70,10 +69,7 @@ const handelGetAllDistricts = async (req, res) => {
         }
 
 
-        if (
-            !mongoose.Types.ObjectId.isValid(divisionId)
-
-        ) {
+        if (!mongoose.Types.ObjectId.isValid(divisionId)) {
             return res.status(400).json({ message: "Invalid ID format." });
         }
 
@@ -83,8 +79,7 @@ const handelGetAllDistricts = async (req, res) => {
         if (!division) {
             return res.status(404).json({ message: "Division not found" });
         }
-        console.log("division", division)
-
+         
 
         return res.status(200).json({
             message: 'Districts fetched successfully',
@@ -124,7 +119,7 @@ const handelSingalDistrict = async (req, res) => {
         }
 
         const district = await District.findOne({ _id: districtId })
-            .populate('upazilas');
+            .populate('upazila');
 
 
         return res.status(200).json({
@@ -165,7 +160,7 @@ const handelDistrictDelete = async (req, res) => {
         }
 
         const district = await District.findOne({ _id: districtId })
-            .populate('upazilas');
+            .populate('upazila');
 
         if (!district) {
             return res.status(404).json({ message: 'District not found' });
@@ -214,7 +209,7 @@ const handelDistrictUpdate = async (req, res) => {
         }
 
         const district = await District.findOne({ _id: districtId })
-            .populate('upazilas');
+            .populate('upazila');
 
         if (!district) {
             return res.status(404).json({ message: 'District not found' });

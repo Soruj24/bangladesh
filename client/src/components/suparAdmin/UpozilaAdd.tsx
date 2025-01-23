@@ -1,162 +1,216 @@
-
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { toast } from "@/hooks/use-toast";
 import { useGetDistrictsQuery } from "@/services/districtApi";
 import { useAddUpozilaMutation } from "@/services/upozilaApi";
-
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setDistrictId } from "@/features/districtSlice";
 
 // Zod Schema Definition
 const districtSchema = z.object({
-    division: z.string().nonempty("Division is required"),
-    name: z
-        .string()
-        .nonempty("Name is required")
-        .min(2, "Name must be at least 2 characters"),
+  division: z.string().nonempty("Division is required"),
+  name: z
+    .string()
+    .nonempty("Name is required")
+    .min(2, "Name must be at least 2 characters"),
 });
-
 
 type DistrictFormValues = z.infer<typeof districtSchema>;
 
 const UpozilaAdd = () => {
-    const dispatch = useDispatch();
+  const [open, setOpen] = useState<boolean>(false);
+  const [value, setValue] = useState<string>("");
+  const dispatch = useDispatch();
 
+  interface RootState {
+    districtIdData: {
+      districtId: string;
+    };
+    divisionIdData: {
+      divisionId: string;
+    };
+  }
 
-    const divisionId = useSelector((state) => (state?.divisionIdData?.divisionId));
-    const districtId = useSelector((state) => (state?.districtIdData?.districtId));
-    const { data: districtData } = useGetDistrictsQuery(divisionId);
-    console.log("districtData", districtData?.division?.districts)
+  const divisionId = useSelector(
+    (state: RootState) => state?.divisionIdData?.divisionId
+  );
 
-    const [addUpozila] = useAddUpozilaMutation();
+  console.log("divisionId", divisionId);
 
+  const districtId = useSelector(
+    (state: { districtIdData: { districtId: string } }) =>
+      state?.districtIdData.districtId
+  );
+  console.log("districtId", districtId);
+  const { data: districtData } = useGetDistrictsQuery(divisionId);
 
+  const divisionItem = districtData?.division?.districts || [];
 
-    const {
-        register,
-        handleSubmit,
-        setValue,
-        formState: { errors },
-    } = useForm<DistrictFormValues>({
-        resolver: zodResolver(districtSchema),
+  const [addUpozila] = useAddUpozilaMutation();
+
+  const {
+    register,
+    handleSubmit,
+    setValue: setFormValue,
+    formState: { errors },
+  } = useForm<DistrictFormValues>({
+    resolver: zodResolver(districtSchema),
+  });
+
+  const onSubmit = async (formData: DistrictFormValues) => {
+    try {
+      const response = await addUpozila({
+        body: formData,
+        divisionId,
+        districtId,
+      }).unwrap();
+      console.log(response);
+      toast({
+        title: "Success",
+        description: "District created successfully.",
+      });
+    } catch (err: unknown) {
+      const errorMessage =
+        (err as { data?: { message?: string } })?.data?.message ||
+        "Failed to create district. Please try again.";
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const onError = () => {
+    toast({
+      title: "Validation Error",
+      description: "Please fill in all required fields correctly.",
+      variant: "destructive",
     });
+  };
 
-
-
-    const onSubmit = async (formData: DistrictFormValues) => {
-        try {
-            const response = await addUpozila({
-                body: formData,
-                divisionId,
-                districtId,
-            }).unwrap();
-
-            console.log('Response:', response);
-
-            toast({
-                title: "Success",
-                description: "District created successfully.",
-            });
-        } catch (err: any) {
-            console.error("Error creating district:", err?.data?.message);
-
-            toast({
-                title: "Error",
-                description: err?.data?.message || "Failed to create district. Please try again.",
-                variant: "destructive",
-            });
-        }
-    };
-
-    const onError = (formErrors: typeof errors) => {
-        console.error("Validation Errors:", formErrors);
-        toast({
-            title: "Validation Error",
-            description: "Please fill in all required fields correctly.",
-            variant: "destructive",
-        });
-    };
-
-    return (
-        <Card className=" ">
-            <CardHeader>
-                <CardTitle>Create Upozila</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <form onSubmit={handleSubmit(onSubmit, onError)}>
-                    <div className="grid w-full items-center gap-4">
-                        {/* Division Field */}
-                        <div className="flex flex-col space-y-1.5">
-                            <Label htmlFor="division">District</Label>
-                            <Select
-                                onValueChange={(value) => {
-                                    setValue("division", value); // Sync with form state
-                                    dispatch(setDistrictId(value));
-                                }}
-                            >
-                                <SelectTrigger id="division">
-                                    <SelectValue placeholder="Select a district" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {districtData?.division?.districts?.map((district) => (
-                                        <SelectItem
-                                            key={district._id}
-                                            value={district._id}
-                                        >
-                                            {district.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            {errors.division && (
-                                <p className="text-sm text-red-600">
-                                    {errors.division.message}
-                                </p>
-                            )}
-                        </div>
-
-                        {/* Name Field */}
-                        <div className="flex flex-col space-y-1.5">
-                            <Label htmlFor="name">Name</Label>
-                            <Input
-                                id="name"
-                                placeholder="Enter district name"
-                                {...register("name")}
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Create Upozila</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit, onError)}>
+          <div className="grid w-full items-center gap-4">
+            <p className="text-sm font-medium leading-none">Select District</p>
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={open}
+                  className="justify-between"
+                >
+                  {value
+                    ? divisionItem?.find(
+                        (division: {
+                          _id: string;
+                          name: string;
+                          value: string;
+                        }) => division.value === value
+                      )?.label
+                    : "Select District..."}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="p-0">
+                <Command>
+                  <CommandInput
+                    placeholder="Search District..."
+                    className="h-9"
+                  />
+                  <CommandList>
+                    <CommandEmpty>No district found.</CommandEmpty>
+                    <CommandGroup>
+                      {divisionItem?.map(
+                        (division: {
+                          _id: string;
+                          name: string;
+                          value: string;
+                        }) => (
+                          <CommandItem
+                            key={division._id}
+                            value={division.name}
+                            onSelect={(currentValue) => {
+                              setFormValue(
+                                "division",
+                                currentValue === value ? "" : currentValue
+                              );
+                              dispatch(setDistrictId(division._id));
+                              setValue(currentValue);
+                              setOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                value === division.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
                             />
-                            {errors.name && (
-                                <p className="text-sm text-red-600">
-                                    {errors.name.message}
-                                </p>
-                            )}
-                        </div>
-                    </div>
-                    <CardFooter className="flex justify-end mt-4">
-                        <Button type="submit">Add Upazila</Button>
-                    </CardFooter>
-                </form>
-            </CardContent>
-        </Card>
-    );
+                            {division.name}
+                          </CommandItem>
+                        )
+                      )}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                placeholder="Enter district name"
+                {...register("name")}
+              />
+              {errors.name && (
+                <p className="text-sm text-red-600">{errors.name.message}</p>
+              )}
+            </div>
+          </div>
+          <CardFooter className="flex justify-end mt-4">
+            <Button type="submit">Add Upazila</Button>
+          </CardFooter>
+        </form>
+      </CardContent>
+    </Card>
+  );
 };
 
 export default UpozilaAdd;

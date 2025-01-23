@@ -19,9 +19,10 @@ const handelCreateUpazila = async (req, res) => {
             !mongoose.Types.ObjectId.isValid(districtId)) {
             return res.status(400).json({ message: "Invalid ID format." });
         }
-
+            console.log("divisionId", divisionId, districtId)
         // Check if Division exists
         const division = await Division.findById(divisionId);
+        console.log("division", division)
         if (!division) {
             return res.status(404).json({ message: "Division not found" });
         }
@@ -32,10 +33,7 @@ const handelCreateUpazila = async (req, res) => {
             return res.status(404).json({ message: "District not found" });
         }
 
-
-
-
-
+        // Check if name is provided
         const nameExists = await Upazila.findOne({ name, district: districtId });
         if (nameExists) {
             return res.status(400).json({ message: 'Upazila already exists' });
@@ -43,12 +41,11 @@ const handelCreateUpazila = async (req, res) => {
 
 
         const upazila = await Upazila.create({ name, district: districtId });
-        await District.findByIdAndUpdate(districtId, { $push: { upazilas: upazila._id } });
+        await District.findByIdAndUpdate(districtId, { $push: { upazila: upazila._id } });
 
         return res.status(201).json({
             message: 'Upazila created successfully',
             upazila
-
         });
 
     } catch (error) {
@@ -78,7 +75,7 @@ const handelGetAllUpazila = async (req, res) => {
         }
 
         // Check if District exists
-        const districtExists = await District.findById(districtId).populate('upazilas');
+        const districtExists = await District.findById(districtId).populate('upazila');
         if (!districtExists) {
             return res.status(404).json({ message: "District not found" });
         }
@@ -86,8 +83,8 @@ const handelGetAllUpazila = async (req, res) => {
 
          
         return res.status(200).json({
-            message: 'Upazilas fetched successfully',
-            upazilas: districtExists.upazilas
+            message: 'Upazila fetched successfully',
+            upazila: districtExists.upazila
         });
     } catch (error) {
         console.error(error);

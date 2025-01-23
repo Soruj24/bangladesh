@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export interface Union {
-    id: number
+    id: string
     name: string
 }
 
@@ -12,7 +12,7 @@ export const unionApi = createApi({
     baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api' }),
     tagTypes: ['Unions'],
     endpoints: (build) => ({
-        getUnions: build.query<UnionsResponse, { divisionId: number; districtId: number; upazilaId: number }>({
+        getUnions: build.query<UnionsResponse, { divisionId: string; districtId: string; upazilaId: string }>({
             query: ({ divisionId, districtId, upazilaId }) =>
                 `unions/${divisionId}/${districtId}/${upazilaId}`,
             providesTags: (result) =>
@@ -24,7 +24,7 @@ export const unionApi = createApi({
                     : [{ type: 'Unions', id: 'LIST' }],
         }),
 
-        addUnion: build.mutation<Union, { body: Partial<Union>; divisionId: number; districtId: number; upazilaId: number }>({
+        addUnion: build.mutation<Union, { body: Partial<Union>; divisionId: string; districtId: string; upazilaId: string }>({
             query({ body, divisionId, districtId, upazilaId }) {
                 return {
                     url: `unions/${divisionId}/${districtId}/${upazilaId}`,
@@ -34,7 +34,7 @@ export const unionApi = createApi({
             },
             invalidatesTags: [{ type: 'Unions', id: 'LIST' }],
         }),
-        getUnion: build.query<Union, number>({
+        getUnion: build.query<Union, string>({
             query: (id) => `union/${id}`,
             providesTags: (result, error, id) => [{ type: 'Unions', id }],
         }),
@@ -49,7 +49,7 @@ export const unionApi = createApi({
             },
             invalidatesTags: (result, error, { id }) => [{ type: 'Unions', id }],
         }),
-        deleteUnion: build.mutation<{ success: boolean; id: number }, number>({
+        deleteUnion: build.mutation<{ success: boolean; id: string }, string>({
             query(id) {
                 return {
                     url: `unions/${id}`,

@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export interface Upozila {
-    id: number;
+    id: string;
     name: string;
 }
 
@@ -12,7 +12,7 @@ export const upozilaApi = createApi({
     baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api/' }),
     tagTypes: ['Upazilas'],
     endpoints: (build) => ({
-        getUpazilas: build.query<UpazilasResponse, { divisionId: number; districtId: number }>({
+        getUpazilas: build.query<UpazilasResponse, { divisionId: string; districtId: string }>({
             query: ({ divisionId, districtId }) => `upazilas/${divisionId}/${districtId}`,
             providesTags: (result) =>
                 Array.isArray(result)
@@ -23,7 +23,7 @@ export const upozilaApi = createApi({
                     : [{ type: 'Upazilas', id: 'LIST' }],
         }),
 
-        addUpozila: build.mutation<Upozila, { body: Partial<Upozila>; divisionId: number; districtId: number }>({
+        addUpozila: build.mutation<Upozila, { body: Partial<Upozila>; divisionId: string; districtId: string }>({
             query({ body, divisionId, districtId }) {
                 return {
                     url: `upazilas/${divisionId}/${districtId}`,
@@ -34,7 +34,7 @@ export const upozilaApi = createApi({
             invalidatesTags: [{ type: 'Upazilas', id: 'LIST' }],
         }),
 
-        getUpozila: build.query<Upozila, number>({
+        getUpozila: build.query<Upozila, string>({
             query: (id) => `upazila/${id}`,
             providesTags: (result, error, id) => [{ type: 'Upazilas', id }],
         }),
@@ -51,7 +51,7 @@ export const upozilaApi = createApi({
             invalidatesTags: (result, error, { id }) => [{ type: 'Upazilas', id }],
         }),
 
-        deleteUpozila: build.mutation<{ success: boolean; id: number }, number>({
+        deleteUpozila: build.mutation<{ success: boolean; id: string }, string>({
             query(id) {
                 return {
                     url: `upazilas/${id}`,

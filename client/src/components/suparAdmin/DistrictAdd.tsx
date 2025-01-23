@@ -31,15 +31,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {  setDivisionId } from "@/features/divisionSlice";
 
 type Division = {
   _id: string;
   value: string;
   name: string;
 };
-
-
-
 
 const districtSchema = z.object({
   name: z
@@ -53,12 +52,14 @@ type DistrictFormValues = z.infer<typeof districtSchema>;
 const DistrictAdd: React.FC = () => {
   const { data: divisionData, isLoading, refetch } = useGetDivisionsQuery();
   const [addDistrict] = useAddDistrictMutation();
-  const [divisionId, setDivisionId] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
   const [value, setValue] = useState<string>("");
 
-  console.log(divisionId);
+  const dispatch = useDispatch();
 
+  const divisionId = useSelector((state)=>(state?.divisionIdData?.divisionId))
+
+   
   const {
     register,
     handleSubmit,
@@ -68,7 +69,7 @@ const DistrictAdd: React.FC = () => {
     resolver: zodResolver(districtSchema),
   });
 
-  const divisionItem = divisionData?.divisions
+  const divisionItem = divisionData?.divisions;
 
   const onSubmit = async (formData: DistrictFormValues) => {
     const payload = { divisionId: String(divisionId), name: formData.name };
@@ -82,8 +83,8 @@ const DistrictAdd: React.FC = () => {
       });
 
       // Refetch division data and reset form
-      refetch();
-      reset();
+      // refetch();
+      // reset();
       setValue("");
       setDivisionId("");
     } catch (err) {
@@ -148,7 +149,7 @@ const DistrictAdd: React.FC = () => {
                             setValue(
                               currentValue === value ? "" : currentValue
                             );
-                            setDivisionId(division._id);
+                            dispatch( setDivisionId(division._id))
                             setOpen(false);
                           }}
                         >
@@ -169,8 +170,6 @@ const DistrictAdd: React.FC = () => {
               </PopoverContent>
             </Popover>
 
-           
-
             {/* Name Field */}
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="name">Name</Label>
@@ -185,9 +184,7 @@ const DistrictAdd: React.FC = () => {
             </div>
           </div>
           <CardFooter className="flex justify-end mt-4">
-            <Button type="submit" >
-              Add District
-            </Button>
+            <Button type="submit">Add District</Button>
           </CardFooter>
         </form>
       </CardContent>

@@ -17,6 +17,10 @@ const handelCreateUnion = async (req, res) => {
         if (!divisionId || !districtId || !upazilaId) {
             return res.status(400).json({ message: "Missing required parameters." });
         }
+        
+        console.log("divisionId", divisionId)
+        console.log("districtId", districtId)
+        console.log("upazilaId", upazilaId)
 
         if (
             !mongoose.Types.ObjectId.isValid(divisionId) ||
@@ -49,8 +53,8 @@ const handelCreateUnion = async (req, res) => {
         if (nameExists) {
             return res.status(400).json({ message: 'Union already exists' });
         }
-        const union = await Union.create({ 
-            name ,
+        const union = await Union.create({
+            name,
             upazila: upazilaId
         })
         if (!union) {
@@ -161,7 +165,7 @@ const handelGetUnions = async (req, res) => {
             return res.status(404).json({ message: "Upazila not found" });
         }
 
-        
+
 
 
         return res.status(200).json({
@@ -215,7 +219,6 @@ const handelUnionDelete = async (req, res) => {
 
         // Check if Union exists
         const union = await Union.findByIdAndDelete(unionId);
-        console.log("union", union)
         if (!union) {
             return res.status(404).json({ message: "Union not found" });
         }
@@ -295,4 +298,10 @@ const handleUpdateUnion = async (req, res) => {
 
 
 
-module.exports = { handelCreateUnion, handleUpdateUnion, handelGetSingleUnion, handelUnionDelete, handelGetUnions };
+module.exports = {
+    handelCreateUnion,
+    handleUpdateUnion,
+    handelGetSingleUnion,
+    handelUnionDelete,
+    handelGetUnions
+};
