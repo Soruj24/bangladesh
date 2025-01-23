@@ -94,6 +94,26 @@ const handelGetAllDistricts = async (req, res) => {
     }
 };
 
+const handelDistrictWithOutDivision = async (req, res) => {
+    try {
+        
+        const district = await District.find().populate('division');
+
+        if (!district || district.length === 0) {
+            return res.status(404).json({ message: 'District not found' });
+        }
+
+        return res.status(200).json({
+            message: 'District fetched successfully',
+            district,
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+}
+
 const handelSingalDistrict = async (req, res) => {
     try {
         const { divisionId, districtId } = req.params;
@@ -137,28 +157,19 @@ const handelSingalDistrict = async (req, res) => {
 
 const handelDistrictDelete = async (req, res) => {
     try {
-        const { divisionId, districtId } = req.params;
+        const {districtId } = req.params;
 
         // Check if all required parameters are present
-        if (!divisionId || !districtId) {
+        if ( !districtId) {
             return res.status(400).json({ message: "Missing required parameters." });
         }
 
-        if (
-            !mongoose.Types.ObjectId.isValid(divisionId) ||
-            !mongoose.Types.ObjectId.isValid(districtId)
-
-        ) {
+        if (!mongoose.Types.ObjectId.isValid(districtId)) {
             return res.status(400).json({ message: "Invalid ID format." });
         }
 
-        // Check if Division exists
-        const division = await Division.findById(divisionId);
-
-        if (!division) {
-            return res.status(404).json({ message: "Division not found" });
-        }
-
+        
+        
         const district = await District.findOne({ _id: districtId })
             .populate('upazila');
 
@@ -186,27 +197,18 @@ const handelDistrictUpdate = async (req, res) => {
     try {
         const { name } = req.body;
 
-        const { divisionId, districtId } = req.params;
+        const {  districtId } = req.params;
 
         // Check if all required parameters are present
-        if (!divisionId || !districtId) {
+        if ( !districtId) {
             return res.status(400).json({ message: "Missing required parameters." });
         }
 
-        if (
-            !mongoose.Types.ObjectId.isValid(divisionId) ||
-            !mongoose.Types.ObjectId.isValid(districtId)
-
-        ) {
+        if (  !mongoose.Types.ObjectId.isValid(districtId) ) {
             return res.status(400).json({ message: "Invalid ID format." });
         }
 
-        // Check if Division exists
-        const division = await Division.findById(divisionId);
-
-        if (!division) {
-            return res.status(404).json({ message: "Division not found" });
-        }
+        
 
         const district = await District.findOne({ _id: districtId })
             .populate('upazila');
@@ -236,6 +238,7 @@ module.exports = {
     handelGetAllDistricts,
     handelSingalDistrict,
     handelDistrictDelete,
-    handelDistrictUpdate
+    handelDistrictUpdate,
+    handelDistrictWithOutDivision
 
 };

@@ -4,26 +4,26 @@ import { Skeleton } from "../ui/skeleton"
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog"
 import { toast } from "@/hooks/use-toast"
-import { useDeleteUpozilaMutation, useGetUpazilasQuery, useUpdateUpozilaMutation } from "@/services/upozilaApi"
+import { useDeleteUpozilaMutation, useGetAllUpazilasQuery,  useUpdateUpozilaMutation } from "@/services/upozilaApi"
 
 const UpazilaShow = () => {
-    const { data, isError, isLoading, refetch } = useGetUpazilasQuery()
+    const { data, isError, isLoading, refetch } = useGetAllUpazilasQuery()
     const [updateUpozila] = useUpdateUpozilaMutation()
     const [deleteUpozila] = useDeleteUpozilaMutation()
 
-    console.log(data?.upazilas)
+    console.log(data)
 
     const [isDialogOpen, setIsDialogOpen] = useState(false)
-    const [currentDivision, setCurrentDivision] = useState<any>(null)
+    const [currentDivision, setCurrentDivision] = useState<Upazila | null>(null)
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: string) => {
         const res = await deleteUpozila(id)
         console.log(res)
 
         if (res?.error) {
             toast({
                 title: "Error",
-                description: res?.error?.data?.message,
+                description: (res.error as { data?: { message?: string } })?.data?.message || "Failed to update division",
                 variant: "destructive",
             })
         }
@@ -35,13 +35,17 @@ const UpazilaShow = () => {
         refetch()
     }
 
-    const handleUpdate = (division: any) => {
-        setCurrentDivision(division)
+    const handleUpdate = (upazila: Upazila) => {
+        setCurrentDivision(upazila)
         setIsDialogOpen(true)
     }
 
-    const handleUpdateSubmit = async (updatedDivision: any) => {
-        console.log("Updated Division:", updatedDivision);
+    interface Upazila {
+        _id: number;
+        name: string;
+    }
+
+    const handleUpdateSubmit = async (updatedDivision: Upazila) => {
         if (!updatedDivision?.name?.trim()) {
             toast({
                 title: "Error",
@@ -52,7 +56,7 @@ const UpazilaShow = () => {
         }
 
         try {
-            const res = await updateUpozila({ ...updatedDivision, id: updatedDivision._id }).unwrap();
+            const res = await updateUpozila(  { ...updatedDivision, upazilaId: updatedDivision._id.toString() }).unwrap();
             console.log("Update response:", res); // Debugging
 
             toast({
@@ -67,7 +71,7 @@ const UpazilaShow = () => {
             console.error("Update error:", error); // Debugging
             toast({
                 title: "Error",
-                description: error?.data?.message || "Failed to update division",
+                description: (error as { data?: { message?: string } })?.data?.message || "Failed to update division",
                 variant: "destructive",
             });
         }
@@ -77,7 +81,7 @@ const UpazilaShow = () => {
         return (
             <div className="space-y-6 sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {/* Dynamic Skeleton loaders based on number of divisions */}
-                {[...Array(data?.upazilas.length || 1)].map((_, index) => (
+                {[...Array(data?.upazila.length || 1)].map((_, index) => (
                     <Card key={index} className="max-w-xs p-4 border shadow-lg">
                         <CardHeader>
                             <Skeleton className="w-24 h-6" />
@@ -102,19 +106,19 @@ const UpazilaShow = () => {
     return (
         <div className="mt-4 sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {
-                data?.upazilas?.map((division) => {
+                data?.upazila?.map((upazila: Upazila) => {
                     return (
-                        <Card key={division._id} className="max-w-xs p-4 border shadow-lg">
+                        <Card key={upazila._id} className="max-w-xs p-4 border shadow-lg">
                             <CardHeader>
-                                <h2 className="text-lg font-semibold">{division.name}</h2>
+                                <h2 className="text-lg font-semibold">{upazila.name}</h2>
                             </CardHeader>
                             <CardContent>
                                 {/* Additional division content can go here */}
-                                <p>{division.name}</p>
+                                <p>{upazila.name}</p>
                             </CardContent>
                             <CardFooter className="flex space-x-2">
-                                <Button onClick={() => handleDelete(division._id)}>Delete</Button>
-                                <Button onClick={() => handleUpdate(division)}>Update</Button>
+                                <Button onClick={() => handleDelete(upazila._id.toString())}>Delete</Button>
+                                <Button onClick={() => handleUpdate(upazila)}>Update</Button>
                             </CardFooter>
                         </Card>
                     )
@@ -125,7 +129,7 @@ const UpazilaShow = () => {
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Update Division</DialogTitle>
+                        <DialogTitle>Update upazila</DialogTitle>
                     </DialogHeader>
                     {/* Add form fields for updating division here */}
                     <div className="space-y-4">

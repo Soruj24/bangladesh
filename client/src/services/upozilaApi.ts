@@ -23,6 +23,17 @@ export const upozilaApi = createApi({
                     : [{ type: 'Upazilas', id: 'LIST' }],
         }),
 
+        getAllUpazilas: build.query<UpazilasResponse, void>({
+            query: () => 'upazilas',
+            providesTags: (result) =>
+                Array.isArray(result)
+                    ? [
+                        ...result.map(({ id }) => ({ type: 'Upazilas', id }) as const),
+                        { type: 'Upazilas', id: 'LIST' },
+                    ]
+                    : [{ type: 'Upazilas', id: 'LIST' }],
+        }),
+
         addUpozila: build.mutation<Upozila, { body: Partial<Upozila>; divisionId: string; districtId: string }>({
             query({ body, divisionId, districtId }) {
                 return {
@@ -39,11 +50,11 @@ export const upozilaApi = createApi({
             providesTags: (result, error, id) => [{ type: 'Upazilas', id }],
         }),
 
-        updateUpozila: build.mutation<Upozila, Partial<Upozila>>({
+        updateUpozila: build.mutation<Upozila, { upazilaId: string } & Partial<Upozila>>({
             query(data) {
-                const { id, ...body } = data;
+                const { upazilaId, ...body } = data;
                 return {
-                    url: `upazilas/${id}`,
+                    url: `upazilas/${upazilaId}`,
                     method: 'PUT',
                     body,
                 };
@@ -51,14 +62,14 @@ export const upozilaApi = createApi({
             invalidatesTags: (result, error, { id }) => [{ type: 'Upazilas', id }],
         }),
 
-        deleteUpozila: build.mutation<{ success: boolean; id: string }, string>({
-            query(id) {
+        deleteUpozila: build.mutation<{ success: boolean; upazilaId: string }, string>({
+            query(upazilaId) {
                 return {
-                    url: `upazilas/${id}`,
+                    url: `upazilas/${upazilaId}`,
                     method: 'DELETE',
                 };
             },
-            invalidatesTags: (result, error, id) => [{ type: 'Upazilas', id }],
+            invalidatesTags: (result, error,upazilaId) => [{ type: 'Upazilas', upazilaId }],
         }),
     }),
 });
@@ -69,4 +80,5 @@ export const {
     useGetUpozilaQuery,
     useUpdateUpozilaMutation,
     useDeleteUpozilaMutation,
+    useGetAllUpazilasQuery
 } = upozilaApi;

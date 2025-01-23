@@ -23,6 +23,19 @@ export const districtApi = createApi({
                     : [{ type: 'Districts', id: 'LIST' }],
 
         }),
+
+        getAllDistricts: build.query<DistrictsResponse, void>({
+            query: () => 'districts',
+            providesTags: (result) =>
+                Array.isArray(result) && result.length > 0 
+                    ? [
+                        ...result.map(({ id }) => ({ type: 'Districts', id } as const)),
+                        { type: 'Districts', id: 'LIST' },
+                    ]
+                    : [{ type: 'Districts', id: 'LIST' }],
+        }), 
+
+
         addDistrict: build.mutation<District, { name: string; divisionId: string }>({
             query: ({ name, divisionId }) => ({
                 url: `districts/${divisionId}`,
@@ -37,19 +50,19 @@ export const districtApi = createApi({
         }),
         updateDistrict: build.mutation<
             District,
-            { divisionId: string; districtId: string; name: string }
+            {  districtId: string; name: string }
         >({
-            query: ({ divisionId, districtId, ...body }) => ({
-                url: `districts/${divisionId}/${districtId}`,
+            query: ({ districtId, ...body }) => ({
+                url: `districts/${districtId}`,
                 method: 'PUT',
                 body,
             }),
             invalidatesTags: (result, error, { districtId }) => [{ type: 'Districts', id: districtId }],
         }),
-        deleteDistrict: build.mutation<{ success: boolean }, { divisionId: string; districtId: string }>(
+        deleteDistrict: build.mutation<{ success: boolean }, {  districtId: string }>(
             {
-                query: ({ divisionId, districtId }) => ({
-                    url: `districts/${divisionId}/${districtId}`,
+                query: ({  districtId }) => ({
+                    url: `districts/${districtId}`,
                     method: 'DELETE',
                 }),
                 invalidatesTags: (result, error, { districtId }) => [{ type: 'Districts', id: districtId }],
@@ -64,4 +77,5 @@ export const {
     useGetDistrictQuery,
     useUpdateDistrictMutation,
     useDeleteDistrictMutation,
+    useGetAllDistrictsQuery,
 } = districtApi;

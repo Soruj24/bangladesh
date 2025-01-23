@@ -79,8 +79,7 @@ const handelGetAllUpazila = async (req, res) => {
         if (!districtExists) {
             return res.status(404).json({ message: "District not found" });
         }
-
-
+ 
          
         return res.status(200).json({
             message: 'Upazila fetched successfully',
@@ -91,6 +90,30 @@ const handelGetAllUpazila = async (req, res) => {
         return res.status(500).json({ message: 'Server error' });
     }
 };
+
+const handelGetAllUpazilaWithOutDistrict = async (req,res)=>{
+    try {
+        
+        const upazila = await Upazila.find()
+
+        if(!upazila){
+            return res.status(400).json({
+                message:"Upazila not found"
+            })
+        }
+
+        return res.status(200).json({
+            message:"Upazila return successfully",
+            upazila
+        })
+
+
+    } catch (error) {
+        return res.status(500).json({
+            message:"server error"
+        })
+    }
+}
 
 const handelGetSingleUpazila = async (req, res) => {
     try {
@@ -144,45 +167,26 @@ const handelGetSingleUpazila = async (req, res) => {
 
 const handelUpdateUpazila = async (req, res) => {
     try {
-        const { divisionId, districtId, upazilaId } = req.params;
+        const {  upazilaId } = req.params;
         const { name } = req.body;
         // Validate if name is provided
         if (!name || name.trim() === "") {
             return res.status(400).json({ message: "Upazila name is required." });
         }
         // Check if all required parameters are present
-        if (!divisionId || !districtId || !upazilaId) {
+        if ( !upazilaId) {
             return res.status(400).json({ message: "Missing required parameters." });
         }
 
-        if (
-            !mongoose.Types.ObjectId.isValid(divisionId) ||
-            !mongoose.Types.ObjectId.isValid(districtId) ||
-            !mongoose.Types.ObjectId.isValid(upazilaId)
-
-        ) {
+        if ( !mongoose.Types.ObjectId.isValid(upazilaId)) {
             return res.status(400).json({ message: "Invalid ID format." });
         }
-
-        // Check if Division exists
-        const division = await Division.findById(divisionId);
-        if (!division) {
-            return res.status(404).json({ message: "Division not found" });
-        }
-
-        // Check if District exists
-        const district = await District.findById(districtId);
-        if (!district) {
-            return res.status(404).json({ message: "District not found" });
-        }
-
+ 
         // Check if Upazila exists
         const upazila = await Upazila.findById(upazilaId)
         if (!upazila) {
             return res.status(404).json({ message: "Upazila not found" });
         }
-
-
 
         // Update the upazila by ID
         const upazilaUpdate = await Upazila.findByIdAndUpdate(
@@ -202,7 +206,6 @@ const handelUpdateUpazila = async (req, res) => {
             upazilaUpdate,
         });
     } catch (error) {
-        console.log(error)
         return res.status(500).json({ message: "Server error." });
     }
 };
@@ -211,9 +214,8 @@ const handelUpdateUpazila = async (req, res) => {
 const handelDeleteUpazila = async (req, res) => {
     try {
 
-        const { divisionId, districtId, upazilaId } = req.params;
-        console.log("divisionId", districtId, divisionId, upazilaId)
-        await upazilaFindById(res, divisionId, districtId, upazilaId);
+        const {  upazilaId } = req.params;
+
         const upazila = await Upazila.findByIdAndDelete(upazilaId);
 
         if (!upazila) {
@@ -238,5 +240,6 @@ module.exports = {
     handelGetAllUpazila,
     handelGetSingleUpazila,
     handelUpdateUpazila,
-    handelDeleteUpazila
+    handelDeleteUpazila,
+    handelGetAllUpazilaWithOutDistrict
 };

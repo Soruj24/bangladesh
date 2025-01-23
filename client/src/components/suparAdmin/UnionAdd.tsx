@@ -64,7 +64,9 @@ const UnionAdd = () => {
   );
 
 
-  const upazilaId = useSelector((state)=>(state?.upazilaIdData?.upazilaId))
+  const upazilaId = useSelector(
+    (state: { upazilaIdData: { upazilaId: string } }) => state?.upazilaIdData?.upazilaId
+  );
 
   console.log("upazilaId", upazilaId);
 
@@ -80,7 +82,7 @@ const UnionAdd = () => {
 
   const onSubmit = async (formData: DistrictFormValues) => {
     try {
-      const response = await addUnion({
+     await addUnion({
         body: formData,
         divisionId,
         districtId,
@@ -91,11 +93,10 @@ const UnionAdd = () => {
         description: "District created successfully.",
       });
     } catch (err) {
-      console.error("Error creating district:", err?.data?.message);
       toast({
         title: "Error",
         description:
-          err?.data?.message || "Failed to create district. Please try again.",
+          (err as { data?: { message?: string } })?.data?.message || "Failed to create district. Please try again.",
         variant: "destructive",
       });
     }
