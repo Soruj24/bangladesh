@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
 import { RootState } from "@/app/store"; // Ensure your RootState is correctly imported
 import { useGetUnionsQuery } from "@/services/unionsApi";
-import { setUnionId } from "@/features/unionSlice";
+import { setUnionId, setUnionName } from "@/features/unionSlice";
 
 const UnionCombo = () => {
   // Selectors for division, district, and upazila IDs
@@ -52,7 +52,7 @@ const UnionCombo = () => {
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="justify-between"
+            className="justify-between w-full"
           >
             {selectedUnion
               ? unionData?.unions?.find(
@@ -62,7 +62,7 @@ const UnionCombo = () => {
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="p-0">
+        <PopoverContent className="p-0 w-full">
           <Command>
             <CommandInput placeholder="Search union..." />
             <CommandList>
@@ -78,6 +78,7 @@ const UnionCombo = () => {
                         onSelect={() => {
                           setSelectedUnion(union._id); // Update state
                           dispatch(setUnionId(union._id)); // Dispatch Redux action
+                          dispatch(setUnionName(union.name)); // Dispatch Redux action
                           setOpen(false); // Close popover
                         }}
                       >

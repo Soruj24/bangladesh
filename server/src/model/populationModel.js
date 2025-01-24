@@ -9,7 +9,7 @@ const populationSchema = new mongoose.Schema(
       required: [true, 'Please provide your name'],
       trim: true,
       minlength: [3, 'Name must be at least 3 characters long'],
-      max_length: [100, 'Name cannot be longer than 100 characters'],
+      maxlength: [100, 'Name cannot be longer than 100 characters'], // Fixed max_length to maxlength
     },
     email: {
       type: String,
@@ -18,7 +18,6 @@ const populationSchema = new mongoose.Schema(
       lowercase: true,
       match: [/\S+@\S+\.\S+/, 'Please provide a valid email address'], // Email format validation
     },
-
     phone: {
       type: String,
       required: [true, 'Please provide a phone number'],
@@ -26,11 +25,14 @@ const populationSchema = new mongoose.Schema(
     },
     tag: {
       type: String,
-      required: [true, 'Tag is required']
+      required: [true, 'Tag is required'],
+      trim: true,
     },
     bio: {
       type: String,
-      required: [true, 'Bio is required']
+      required: [true, 'Bio is required'],
+      trim: true,
+      maxlength: [500, 'Bio cannot exceed 500 characters'], // Added a max length
     },
     image: {
       type: String,
@@ -41,8 +43,8 @@ const populationSchema = new mongoose.Schema(
     upazila: { type: mongoose.Schema.Types.ObjectId, ref: 'Upazila', required: true },
     union: { type: mongoose.Schema.Types.ObjectId, ref: 'Union', required: true },
     village: { type: mongoose.Schema.Types.ObjectId, ref: 'Village' },
-
   },
+  
   {
     timestamps: true, // Automatically adds createdAt and updatedAt fields
   }

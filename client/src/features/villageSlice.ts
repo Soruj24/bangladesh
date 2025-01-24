@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     villageId: '',
+    villageName: '',
 };
 
 const villageSlice = createSlice({
@@ -11,10 +12,13 @@ const villageSlice = createSlice({
         setVillageId: (state, action) => {
             state.villageId = action.payload;
         },
+        setVillageName: (state, action) => {
+            state.villageName = action.payload;
+        }
     },
 });
 
-export const { setVillageId } = villageSlice.actions;
+export const { setVillageId , setVillageName} = villageSlice.actions;
 
 
 export default villageSlice.reducer;

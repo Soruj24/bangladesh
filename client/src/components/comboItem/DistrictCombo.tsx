@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
 import { useGetDistrictsQuery } from "@/services/districtApi";
 import RootState from "@/app/action";
-import { setDistrictId } from "@/features/districtSlice";
+import { setDistrictId, setDistrictName } from "@/features/districtSlice";
 
 const DistrictCombo = () => {
   const divisionId = useSelector(
@@ -40,7 +40,7 @@ const DistrictCombo = () => {
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="justify-between"
+            className="justify-between w-full"
           >
             {value
               ? districtData?.division?.districts?.find(
@@ -50,7 +50,7 @@ const DistrictCombo = () => {
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="p-0">
+        <PopoverContent className="p-0 w-full">
           <Command>
             <CommandInput placeholder="Search division..." className="h-9" />
             <CommandList>
@@ -64,6 +64,7 @@ const DistrictCombo = () => {
                       onSelect={(currentValue) => {
                         setValue(currentValue === value ? "" : currentValue);
                         dispatch(setDistrictId(division._id));
+                        dispatch(setDistrictName(division.name));
                         setOpen(false);
                       }}
                     >

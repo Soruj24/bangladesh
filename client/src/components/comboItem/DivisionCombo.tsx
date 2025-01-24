@@ -8,16 +8,18 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { setDivisionId } from "@/features/divisionSlice";
+import { setDivisionId, setDivisionName } from "@/features/divisionSlice";
 import { useGetDivisionsQuery } from "@/services/dividionApi";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Button } from "../ui/button";
+
 const DivisionCombo = () => {
   const { data: divisionData, isLoading } = useGetDivisionsQuery();
   const [open, setOpen] = useState<boolean>(false);
@@ -31,13 +33,13 @@ const DivisionCombo = () => {
   return (
     <div>
       <p className="text-sm my-4 font-medium leading-none">Select Division</p>
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open}  onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="justify-between"
+            className="justify-between w-full"
           >
             {value
               ? divisionData?.divisions?.find(
@@ -47,7 +49,7 @@ const DivisionCombo = () => {
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="p-0">
+        <PopoverContent className="p-0 w-full">
           <Command>
             <CommandInput placeholder="Search division..." className="h-9" />
             <CommandList>
@@ -61,6 +63,7 @@ const DivisionCombo = () => {
                       onSelect={(currentValue) => {
                         setValue(currentValue === value ? "" : currentValue);
                         dispatch(setDivisionId(division._id));
+                        dispatch(setDivisionName(division.name));
                         setOpen(false);
                       }}
                     >

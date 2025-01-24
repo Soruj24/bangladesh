@@ -22,6 +22,7 @@ import DistrictCombo from "../comboItem/DistrictCombo";
 import UpazilaCombo from "../comboItem/UpazilaCombo";
 import UnionCombo from "../comboItem/UnionCombo";
 import VillageCombo from "../comboItem/VillageCombo";
+import { useSelector } from "react-redux";
 
 const formSchema = z.object({
   name: z
@@ -39,15 +40,40 @@ const AddAdminUsers = () => {
     defaultValues: { name: "", email: "", bio: "", tag: "", phone: "" },
   });
 
- 
   const [addPopulation] = useAddPopulationMutation();
 
+
+const divisionId = useSelector(
+  (state: { divisionIdData: { divisionId: string } }) => state?.divisionIdData?.divisionId
+);
+
+const districtId = useSelector(
+  (state: { districtIdData: { districtId: string } }) => state?.districtIdData?.districtId
+);
+
+const upazilaId = useSelector(
+  (state: { upazilaIdData: { upazilaId: string } }) => state?.upazilaIdData?.upazilaId
+);
+
+const unionId = useSelector(
+  (state: { unionIdData: { unionId: string } }) => state?.unionIdData?.unionId
+);
+
+const villageId = useSelector(
+  (state: { villageIdData: { villageId: string } }) => state?.villageIdData?.villageId
+);
+
+ 
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       const newPopulation = {
         ...data,
-       
+       division:  divisionId,
+       district:  districtId,
+        upazila:  upazilaId,
+        union:  unionId,
+        village:  villageId,
       };
 
       const res = await addPopulation(newPopulation);
@@ -70,6 +96,7 @@ const AddAdminUsers = () => {
     } catch (error) {
       console.log(error);
     }
+    
   };
 
   return (
@@ -167,16 +194,12 @@ const AddAdminUsers = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                
-
-                  <DivisionCombo />
-                  <DistrictCombo />
-                  <UpazilaCombo />
-                  <UnionCombo />
-                  <VillageCombo />
-                
-
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3 justify-center items-center">
+                <DivisionCombo />
+                <DistrictCombo />
+                <UpazilaCombo />
+                <UnionCombo />
+                <VillageCombo />
               </div>
 
               <Button type="submit" className="w-full md:w-auto">

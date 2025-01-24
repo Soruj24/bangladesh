@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
 import RootState from "@/app/action";
 import { useGetVillagesQuery } from "@/services/villageApi";
-import { setVillageId } from "@/features/villageSlice";
+import { setVillageId, setVillageName } from "@/features/villageSlice";
 
 const VillageCombo = () => {
   const divisionId = useSelector(
@@ -53,7 +53,7 @@ const VillageCombo = () => {
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="justify-between"
+            className="justify-between w-full"
           >
             {value
               ? villageData?.villages?.find(
@@ -63,7 +63,7 @@ const VillageCombo = () => {
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="p-0">
+        <PopoverContent className="p-0 w-full">
           <Command>
             <CommandInput placeholder="Search division..." className="h-9" />
             <CommandList>
@@ -77,6 +77,7 @@ const VillageCombo = () => {
                       onSelect={(currentValue) => {
                         setValue(currentValue === value ? "" : currentValue);
                         dispatch(setVillageId(village._id));
+                        dispatch(setVillageName(village.name));
                         setOpen(false);
                       }}
                     >

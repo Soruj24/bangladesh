@@ -17,7 +17,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
 import { useGetUpazilasQuery } from "@/services/upozilaApi";
-import { setUpazilaId } from "@/features/upazilaSlice";
+import { setUpazilaId, setUpazilaName } from "@/features/upazilaSlice";
 
 
 const UpazilaCombo = () => {
@@ -56,7 +56,7 @@ const UpazilaCombo = () => {
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="justify-between"
+            className="justify-between w-full"
           >
             {value
               ? upazilaData?.upazila?.find(
@@ -67,7 +67,7 @@ const UpazilaCombo = () => {
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="p-0">
+        <PopoverContent className="p-0 w-full">
           <Command>
             <CommandInput placeholder="Search division..." className="h-9" />
             <CommandList>
@@ -80,6 +80,7 @@ const UpazilaCombo = () => {
                     onSelect={(currentValue) => {
                       setValue(currentValue === value ? "" : currentValue);
                       dispatch(setUpazilaId(upazila._id));
+                      dispatch(setUpazilaName(upazila.name));
                       setOpen(false);
                     }}
                   >
