@@ -24,7 +24,7 @@ export const upozilaApi = createApi({
         }),
 
         getAllUpazilas: build.query<UpazilasResponse, void>({
-            query: () => 'upazilas',
+            query: () => 'upazilas/withOutDistrict',
             providesTags: (result) =>
                 Array.isArray(result)
                     ? [
@@ -71,6 +71,7 @@ export const upozilaApi = createApi({
             },
             invalidatesTags: (result, error,upazilaId) => [{ type: 'Upazilas', upazilaId }],
         }),
+        
     }),
 });
 

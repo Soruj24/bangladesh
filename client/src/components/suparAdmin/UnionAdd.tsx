@@ -57,6 +57,7 @@ const UnionAdd = () => {
     (state: { divisionIdData: { divisionId: string } }) =>
       state?.divisionIdData?.divisionId
   );
+  
   const districtId = useSelector(
     (state: { districtIdData: { districtId: string } }) =>
       state?.districtIdData?.districtId
@@ -138,7 +139,7 @@ console.log(upazilaData)
                 >
                   {value
                     ? upazilaData?.upazila?.find(
-                        (upazila) => upazila.value === value
+                        (upazila: { value: string; label: string }) => upazila.value === value
                       )?.label
                     : "Select Division..."}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

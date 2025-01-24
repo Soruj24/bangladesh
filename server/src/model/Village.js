@@ -23,7 +23,7 @@ villageSchema.pre('save', function (next) {
     next();
 });
 
-// Village মডেল তৈরি
+
 const Village = mongoose.model('Village', villageSchema);
 
 module.exports = Village;

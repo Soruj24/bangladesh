@@ -83,7 +83,7 @@ const VillageShow = () => {
         return (
             <div className="space-y-6 sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {/* Dynamic Skeleton loaders based on number of divisions */}
-                {[...Array(data?.villages?.length || 1)].map((_, index) => (
+                {[...Array(data?.villagesWithOutUnion?.length || 1)].map((_, index) => (
                     <Card key={index} className="max-w-xs p-4 border shadow-lg">
                         <CardHeader>
                             <Skeleton className="w-24 h-6" />
@@ -106,52 +106,57 @@ const VillageShow = () => {
     }
 
     return (
-        <div className="mt-4 sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {
-                data?.villages?.map((village: Village) => {
-                    return (
-                        <Card key={village._id} className="max-w-xs p-4 border shadow-lg">
-                            <CardHeader>
-                                <h2 className="text-lg font-semibold">{village.name}</h2>
-                            </CardHeader>
-                            <CardContent>
-                                {/* Additional division content can go here */}
-                                <p>{village.name}</p>
-                            </CardContent>
-                            <CardFooter className="flex space-x-2">
-                                <Button onClick={() => handleDelete(village._id)}>Delete</Button>
-                                <Button onClick={() => handleUpdate(village)}>Update</Button>
-                            </CardFooter>
-                        </Card>
-                    )
-                })
-            }
+       <>
 
-            {/* Dialog for updating the division */}
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Update Village</DialogTitle>
-                    </DialogHeader>
-                    {/* Add form fields for updating division here */}
-                    <div className="space-y-4">
-                        <label className="block">
-                            <span className="text-sm  font-semibold">Village Name</span>
-                            <input
-                                type="text"
-                                value={currentDivision?.name || ""}
-                                onChange={(e) => setCurrentDivision({ ...currentDivision, name: e.target.value })}
-                                className="mt-2 p-2 text-black border rounded-md w-full"
-                            />
-                        </label>
-                    </div>
-                    <DialogFooter>
-                        <Button onClick={() => handleUpdateSubmit(currentDivision)}>Update</Button>
-                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        </div>
+       <h1 className="text-2xl font-semibold mb-4 text-center my-4">All Villages Show Here </h1>
+        <div className="mt-4 sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+           
+           {
+               data?.villagesWithOutUnion?.map((village: Village) => {
+                   return (
+                       <Card key={village._id} className="max-w-xs p-4 border shadow-lg">
+                           <CardHeader>
+                               <h2 className="text-lg font-semibold">{village.name}</h2>
+                           </CardHeader>
+                           <CardContent>
+                               {/* Additional division content can go here */}
+                               <p>{village.name}</p>
+                           </CardContent>
+                           <CardFooter className="flex space-x-2">
+                               <Button onClick={() => handleDelete(village._id)}>Delete</Button>
+                               <Button onClick={() => handleUpdate(village)}>Update</Button>
+                           </CardFooter>
+                       </Card>
+                   )
+               })
+           }
+
+           {/* Dialog for updating the division */}
+           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+               <DialogContent>
+                   <DialogHeader>
+                       <DialogTitle>Update Village</DialogTitle>
+                   </DialogHeader>
+                   {/* Add form fields for updating division here */}
+                   <div className="space-y-4">
+                       <label className="block">
+                           <span className="text-sm  font-semibold">Village Name</span>
+                           <input
+                               type="text"
+                               value={currentDivision?.name || ""}
+                               onChange={(e) => setCurrentDivision({ ...currentDivision, name: e.target.value })}
+                               className="mt-2 p-2 text-black border rounded-md w-full"
+                           />
+                       </label>
+                   </div>
+                   <DialogFooter>
+                       <Button onClick={() => handleUpdateSubmit(currentDivision)}>Update</Button>
+                       <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+                   </DialogFooter>
+               </DialogContent>
+           </Dialog>
+       </div>
+       </>
     )
 }
 

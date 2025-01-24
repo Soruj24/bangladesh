@@ -54,6 +54,7 @@ const handelCreateUpazila = async (req, res) => {
     }
 
 };
+
 const handelGetAllUpazila = async (req, res) => {
     try {
 
@@ -92,21 +93,22 @@ const handelGetAllUpazila = async (req, res) => {
     }
 };
 
+
 const handelGetAllUpazilaWithOutDistrict = async (req, res) => {
     try {
 
-        // const upazila = await Upazila.find()
+        const UpazilaWithOutDistrict = await Upazila.find()
 
-        // if (!upazila) {
-        //     return res.status(400).json({
-        //         message: "Upazila not found"
-        //     })
-        // }
+        if (!UpazilaWithOutDistrict) {
+            return res.status(400).json({
+                message: "Upazila not found"
+            })
+        }
 
-        // return res.status(200).json({
-        //     message: "Upazila return successfully",
-        //     upazila
-        // })
+        return res.status(200).json({
+            message: "Upazila return successfully",
+            UpazilaWithOutDistrict
+        })
 
 
     } catch (error) {
@@ -114,6 +116,7 @@ const handelGetAllUpazilaWithOutDistrict = async (req, res) => {
             message: "server error"
         })
     }
+
 }
 
 const handelGetSingleUpazila = async (req, res) => {
@@ -126,12 +129,9 @@ const handelGetSingleUpazila = async (req, res) => {
             return res.status(400).json({ message: "Missing required parameters." });
         }
 
-        if (
-            !mongoose.Types.ObjectId.isValid(divisionId) ||
+        if ( !mongoose.Types.ObjectId.isValid(divisionId) ||
             !mongoose.Types.ObjectId.isValid(districtId) ||
-            !mongoose.Types.ObjectId.isValid(upazilaId)
-
-        ) {
+            !mongoose.Types.ObjectId.isValid(upazilaId)) {
             return res.status(400).json({ message: "Invalid ID format." });
         }
 
@@ -158,6 +158,7 @@ const handelGetSingleUpazila = async (req, res) => {
             message: "Upazila fetched successfully",
             upazila,
         });
+
 
     } catch (error) {
         console.log(error)
@@ -206,6 +207,7 @@ const handelUpdateUpazila = async (req, res) => {
             message: "Upazila updated successfully.",
             upazilaUpdate,
         });
+
     } catch (error) {
         return res.status(500).json({ message: "Server error." });
     }

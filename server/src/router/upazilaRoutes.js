@@ -11,6 +11,6 @@ upazilaRoutes.get('/:divisionId/:districtId', handelGetAllUpazila)
 upazilaRoutes.get('/:divisionId/:districtId/:upazilaId', handelGetSingleUpazila)
 upazilaRoutes.put('/:upazilaId', handelUpdateUpazila)
 upazilaRoutes.delete('/:upazilaId', handelDeleteUpazila)
-upazilaRoutes.get("/",handelGetAllUpazilaWithOutDistrict)
+upazilaRoutes.get("/withOutDistrict",handelGetAllUpazilaWithOutDistrict)
 
 module.exports = upazilaRoutes

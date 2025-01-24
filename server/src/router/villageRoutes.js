@@ -12,6 +12,6 @@ villageRoutes.get('/:divisionId/:districtId/:upazilaId/:unionId', handelGetAllVi
 villageRoutes.get('/:divisionId/:districtId/:upazilaId/:unionId/:villageId', handelSinglalVillage)
 villageRoutes.delete('/:villageId', handelDeleteVillage)
 villageRoutes.put('/:villageId', handelUpdateVillage)
-villageRoutes.get("/",handelGetAllVillageWithOut)
+villageRoutes.get("/villagesWithOutUnion",handelGetAllVillageWithOut)
 
 module.exports = villageRoutes
