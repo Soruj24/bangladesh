@@ -34,20 +34,35 @@ export const unionApi = createApi({
             },
             invalidatesTags: [{ type: 'Unions', id: 'LIST' }],
         }),
+
+        getAllUnions: build.query<UnionsResponse, void>({
+            query: () => 'unions',
+            providesTags: (result) =>
+                Array.isArray(result)
+                    ? [
+                        ...result.map(({ id }) => ({ type: 'Unions', id }) as const),
+                        { type: 'Unions', id: 'LIST' },
+                    ]
+                    : [{ type: 'Unions', id: 'LIST' }],
+        }),
+
         getUnion: build.query<Union, string>({
             query: (id) => `union/${id}`,
             providesTags: (result, error, id) => [{ type: 'Unions', id }],
         }),
-        updateUnion: build.mutation<Union, Partial<Union>>({
+
+        updateUnion: build.mutation<Union, { unionId: string } & Partial<Union>>({
             query(data) {
-                const { id, ...body } = data;
+                const { unionId, ...body } = data;
+               
                 return {
-                    url: `unions/${id}`,
+                    url: `unions/${unionId}`,
                     method: 'PUT',
                     body,
+                    headers: { 'Content-Type': 'application/json' },
                 };
             },
-            invalidatesTags: (result, error, { id }) => [{ type: 'Unions', id }],
+            invalidatesTags: (result, error, { unionId}) => [{ type: 'Unions', unionId }],
         }),
         deleteUnion: build.mutation<{ success: boolean; id: string }, string>({
             query(id) {
@@ -67,4 +82,5 @@ export const {
     useGetUnionQuery,
     useUpdateUnionMutation,
     useDeleteUnionMutation,
+    useGetAllUnionsQuery
 } = unionApi;

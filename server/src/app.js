@@ -25,13 +25,13 @@ app.use(cookieParser())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use('/api/unions', unionRoutes)
 app.use('/api/users', userRouter)
 app.use('/api/population', populationRoute)
 app.use('/api/auth', authRouter)
 app.use('/api/divisions', divisionRoutes);
 app.use('/api/districts', districtRoutes);
 app.use('/api/upazilas', upazilaRoutes);
-app.use('/api/unions', unionRoutes)
 app.use('/api/villages', villageRoutes)
 
 

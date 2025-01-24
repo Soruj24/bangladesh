@@ -1,161 +1,221 @@
-import * as React from "react";
-import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+
 import { toast } from "@/hooks/use-toast";
 import { useGetUnionsQuery } from "@/services/unionsApi";
 import { useAddVillageMutation } from "@/services/villageApi";
 import { useDispatch, useSelector } from "react-redux";
-import { setVillageId } from "@/features/villageSlice";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { useState } from "react";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { setUnionId } from "@/features/unionSlice";
 
 // Zod Schema Definition
-const districtSchema = z.object({
-    division: z.string().nonempty("Division is required"),
-    name: z
-        .string()
-        .nonempty("Name is required")
-        .min(2, "Name must be at least 2 characters"),
+const villageSchema = z.object({
+  name: z
+    .string()
+    .nonempty("Name is required")
+    .min(2, "Name must be at least 2 characters"),
 });
 
-type DistrictFormValues = z.infer<typeof districtSchema>;
+type VillageFormValues = z.infer<typeof villageSchema>;
 
 const VillageAdd = () => {
+  const dispatch = useDispatch();
+  const [open, setOpen] = useState<boolean>(false);
+  const [selectedUnion, setSelectedUnion] = useState<string>("");
 
-    const dispatch = useDispatch()
-    const divisionId = useSelector((state: { divisionIdData: { divisionId: string } }) => (state?.divisionIdData?.divisionId));
-    const districtId = useSelector((state: { districtIdData: { districtId: string } }) => (state?.districtIdData?.districtId));
-    const upazilaId = useSelector((state: { upazilaIdData: { upazilaId: string } }) => (state?.upazilaIdData?.upazilaId?.districtId));
-    const unionId = useSelector((state: { villageIdData: { villageId: string } }) => (state.villageIdData.villageId))
-    const { data: unionData } = useGetUnionsQuery({ divisionId, districtId, upazilaId });
+  // Selectors for Redux state
+  const divisionId = useSelector(
+    (state: { divisionIdData: { divisionId: string } }) =>
+      state.divisionIdData.divisionId
+  );
 
-    const [addVillage] = useAddVillageMutation();
-    const {
-        register,
-        handleSubmit,
-        setValue,
-        formState: { errors },
-    } = useForm<DistrictFormValues>({
-        resolver: zodResolver(districtSchema),
+  const districtId = useSelector(
+    (state: { districtIdData: { districtId: string } }) =>
+      state.districtIdData.districtId
+  );
+
+  const upazilaId = useSelector(
+    (state: { upazilaIdData: { upazilaId: string } }) =>
+      state.upazilaIdData.upazilaId
+  );
+
+  const unionId = useSelector((state: { unionIdData: { unionId: string } }) => state.unionIdData.unionId);
+
+ 
+  // API calls
+  const { data: unionData, isLoading: unionLoading } = useGetUnionsQuery({
+    divisionId,
+    districtId,
+    upazilaId,
+  });
+
+  const [addVillage] = useAddVillageMutation();
+
+  // Form setup
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<VillageFormValues>({
+    resolver: zodResolver(villageSchema),
+  });
+
+  const onSubmit = async (formData: VillageFormValues) => {
+    try {
+      // Combine form data with selected IDs
+      const payload = {
+        ...formData,
+        divisionId,
+        districtId,
+        upazilaId,
+        unionId,
+      }; 
+
+      console.log("Payload sent to API:", payload);
+
+      const response = await addVillage(payload).unwrap();
+      console.log("API Response:", response);
+
+      toast({
+        title: "Success",
+        description: "Village created successfully.",
+      });
+    } catch (err) {
+      const errorMessage =
+        (err as { data?: { message?: string } })?.data?.message ??
+        "Failed to create village. Please try again.";
+      console.error("Error creating village:", errorMessage);
+
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const onError = (formErrors: typeof errors) => {
+    console.error("Validation Errors:", formErrors);
+    toast({
+      title: "Validation Error",
+      description: "Please fill in all required fields correctly.",
+      variant: "destructive",
     });
+  };
 
-    const onSubmit = async (formData: DistrictFormValues) => {
-        try {
-            // Combine all necessary data into a single object
-            const payload = {
-                ...formData,
-                divisionId,
-                districtId,
-                upazilaId,
-                unionId,
-            };
-
-            // Call the mutation with the combined payload
-            const response = await addVillage(payload).unwrap();
-
-            console.log('response', response);
-
-            toast({
-                title: "Success",
-                description: "Village created successfully.",
-            });
-        } catch (err) {
-            console.error("Error creating village:", err?.data?.message);
-            toast({
-                title: "Error",
-                description: err?.data?.message || "Failed to create village. Please try again.",
-                variant: "destructive",
-            });
-        }
-    };
-
-    const onError = (formErrors: typeof errors) => {
-        console.error("Validation Errors:", formErrors);
-        toast({
-            title: "Validation Error",
-            description: "Please fill in all required fields correctly.",
-            variant: "destructive",
-        });
-    };
-
-    return (
-        <Card className=" ">
-            <CardHeader>
-                <CardTitle>Create Village</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <form onSubmit={handleSubmit(onSubmit, onError)}>
-                    <div className="grid w-full items-center gap-4">
-                        {/* Division Field */}
-                        <div className="flex flex-col space-y-1.5">
-                            <Label htmlFor="division">Union</Label>
-                            <Select
-                                onValueChange={(value) => {
-                                    setValue("division", value); // Sync with form state
-                                    dispatch(setVillageId(value))
-                                }}
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Create Village</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit, onError)}>
+          <div className="grid w-full items-center gap-4">
+            {/* Union Dropdown */}
+            <p className="text-sm font-medium leading-none">Select Union</p>
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={open}
+                  className="justify-between"
+                >
+                  {selectedUnion
+                    ? unionData?.unions?.find(
+                        (union: { _id: string }) => union._id === selectedUnion
+                      )?.name
+                    : "Select union..."}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="p-0">
+                <Command>
+                  <CommandInput placeholder="Search union..." />
+                  <CommandList>
+                    {unionLoading ? (
+                      <p className="p-4 text-sm">Loading unions...</p>
+                    ) : unionData?.unions?.length ? (
+                      <CommandGroup>
+                        {unionData.unions.map(
+                          (union: { _id: string; name: string }) => (
+                            <CommandItem
+                              key={union._id}
+                              value={union.name}
+                              onSelect={() => {
+                                setSelectedUnion(union._id);
+                                dispatch(setUnionId(union._id));
+                                setOpen(false);
+                              }}
                             >
-                                <SelectTrigger id="division">
-                                    <SelectValue placeholder="Select a division" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {unionData?.unions?.map((division) => (
-                                        <SelectItem
-                                            key={division._id}
-                                            value={division._id}
-                                        >
-                                            {division.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            {errors.division && (
-                                <p className="text-sm text-red-600">
-                                    {errors.division.message}
-                                </p>
-                            )}
-                        </div>
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  selectedUnion === union._id
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                              {union.name}
+                            </CommandItem>
+                          )
+                        )}
+                      </CommandGroup>
+                    ) : (
+                      <CommandEmpty>No unions found.</CommandEmpty>
+                    )}
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
 
-                        {/* Name Field */}
-                        <div className="flex flex-col space-y-1.5">
-                            <Label htmlFor="name">Name</Label>
-                            <Input
-                                id="name"
-                                placeholder="Enter district name"
-                                {...register("name")}
-                            />
-                            {errors.name && (
-                                <p className="text-sm text-red-600">
-                                    {errors.name.message}
-                                </p>
-                            )}
-                        </div>
-                    </div>
-                    <CardFooter className="flex justify-end mt-4">
-                        <Button type="submit">Add Village</Button>
-                    </CardFooter>
-                </form>
-            </CardContent>
-        </Card>
-    );
+            {/* Name Field */}
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                placeholder="Enter village name"
+                {...register("name")}
+              />
+              {errors.name && (
+                <p className="text-sm text-red-600">{errors.name.message}</p>
+              )}
+            </div>
+          </div>
+          <CardFooter className="flex justify-end mt-4">
+            <Button type="submit">Add Village</Button>
+          </CardFooter>
+        </form>
+      </CardContent>
+    </Card>
+  );
 };
 
 export default VillageAdd;

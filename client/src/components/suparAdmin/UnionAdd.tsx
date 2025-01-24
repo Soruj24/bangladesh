@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -30,21 +29,21 @@ import {
 } from "@/components/ui/popover";
 import { toast } from "@/hooks/use-toast";
 import { useGetUpazilasQuery } from "@/services/upozilaApi";
-import { useAddUnionMutation } from "@/services/unionsApi";
+
 import { useDispatch, useSelector } from "react-redux";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { setUpazilaId } from "@/features/upazilaSlice";
+import { useAddUnionMutation } from "@/services/unionsApi";
 
-// Zod Schema Definition
-const districtSchema = z.object({
-  division: z.string().nonempty("Division is required"),
+// Zod schema for form validation
+const unionSchema = z.object({
   name: z
     .string()
     .nonempty("Name is required")
     .min(2, "Name must be at least 2 characters"),
 });
 
-type DistrictFormValues = z.infer<typeof districtSchema>;
+type UnionFormValues = z.infer<typeof unionSchema>;
 
 const UnionAdd = () => {
   const dispatch = useDispatch();
@@ -53,57 +52,65 @@ const UnionAdd = () => {
 
   const [addUnion] = useAddUnionMutation();
 
+  // Selectors to get IDs from Redux
   const divisionId = useSelector(
     (state: { divisionIdData: { divisionId: string } }) =>
       state?.divisionIdData?.divisionId
   );
-
   const districtId = useSelector(
     (state: { districtIdData: { districtId: string } }) =>
       state?.districtIdData?.districtId
   );
 
-
   const upazilaId = useSelector(
     (state: { upazilaIdData: { upazilaId: string } }) => state?.upazilaIdData?.upazilaId
   );
 
-  console.log("upazilaId", upazilaId);
+  const { data: upazilaData } = useGetUpazilasQuery({
+    divisionId,
+    districtId,
+  });
 
-  const { data: upazilaData } = useGetUpazilasQuery({ divisionId, districtId });
+console.log(upazilaData)
+
   const {
     register,
     handleSubmit,
-    
     formState: { errors },
-  } = useForm<DistrictFormValues>({
-    resolver: zodResolver(districtSchema),
+  } = useForm<UnionFormValues>({
+    resolver: zodResolver(unionSchema),
   });
 
-  const onSubmit = async (formData: DistrictFormValues) => {
+  
+  const onSubmit = async (formData: UnionFormValues) => {
     try {
-     await addUnion({
+      
+      const payload = {
         body: formData,
         divisionId,
         districtId,
-        upazilaId,
-      }).unwrap();
+        upazilaId
+      };
+
+      await addUnion(payload).unwrap();
+
       toast({
         title: "Success",
-        description: "District created successfully.",
+        description: "Union created successfully.",
       });
+
     } catch (err) {
       toast({
         title: "Error",
         description:
-          (err as { data?: { message?: string } })?.data?.message || "Failed to create district. Please try again.",
+          (err as { data?: { message?: string } })?.data?.message ||
+          "Failed to create union. Please try again.",
         variant: "destructive",
       });
     }
   };
 
-  const onError = (formErrors: typeof errors) => {
-    console.error("Validation Errors:", formErrors);
+  const onError = () => {
     toast({
       title: "Validation Error",
       description: "Please fill in all required fields correctly.",
@@ -112,16 +119,15 @@ const UnionAdd = () => {
   };
 
   return (
-    <Card className=" ">
+    <Card>
       <CardHeader>
         <CardTitle>Create Union</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit, onError)}>
-          <div className="grid w-full items-center gap-4">
-            {/* Division Field */}
-
-            <p className="text-sm font-medium leading-none">Select upazila</p>
+          <div className="grid gap-4">
+            {/* Upazila Selection */}
+            <p className="text-sm font-medium leading-none">Select Upazila</p>
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -134,7 +140,7 @@ const UnionAdd = () => {
                     ? upazilaData?.upazila?.find(
                         (upazila) => upazila.value === value
                       )?.label
-                    : "Select upazila..."}
+                    : "Select Division..."}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
@@ -147,7 +153,7 @@ const UnionAdd = () => {
                   <CommandList>
                     <CommandEmpty>No division found.</CommandEmpty>
                     <CommandGroup>
-                      {upazilaData?.upazila?.map((upazila) => (
+                      {upazilaData?.upazila?.map((upazila ) => (
                         <CommandItem
                           key={upazila._id}
                           value={upazila.name}
@@ -181,7 +187,7 @@ const UnionAdd = () => {
               <Label htmlFor="name">Name</Label>
               <Input
                 id="name"
-                placeholder="Enter district name"
+                placeholder="Enter union name"
                 {...register("name")}
               />
               {errors.name && (

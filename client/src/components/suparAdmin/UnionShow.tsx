@@ -1,83 +1,95 @@
-import { useState } from "react"
-import { Button } from "../ui/button"
-import { Skeleton } from "../ui/skeleton"
-import { Card, CardContent, CardFooter, CardHeader } from "../ui/card"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog"
-import { toast } from "@/hooks/use-toast"
-import { useDeleteUnionMutation, useGetUnionsQuery, useUpdateUnionMutation } from "@/services/unionsApi"
+import { useState } from "react";
+import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
+import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
+import { toast } from "@/hooks/use-toast";
+import {
+    useDeleteUnionMutation,
+    useGetAllUnionsQuery,
+    useUpdateUnionMutation,
+} from "@/services/unionsApi";
 
 const UnionShow = () => {
-    const { data, isError, isLoading, refetch } = useGetUnionsQuery()
-    const [updateUnion] = useUpdateUnionMutation()
-    const [deleteUnion] = useDeleteUnionMutation()
+    const { data, isError, isLoading, refetch } = useGetAllUnionsQuery();
+    const [updateUnion] = useUpdateUnionMutation();
+    const [deleteUnion] = useDeleteUnionMutation();
 
-    console.log(data?.union)
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
-    const [currentDivision, setCurrentDivision] = useState<any>(null)
+    interface Union {
+        _id: string;
+        name: string;
+    }
 
-    const handleDelete = async (id: number) => {
-        const res = await deleteUnion(id)
-        console.log(res)
+    const [currentUnion, setCurrentUnion] = useState<Union | null>(null);
 
-        if (res?.error) {
+    // Handle delete functionality
+    const handleDelete = async (id: string) => {
+        try {
+             await deleteUnion(id).unwrap();
+
+            toast({
+                title: "Success",
+                description: "Union deleted successfully",
+                variant: "default",
+            });
+            refetch();
+        } catch (error) {
             toast({
                 title: "Error",
-                description: res?.error?.data?.message,
+                description:
+                    (error as { data?: { message?: string } })?.data?.message || "Failed to delete union",
                 variant: "destructive",
-            })
+            });
         }
-        toast({
-            title: 'Success',
-            description: 'Division deleted successfully',
-            variant: 'default',
-        })
-        refetch()
-    }
+    };
 
-    const handleUpdate = (division: any) => {
-        setCurrentDivision(division)
-        setIsDialogOpen(true)
-    }
+    // Open update dialog
+    const handleUpdate = (union: Union) => {
+        setCurrentUnion(union);
+        setIsDialogOpen(true);
+    };
 
-    const handleUpdateSubmit = async (updatedDivision: any) => {
-        console.log("Updated Division:", updatedDivision);
-        if (!updatedDivision?.name?.trim()) {
+    // Handle update submission
+    const handleUpdateSubmit = async (updatedUnion: Union) => {
+        if (!updatedUnion?.name?.trim()) {
             toast({
                 title: "Error",
-                description: "Division name cannot be empty",
+                description: "Union name cannot be empty",
                 variant: "destructive",
             });
             return;
         }
 
         try {
-            const res = await updateUnion({ ...updatedDivision, id: updatedDivision._id }).unwrap();
-            console.log("Update response:", res); // Debugging
+            const res = await updateUnion({ ...updatedUnion, unionId: updatedUnion._id }).unwrap();
+            console.log("Update response:", res); // Debugging response
 
             toast({
-                title: 'Success',
-                description: 'Division updated successfully',
-                variant: 'default',
+                title: "Success",
+                description: "Union updated successfully",
+                variant: "default",
             });
 
-            refetch(); // Refresh divisions list
+            refetch(); // Refresh the unions list
             setIsDialogOpen(false); // Close dialog
         } catch (error) {
-            console.error("Update error:", error); // Debugging
+            console.error("Update error:", error); // Debugging error
             toast({
                 title: "Error",
-                description: error?.data?.message || "Failed to update division",
+                description:
+                    (error as { data?: { message?: string } })?.data?.message || "Failed to update union",
                 variant: "destructive",
             });
         }
     };
 
+    // Render loading state
     if (isLoading) {
         return (
             <div className="space-y-6 sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {/* Dynamic Skeleton loaders based on number of divisions */}
-                {[...Array(data?.union?.length || 1)].map((_, index) => (
+                {[...Array(4)].map((_, index) => (
                     <Card key={index} className="max-w-xs p-4 border shadow-lg">
                         <CardHeader>
                             <Skeleton className="w-24 h-6" />
@@ -92,61 +104,66 @@ const UnionShow = () => {
                     </Card>
                 ))}
             </div>
-        )
+        );
     }
 
+    // Render error state
     if (isError) {
-        return <h1>Error</h1>
+        return <h1>Error loading unions</h1>;
     }
 
     return (
         <div className="mt-4 sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {
-                data?.union?.map((division) => {
-                    return (
-                        <Card key={division._id} className="max-w-xs p-4 border shadow-lg">
-                            <CardHeader>
-                                <h2 className="text-lg font-semibold">{division.name}</h2>
-                            </CardHeader>
-                            <CardContent>
-                                {/* Additional division content can go here */}
-                                <p>{division.name}</p>
-                            </CardContent>
-                            <CardFooter className="flex space-x-2">
-                                <Button onClick={() => handleDelete(division._id)}>Delete</Button>
-                                <Button onClick={() => handleUpdate(division)}>Update</Button>
-                            </CardFooter>
-                        </Card>
-                    )
-                })
-            }
+            {data?.union?.map((union: Union) => (
+                <Card key={union._id} className="max-w-xs p-4 border shadow-lg">
+                    <CardHeader>
+                        <h2 className="text-lg font-semibold">{union.name}</h2>
+                    </CardHeader>
+                    <CardContent>
+                        <p>{union.name}</p>
+                    </CardContent>
+                    <CardFooter className="flex space-x-2">
+                        <Button onClick={() => handleDelete(union._id)}>Delete</Button>
+                        <Button onClick={() => handleUpdate(union)}>Update</Button>
+                    </CardFooter>
+                </Card>
+            ))}
 
-            {/* Dialog for updating the division */}
+            {/* Update Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Update Division</DialogTitle>
+                        <DialogTitle>Update Union</DialogTitle>
                     </DialogHeader>
-                    {/* Add form fields for updating division here */}
                     <div className="space-y-4">
                         <label className="block">
-                            <span className="text-sm  font-semibold">Division Name</span>
+                            <span className="text-sm font-semibold">Union Name</span>
                             <input
                                 type="text"
-                                value={currentDivision?.name || ""}
-                                onChange={(e) => setCurrentDivision({ ...currentDivision, name: e.target.value })}
+                                value={currentUnion?.name || ""}
+                                onChange={(e) =>
+                                    setCurrentUnion(
+                                        currentUnion
+                                            ? { ...currentUnion, name: e.target.value }
+                                            : null
+                                    )
+                                }
                                 className="mt-2 p-2 text-black border rounded-md w-full"
                             />
                         </label>
                     </div>
                     <DialogFooter>
-                        <Button onClick={() => handleUpdateSubmit(currentDivision)}>Update</Button>
-                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+                        <Button onClick={() => currentUnion && handleUpdateSubmit(currentUnion)}>
+                            Update
+                        </Button>
+                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                            Cancel
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
         </div>
-    )
-}
+    );
+};
 
-export default UnionShow
+export default UnionShow;

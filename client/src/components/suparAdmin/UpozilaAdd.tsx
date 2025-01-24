@@ -63,8 +63,7 @@ const UpozilaAdd = () => {
     (state: RootState) => state?.divisionIdData?.divisionId
   );
 
-  console.log("divisionId", divisionId);
-
+ 
   const districtId = useSelector(
     (state: { districtIdData: { districtId: string } }) =>
       state?.districtIdData.districtId
@@ -87,11 +86,13 @@ const UpozilaAdd = () => {
 
   const onSubmit = async (formData: DistrictFormValues) => {
     try {
+      
       const response = await addUpozila({
         body: formData,
         divisionId,
         districtId,
       }).unwrap();
+
       console.log(response);
       toast({
         title: "Success",

@@ -85,8 +85,8 @@ const DistrictAdd: React.FC = () => {
       // Refetch division data and reset form
       // refetch();
       // reset();
-      setValue("");
-      setDivisionId("");
+      // setValue("");
+      // setDivisionId("");
     } catch (err) {
       toast({
         title: "Error",
