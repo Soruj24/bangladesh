@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
@@ -35,6 +36,10 @@ const formSchema = z.object({
 });
 
 const AddAdminUsers = () => {
+  const [image, setImage] = useState<string | null>(null); // State for the selected or default image
+  const defaultImage = "/default-image.png"; // Path to your default image
+  const fileInputRef = useRef<HTMLInputElement>(null); // Ref for the file input
+
   const formMethods = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: { name: "", email: "", bio: "", tag: "", phone: "" },
@@ -42,38 +47,50 @@ const AddAdminUsers = () => {
 
   const [addPopulation] = useAddPopulationMutation();
 
+  const divisionId = useSelector(
+    (state: { divisionIdData: { divisionId: string } }) => state?.divisionIdData?.divisionId
+  );
 
-const divisionId = useSelector(
-  (state: { divisionIdData: { divisionId: string } }) => state?.divisionIdData?.divisionId
-);
+  const districtId = useSelector(
+    (state: { districtIdData: { districtId: string } }) => state?.districtIdData?.districtId
+  );
 
-const districtId = useSelector(
-  (state: { districtIdData: { districtId: string } }) => state?.districtIdData?.districtId
-);
+  const upazilaId = useSelector(
+    (state: { upazilaIdData: { upazilaId: string } }) => state?.upazilaIdData?.upazilaId
+  );
 
-const upazilaId = useSelector(
-  (state: { upazilaIdData: { upazilaId: string } }) => state?.upazilaIdData?.upazilaId
-);
+  const unionId = useSelector(
+    (state: { unionIdData: { unionId: string } }) => state?.unionIdData?.unionId
+  );
 
-const unionId = useSelector(
-  (state: { unionIdData: { unionId: string } }) => state?.unionIdData?.unionId
-);
+  const villageId = useSelector(
+    (state: { villageIdData: { villageId: string } }) => state?.villageIdData?.villageId
+  );
 
-const villageId = useSelector(
-  (state: { villageIdData: { villageId: string } }) => state?.villageIdData?.villageId
-);
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      setImage(URL.createObjectURL(file)); // Update the image preview
+    }
+  };
 
- 
+  const handleImageClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click(); // Trigger the file input click
+    }
+  };
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data) => {
     try {
       const newPopulation = {
         ...data,
-       division:  divisionId,
-       district:  districtId,
-        upazila:  upazilaId,
-        union:  unionId,
-        village:  villageId,
+        division: divisionId,
+        district: districtId,
+        upazila: upazilaId,
+        union: unionId,
+        village: villageId,
+        image, // Include the image URL in the submission
       };
 
       const res = await addPopulation(newPopulation);
@@ -87,7 +104,6 @@ const villageId = useSelector(
         return;
       }
 
-      console.log(res);
       toast({
         title: " Success",
         description: "Admin User Added Successfully",
@@ -96,7 +112,6 @@ const villageId = useSelector(
     } catch (error) {
       console.log(error);
     }
-    
   };
 
   return (
@@ -110,7 +125,25 @@ const villageId = useSelector(
             <form
               onSubmit={formMethods.handleSubmit(onSubmit)}
               className="space-y-6"
+              encType="multipart/form-data"
             >
+              <div className="flex flex-col items-center space-y-4">
+                <img
+                  src={image || defaultImage} // Show selected or default image
+                  alt="Preview"
+                  className="w-32 h-32 object-cover rounded-full border cursor-pointer"
+                  onClick={handleImageClick} // Click the image to open file picker
+                />
+                <input
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  ref={fileInputRef} // Link the input to the ref
+                  onChange={handleImageChange}
+                  className="hidden" // Hide the input
+                />
+              </div>
+
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <FormField
                   name="name"

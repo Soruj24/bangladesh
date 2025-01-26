@@ -11,8 +11,13 @@ interface District {
     name: string;
 }
 
+interface Division {
+    _id: string;
+    name: string;
+}
+
 const DistrictShow = () => {
-    const { data, error, isFetching, refetch } = useGetAllDistrictsQuery<{ district: District[] }>();
+    const { data, error,isLoading,  refetch } = useGetAllDistrictsQuery<{ district: District[] }>();
     const [updateDistrict] = useUpdateDistrictMutation();
     const [deleteDistrict] = useDeleteDistrictMutation();
 
@@ -40,7 +45,7 @@ const DistrictShow = () => {
     };
 
     const handleUpdate = (district: District) => {
-        setCurrentDivision(district);
+        setCurrentDivision({ _id: district.id, name: district.name });
         setIsDialogOpen(true);
     };
 
@@ -77,7 +82,7 @@ const DistrictShow = () => {
         }
     };
 
-    if (isFetching) {
+    if (isLoading) {
         return (
             <div className="space-y-6 sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {[...Array(data?.district?.length || 1)].map((_, index) => (
@@ -104,7 +109,7 @@ const DistrictShow = () => {
 
     return (
         <div className="mt-4 sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {data?.district?.map((district) => (
+            {data?.district?.map((district: District) => (
                 <Card key={district.id} className="max-w-xs p-4 border shadow-lg">
                     <CardHeader>
                         <h2 className="text-lg font-semibold">{district.name}</h2>

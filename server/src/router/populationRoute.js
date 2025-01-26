@@ -1,10 +1,11 @@
 const { addUser, populationGetAllUsers, populationGetSingalUser, populationUpdateUser, populationUserDelete, populationHandelAdminUpdateUser } = require('../controller/populationController')
 const { isLoggedOut, isSuperAdmin, isAdmin, isLoggedIn } = require('../middleware/auth')
+const upload = require('../middleware/imageUploader')
 
 const populationRoute = require('express').Router()
 
 
-populationRoute.post('/', addUser)
+populationRoute.post('/', upload.single('image'),addUser)
 populationRoute.get('/', populationGetAllUsers)
 populationRoute.get('/:id', populationGetSingalUser)
 populationRoute.put('/:id', populationUpdateUser)

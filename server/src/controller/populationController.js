@@ -4,9 +4,19 @@ const Population = require("../model/populationModel");
 const addUser = async (req, res) => {
     try {
 
-        const { name, email, phone, tag, bio, village, union, upazila, district, division } = req.body;
-
-        console.log(req.body)
+        const {
+            name,
+            email,
+            phone,
+            tag,
+            image,
+            bio,
+            village,
+            union,
+            upazila,
+            district,
+            division
+        } = req.body;
 
 
         // Check if the user already exists by email or phone
@@ -21,6 +31,7 @@ const addUser = async (req, res) => {
             email,
             phone,
             tag,
+            image,
             bio,
             division,
             district,
@@ -40,6 +51,7 @@ const addUser = async (req, res) => {
                 email: savedUser.email,
                 phone: savedUser.phone,
                 tag: savedUser.tag,
+                image: savedUser.image,
                 village: savedUser.village,
                 union: savedUser.union,
                 upazila: savedUser.upazila,
@@ -47,7 +59,7 @@ const addUser = async (req, res) => {
                 division: savedUser.division
             }
         });
-        
+
 
     } catch (error) {
         console.log(error)

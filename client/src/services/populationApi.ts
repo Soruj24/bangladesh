@@ -6,8 +6,21 @@ export interface Population {
     relatedData?: string; // Example of populated data
 }
 
-type PopulationResponse = Population[];
+ 
 
+type PopulationResponse = {
+    users: {
+        _id: string;
+        name: string;
+        email: string;
+        image: string;
+        division: string;
+        district: string;
+        upazila: string;
+        union: string;
+        village: string;
+    }[];
+};
 export const populationApi = createApi({
     reducerPath: 'populationApi',
     baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api/' }),

@@ -1,12 +1,15 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-
+ 
 export interface District {
     id: string;
     name: string;
 }
+ 
 
-type DistrictsResponse = District[];
-
+ 
+type DistrictsResponse = District[]
+  
+ 
 export const districtApi = createApi({
     reducerPath: 'districtsApi',
     baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api' }),

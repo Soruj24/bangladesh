@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useGetDivisionsQuery, useDeleteDivisionMutation, useUpdateDivisionMutation } from "@/services/dividionApi"
+import { useGetDivisionsQuery, useDeleteDivisionMutation, useUpdateDivisionMutation, Division } from "@/services/dividionApi"
 import { Button } from "../ui/button"
 import { Skeleton } from "../ui/skeleton"
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card"
@@ -12,7 +12,7 @@ const DivisionShow = () => {
     const [updateDivision] = useUpdateDivisionMutation()
 
     const [isDialogOpen, setIsDialogOpen] = useState(false)
-    const [currentDivision, setCurrentDivision] = useState<any>(null)
+    const [currentDivision, setCurrentDivision] = useState<Division | null>(null)
 
     const handleDelete = async (id: number) => {
         const res = await deleteDivision(id)
@@ -33,20 +33,13 @@ const DivisionShow = () => {
         refetch()
     }
 
-    interface Division {
-        _id: number;
-        name: string;
-        // Add other properties if needed
-    }
-
     const handleUpdate = (division: Division) => {
         setCurrentDivision(division)
         setIsDialogOpen(true)
     }
 
-    const handleUpdateSubmit = async (updatedDivision: Division) => {
-        console.log("Updated Division:", updatedDivision);
-        if (!updatedDivision?.name?.trim()) {
+    const handleUpdateSubmit = async (updatedDivision: Division | null) => {
+        if (!updatedDivision || !updatedDivision.name.trim()) {
             toast({
                 title: "Error",
                 description: "Division name cannot be empty",
@@ -56,8 +49,7 @@ const DivisionShow = () => {
         }
 
         try {
-            const res = await updateDivision({ ...updatedDivision, id: updatedDivision._id }).unwrap();
-            console.log("Update response:", res); // Debugging
+            const res = await updateDivision({ ...updatedDivision, id: updatedDivision.id }).unwrap();
 
             toast({
                 title: 'Success',
@@ -65,13 +57,12 @@ const DivisionShow = () => {
                 variant: 'default',
             });
 
-            refetch(); // Refresh divisions list
-            setIsDialogOpen(false); // Close dialog
+            refetch();
+            setIsDialogOpen(false);
         } catch (error) {
-            console.error("Update error:", error); // Debugging
             toast({
                 title: "Error",
-                description: error?.data?.message || "Failed to update division",
+                description: (error as { data?: { message?: string } })?.data?.message || "Failed to update division",
                 variant: "destructive",
             });
         }
@@ -80,8 +71,7 @@ const DivisionShow = () => {
     if (isLoading) {
         return (
             <div className="space-y-6 sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {/* Dynamic Skeleton loaders based on number of divisions */}
-                {[...Array(data?.divisions.length || 1)].map((_, index) => (
+                {[...Array(4)].map((_, index) => (
                     <Card key={index} className="max-w-xs p-4 border shadow-lg">
                         <CardHeader>
                             <Skeleton className="w-24 h-6" />
@@ -100,57 +90,69 @@ const DivisionShow = () => {
     }
 
     if (isError) {
-        return <h1>Error </h1>
+        return (
+            <div className="text-center">
+                <h1 className="text-red-600">Failed to fetch divisions.</h1>
+                <Button onClick={refetch} variant="outline">Retry</Button>
+            </div>
+        )
     }
 
     return (
         <div className="mt-4 sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {
-                data?.divisions.map((division: Division) => {
-                    return (
-                        <Card key={division._id} className="max-w-xs p-4 border shadow-lg">
-                            <CardHeader>
-                                <h2 className="text-lg font-semibold">{division.name}</h2>
-                            </CardHeader>
-                            <CardContent>
-                                {/* Additional division content can go here */}
-                                <p>{division.name}</p>
-                            </CardContent>
-                            <CardFooter className="flex space-x-2">
-                                <Button onClick={() => handleDelete(division._id)}>Delete</Button>
-                                <Button onClick={() => handleUpdate(division)}>Update</Button>
-                            </CardFooter>
-                        </Card>
-                    )
-                })
-            }
+            {data?.divisions.map((division) => (
+                <Card key={division.id} className="max-w-xs p-4 border shadow-lg">
+                    <CardHeader>
+                        <h2 className="text-lg font-semibold">{division.name}</h2>
+                    </CardHeader>
+                    <CardContent>
+                        <p>{division.name}</p>
+                    </CardContent>
+                    <CardFooter className="flex space-x-2">
+                        <Button onClick={() => handleDelete(division.id)}>Delete</Button>
+                        <Button onClick={() => handleUpdate(division)}>Update</Button>
+                    </CardFooter>
+                </Card>
+            ))}
 
-            {/* Dialog for updating the division */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Update Division</DialogTitle>
-                    </DialogHeader>
-                    {/* Add form fields for updating division here */}
-                    <div className="space-y-4">
-                        <label className="block">
-                            <span className="text-sm  font-semibold">Division Name</span>
-                            <input
-                                type="text"
-                                value={currentDivision?.name || ""}
-                                onChange={(e) => setCurrentDivision({ ...currentDivision, name: e.target.value })}
-                                className="mt-2 p-2 text-black border rounded-md w-full"
-                            />
-                        </label>
-                    </div>
-                    <DialogFooter>
-                        <Button onClick={() => handleUpdateSubmit(currentDivision)}>Update</Button>
-                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                    </DialogFooter>
-                </DialogContent>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleUpdateSubmit(currentDivision);
+                    }}
+                >
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Update Division</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                            <label className="block">
+                                <span className="text-sm font-semibold">Division Name</span>
+                                <input
+                                    type="text"
+                                    value={currentDivision?.name || ""}
+                                    onChange={(e) =>
+                                        setCurrentDivision((prev) =>
+                                            prev ? { ...prev, name: e.target.value } : null
+                                        )
+                                    }
+                                    className="mt-2 p-2 text-black border rounded-md w-full"
+                                    required
+                                />
+                            </label>
+                        </div>
+                        <DialogFooter>
+                            <Button type="submit">Update</Button>
+                            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                                Cancel
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </form>
             </Dialog>
         </div>
     )
 }
 
-export default DivisionShow
+export default DivisionShow;

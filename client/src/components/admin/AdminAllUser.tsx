@@ -13,6 +13,8 @@ const AdminAllUser = () => {
         return <p className="text-center text-xl text-red-500">Failed to load users.</p>;
     }
 
+    
+
     return (
         <div className="p-4">
             <h1 className="text-2xl font-semibold mb-4">All Users</h1>
@@ -21,6 +23,7 @@ const AdminAllUser = () => {
                 <Table className="min-w-full table-auto">
                     <TableHeader>
                         <TableRow>
+                            <TableHead>Image</TableHead>
                             <TableHead>Name</TableHead>
                             <TableHead>Email</TableHead>
                             <TableHead>Division</TableHead>
@@ -32,8 +35,9 @@ const AdminAllUser = () => {
                     </TableHeader>
 
                     <TableBody>
-                        {data?.users?.map((user: any) => (
+                        {data?.users?.map((user) => (
                             <TableRow key={user._id}>
+                                <TableCell> <img src={user?.image} alt="User" className="w-8 h-8 rounded-full" /> </TableCell>
                                 <TableCell>{user?.name}</TableCell>
                                 <TableCell>{user?.email}</TableCell>
                                 <TableCell>{user?.division}</TableCell>
@@ -46,8 +50,10 @@ const AdminAllUser = () => {
                     </TableBody>
                 </Table>
             </div>
+
         </div>
     );
 };
+
 
 export default AdminAllUser;

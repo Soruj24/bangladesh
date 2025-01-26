@@ -1,12 +1,12 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
+
 export interface Division {
-    id: number
-    name: string
+    id: string;
+    name: string;
 }
 
-type DivisionsResponse = Division[]
-
+type DivisionsResponse = { divisions: Division[] }; 
 export const divisionApi = createApi({
     reducerPath: 'divisionsApi',
     baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api' }),
