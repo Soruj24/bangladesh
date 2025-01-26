@@ -2,9 +2,7 @@ import App from "@/App";
 import Home from "@/page/Home";
 import SignIn from "@/page/SignIn";
 import SignUp from "@/page/SignUp";
-import {
-    createBrowserRouter,
-} from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminRoute from "./AdminRoute";
 import AdminProfile from "@/components/admin/AdminProfile";
@@ -18,90 +16,91 @@ import UpazilaShow from "@/components/suparAdmin/UpazilaShow";
 import UnionShow from "@/components/suparAdmin/UnionShow";
 import VillageShow from "@/components/suparAdmin/VillageShow";
 import AddAdminUsers from "@/components/admin/AddAdminUsers";
+import SuparAdminProfile from "@/components/suparAdmin/SuparAdminProfile";
 
 const router = createBrowserRouter([
-    {
+  {
+    path: "/",
+    element: <App />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
         path: "/",
-        element: <App />,
-        errorElement: <ErrorPage />,
+        element: <Home />,
+      },
+      {
+        path: "sign-up",
+        element: <SignUp />,
+      },
+      {
+        path: "sign-in",
+        element: <SignIn />,
+      },
+      {
+        path: "dashboard/user",
+        element: <ProtectedRoute />,
         children: [
-            {
-                path: "/",
-                element: <Home />
-            },
-            {
-                path: 'sign-up',
-                element: <SignUp />
-            },
-            {
-                path: 'sign-in',
-                element: <SignIn />
-            },
-            {
-                path: "dashboard/user",
-                element: <ProtectedRoute />,
-                children: [
-                    {
-                        path: "profile",
-                        element: <Home />,
-                    },
+          {
+            path: "profile",
+            element: <Home />,
+          },
+        ],
+      },
+      {
+        path: "dashboard/admin",
+        element: <AdminRoute />,
+        children: [
+          {
+            path: "profile",
+            element: <AdminProfile />,
+          },
 
-                ],
-            },
-            {
-                path: "dashboard/admin",
-                element: <AdminRoute />,
-                children: [
-                    {
-                        path: "profile",
-                        element: <AdminProfile />,
-                    },
-
-                    {
-                        path: "users",
-                        element: <AdminAllUser />,
-                    },
-                    {
-                        path: 'add-admin-users',
-                        element: <AddAdminUsers />
-                    }
-                ],
-            },
-            {
-                path: "dashboard/supar-admin",
-                element: <SuparAdminRoute />,
-                children: [
-                    {
-                        path: "profile",
-                        element: <SuparProfile />,
-                    },
-                    {
-                        path: 'division-show-all',
-                        element: <DivisionShow />
-                    },
-                    {
-                        path: "district-show-all",
-                        element: <DistrictShow />
-                    },
-                    {
-                        path: "upazila-show-all",
-                        element: <UpazilaShow />
-                    },
-                    {
-                        path: "union-show-all",
-                        element: <UnionShow />
-                    },
-                    {
-                        path: 'village-show-all',
-                        element: <VillageShow />
-                    }
-
-
-                ],
-            }
-        ]
-    },
+          {
+            path: "users",
+            element: <AdminAllUser />,
+          },
+          {
+            path: "add-admin-users",
+            element: <AddAdminUsers />,
+          },
+        ],
+      },
+      {
+        path: "dashboard/supar-admin",
+        element: <SuparAdminRoute />,
+        children: [
+          {
+            path: "profile",
+            element: <SuparProfile />,
+          },
+          {
+            path: "supar-profile",
+            element: <SuparAdminProfile />,
+          },
+          {
+            path: "division-show-all",
+            element: <DivisionShow />,
+          },
+          {
+            path: "district-show-all",
+            element: <DistrictShow />,
+          },
+          {
+            path: "upazila-show-all",
+            element: <UpazilaShow />,
+          },
+          {
+            path: "union-show-all",
+            element: <UnionShow />,
+          },
+          {
+            path: "village-show-all",
+            element: <VillageShow />,
+          },
+        ],
+      },
+    ],
+  },
 ]);
 
-
-export default router
+export default router;

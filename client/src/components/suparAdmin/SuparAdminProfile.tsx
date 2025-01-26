@@ -4,18 +4,19 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
- 
-const AdminProfile = () => {
+
+const SuperAdminProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
-    name: "Jane Smith",
-    email: "jane.smith@example.com",
-    phone: "+1 987 654 321",
-    address: "456 Admin Lane, Cityville",
-    bio: "Administrator with 5+ years of experience in operations and management.",
-    role: "Admin",
+    name: "John Doe",
+    email: "john.doe@example.com",
+    phone: "+1 234 567 890",
+    address: "123 Main Street, Cityville",
+    bio: "Super Administrator with 10+ years of experience managing global teams.",
+    role: "Super Admin",
     image: "/user.png",
   });
 
@@ -30,7 +31,6 @@ const AdminProfile = () => {
     setIsEditing(!isEditing);
   };
 
-  
   return (
     <div className="space-y-8 p-4 md:p-8 max-w-4xl mx-auto">
       <Card className="p-4 shadow-lg">
@@ -132,4 +132,4 @@ const AdminProfile = () => {
   );
 };
 
-export default AdminProfile;
+export default SuperAdminProfile;
