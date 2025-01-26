@@ -24,6 +24,7 @@ import UpazilaCombo from "../comboItem/UpazilaCombo";
 import UnionCombo from "../comboItem/UnionCombo";
 import VillageCombo from "../comboItem/VillageCombo";
 import { useSelector } from "react-redux";
+import user from '/user.png'
 
 const formSchema = z.object({
   name: z
@@ -37,7 +38,6 @@ const formSchema = z.object({
 
 const AddAdminUsers = () => {
   const [image, setImage] = useState<string | null>(null); // State for the selected or default image
-  const defaultImage = "/default-image.png"; // Path to your default image
   const fileInputRef = useRef<HTMLInputElement>(null); // Ref for the file input
 
   const formMethods = useForm({
@@ -129,7 +129,7 @@ const AddAdminUsers = () => {
             >
               <div className="flex flex-col items-center space-y-4">
                 <img
-                  src={image || defaultImage} // Show selected or default image
+                  src={image || user} // Show selected or default image
                   alt="Preview"
                   className="w-32 h-32 object-cover rounded-full border cursor-pointer"
                   onClick={handleImageClick} // Click the image to open file picker
