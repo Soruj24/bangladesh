@@ -24,7 +24,8 @@ import UpazilaCombo from "../comboItem/UpazilaCombo";
 import UnionCombo from "../comboItem/UnionCombo";
 import VillageCombo from "../comboItem/VillageCombo";
 import { useSelector } from "react-redux";
-import user from '/user.png'
+import user from "/user.png";
+import axios from "axios";
 
 const formSchema = z.object({
   name: z
@@ -37,7 +38,7 @@ const formSchema = z.object({
 });
 
 const AddAdminUsers = () => {
-  const [image, setImage] = useState<string | null>(null); // State for the selected or default image
+  const [image, setImage] = useState<File | null>(null); // State for the selected file object
   const fileInputRef = useRef<HTMLInputElement>(null); // Ref for the file input
 
   const formMethods = useForm({
@@ -48,15 +49,18 @@ const AddAdminUsers = () => {
   const [addPopulation] = useAddPopulationMutation();
 
   const divisionId = useSelector(
-    (state: { divisionIdData: { divisionId: string } }) => state?.divisionIdData?.divisionId
+    (state: { divisionIdData: { divisionId: string } }) =>
+      state?.divisionIdData?.divisionId
   );
 
   const districtId = useSelector(
-    (state: { districtIdData: { districtId: string } }) => state?.districtIdData?.districtId
+    (state: { districtIdData: { districtId: string } }) =>
+      state?.districtIdData?.districtId
   );
 
   const upazilaId = useSelector(
-    (state: { upazilaIdData: { upazilaId: string } }) => state?.upazilaIdData?.upazilaId
+    (state: { upazilaIdData: { upazilaId: string } }) =>
+      state?.upazilaIdData?.upazilaId
   );
 
   const unionId = useSelector(
@@ -64,14 +68,15 @@ const AddAdminUsers = () => {
   );
 
   const villageId = useSelector(
-    (state: { villageIdData: { villageId: string } }) => state?.villageIdData?.villageId
+    (state: { villageIdData: { villageId: string } }) =>
+      state?.villageIdData?.villageId
   );
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       const file = files[0];
-      setImage(URL.createObjectURL(file)); // Update the image preview
+      setImage(file); // Save the actual file object
     }
   };
 
@@ -81,8 +86,33 @@ const AddAdminUsers = () => {
     }
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: {
+    name: string;
+    email: string;
+    bio?: string;
+    tag?: string;
+    phone?: string;
+  }) => {
     try {
+      let imageUrl = null;
+
+      // Upload image to Cloudinary if an image is selected
+      if (image) {
+        const formData = new FormData();
+        formData.append("file", image); // Add the image file
+        formData.append("upload_preset", "image_upload"); // Replace with your actual preset
+        formData.append("cloud_name", "dlg03uemw"); // Replace with your Cloudinary cloud name
+
+        const resp = await axios.post(
+          "https://api.cloudinary.com/v1_1/dlg03uemw/image/upload",
+          formData
+        );
+
+        imageUrl = resp.data.secure_url; // Get the uploaded image URL
+      }
+      
+
+      // Prepare the new user data
       const newPopulation = {
         ...data,
         division: divisionId,
@@ -90,30 +120,38 @@ const AddAdminUsers = () => {
         upazila: upazilaId,
         union: unionId,
         village: villageId,
-        image, // Include the image URL in the submission
+        image: imageUrl, // Add the uploaded image URL
       };
 
+      // Send the user data to your backend
       const res = await addPopulation(newPopulation);
 
       if (res.error) {
         toast({
           title: "Error",
-          description: res?.error?.data?.message,
+          description:
+            "data" in res.error
+              ? (res.error.data as { message: string }).message
+              : "An error occurred",
           variant: "destructive",
         });
         return;
       }
 
       toast({
-        title: " Success",
+        title: "Success",
         description: "Admin User Added Successfully",
         variant: "default",
       });
     } catch (error) {
-      console.log(error);
+      console.error("Error adding admin user:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add admin user. Please try again.",
+        variant: "destructive",
+      });
     }
   };
-  
 
   return (
     <div className="space-y-8 p-4 md:p-8 max-w-4xl mx-auto">
@@ -130,10 +168,10 @@ const AddAdminUsers = () => {
             >
               <div className="flex flex-col items-center space-y-4">
                 <img
-                  src={image || user} // Show selected or default image
+                  src={image ? URL.createObjectURL(image) : user} // Show preview dynamically
                   alt="Preview"
                   className="w-32 h-32 object-cover rounded-full border cursor-pointer"
-                  onClick={handleImageClick} // Click the image to open file picker
+                  onClick={handleImageClick} // Open the file picker
                 />
                 <input
                   type="file"

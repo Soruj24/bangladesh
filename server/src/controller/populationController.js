@@ -18,7 +18,6 @@ const addUser = async (req, res) => {
             division
         } = req.body;
 
-
         // Check if the user already exists by email or phone
         const userExists = await Population.findOne({ $or: [{ email }, { phone }] });
         if (userExists) {
@@ -39,6 +38,7 @@ const addUser = async (req, res) => {
             union,
             village,
         });
+        
 
         const savedUser = await newPopulation.save();
 

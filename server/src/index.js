@@ -1,11 +1,11 @@
 const app = require("./app");
 const connectDB = require("./config/db");
-const post = 4000;
+const { port } = require("./secret");
+ 
 
 
 
-
-app.listen(post, async() => {
+app.listen(port, async() => {
     await connectDB()
-    console.log(`Server is running on port ${post}`);
+    console.log(`Server is running on port ${port}`);
 });
