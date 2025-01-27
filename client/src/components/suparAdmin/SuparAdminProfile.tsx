@@ -4,12 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
 const SuperAdminProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
+  
   const [profile, setProfile] = useState({
     name: "John Doe",
     email: "john.doe@example.com",
@@ -30,6 +30,10 @@ const SuperAdminProfile = () => {
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
   };
+
+  const handelResetPassword = () => {
+    alert("Password reset coming soon!");
+  };  
 
   return (
     <div className="space-y-8 p-4 md:p-8 max-w-4xl mx-auto">
@@ -124,12 +128,13 @@ const SuperAdminProfile = () => {
             <Button onClick={handleEditToggle}>
               {isEditing ? "Save Changes" : "Edit Profile"}
             </Button>
-            <Button variant="destructive">Reset Password</Button>
+            <Button onClick={() =>handelResetPassword } variant="destructive">Reset Password</Button>
           </div>
         </CardContent>
       </Card>
     </div>
   );
 };
+
 
 export default SuperAdminProfile;

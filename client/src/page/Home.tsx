@@ -5,7 +5,14 @@ import { useSelector } from "react-redux";
 
 const Home = () => {
 
-  const user = useSelector((state: { auth: { user: any } }) => state.auth.user);
+  interface User {
+    id: string;
+    name: string;
+    email: string;
+    // add other user properties here
+  }
+
+  const user = useSelector((state: { auth: { user: User } }) => state.auth.user);
   console.log(user)
 
   return (

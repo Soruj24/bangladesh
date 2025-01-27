@@ -30,6 +30,10 @@ const AdminProfile = () => {
     setIsEditing(!isEditing);
   };
 
+  const handelResetPassword = () => {
+    alert("Password reset coming soon!");
+  };
+
   
   return (
     <div className="space-y-8 p-4 md:p-8 max-w-4xl mx-auto">
@@ -72,8 +76,8 @@ const AdminProfile = () => {
             {isEditing ? (
               <Input
                 name="email"
+                disabled
                 value={profile.email}
-                onChange={handleInputChange}
                 placeholder="Enter email"
               />
             ) : (
@@ -124,7 +128,7 @@ const AdminProfile = () => {
             <Button onClick={handleEditToggle}>
               {isEditing ? "Save Changes" : "Edit Profile"}
             </Button>
-            <Button variant="destructive">Reset Password</Button>
+            <Button onClick={() => handelResetPassword} variant="destructive">Reset Password</Button>
           </div>
         </CardContent>
       </Card>

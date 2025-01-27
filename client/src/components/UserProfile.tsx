@@ -111,7 +111,7 @@ const UserProfile = () => {
               <DropdownMenuSeparator />
               <Link to="dashboard/admin/add-admin-users">
                 <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" /> Add Users
+                  <Settings className="mr-2 h-4 w-4" /> Add Population Users
                 </DropdownMenuItem>
               </Link>
             </div>

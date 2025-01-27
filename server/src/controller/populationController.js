@@ -38,7 +38,7 @@ const addUser = async (req, res) => {
             union,
             village,
         });
-        
+
 
         const savedUser = await newPopulation.save();
 
@@ -66,6 +66,7 @@ const addUser = async (req, res) => {
         return res.status(500).json({ message: "Failed to register user" });
     }
 };
+
 
 
 const populationGetAllUsers = async (req, res) => {
@@ -134,7 +135,6 @@ const populationGetAllUsers = async (req, res) => {
         return res.status(500).json({ message: "Failed to fetch users" });
     }
 };
-
 
 
 const populationGetSingalUser = async (req, res) => {
