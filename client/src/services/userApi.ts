@@ -48,11 +48,19 @@ export const userApi = createApi({
     endpoints: (build) => ({
         // Get Users
         getUsers: build.query({
-            query: () => 'users',
+            query: ({ page = 1, limit = 5, search = "" }) => ({
+                url: `users`,
+                method: 'GET',
+                params: {
+                    page,
+                    limit,
+                    search,
+                },
+            }),
             providesTags: (result) => {
-                if (Array.isArray(result)) {
+                if (result?.users) {
                     return [
-                        ...result.map(({ id }) => ({ type: 'Users', id })),
+                        ...result.users.map(({ id }) => ({ type: 'Users', id })),
                         { type: 'Users', id: 'LIST' },
                     ];
                 }

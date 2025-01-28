@@ -18,6 +18,7 @@ const UserProfile = () => {
   const navigate = useNavigate();
   const [logoutUser] = useLogoutUserMutation();
   const dispatch = useDispatch();
+  
   interface User {
     isSuperAdmin: boolean;
     isAdmin: boolean;
@@ -103,6 +104,12 @@ const UserProfile = () => {
           <DropdownMenuSeparator />
           {user?.isAdmin && (
             <div>
+              <Link to="dashboard/admin/all-users">
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" /> All Users
+                </DropdownMenuItem>
+              </Link>
+              <DropdownMenuSeparator />
               <Link to="dashboard/admin/profile">
                 <DropdownMenuItem>
                   <User className="mr-2 h-4 w-4" /> Admin Profile

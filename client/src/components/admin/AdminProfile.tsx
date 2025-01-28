@@ -125,11 +125,13 @@ const AdminProfile = () => {
           </div>
           <Separator />
           <div className="flex justify-between items-center">
+            
             <Button onClick={handleEditToggle}>
               {isEditing ? "Save Changes" : "Edit Profile"}
             </Button>
             <Button onClick={() => handelResetPassword} variant="destructive">Reset Password</Button>
           </div>
+
         </CardContent>
       </Card>
     </div>

@@ -41,7 +41,7 @@ const registerUser = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
     try {
-        const { search = '', page = 1, limit = 9 } = req.query;
+        const { search = '', page = 1, limit = 5 } = req.query;
 
         // Convert page and limit to integers
         const pageNumber = parseInt(page, 10);

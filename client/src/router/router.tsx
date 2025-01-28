@@ -17,6 +17,7 @@ import UnionShow from "@/components/suparAdmin/UnionShow";
 import VillageShow from "@/components/suparAdmin/VillageShow";
 import AddAdminUsers from "@/components/admin/AddAdminUsers";
 import SuparAdminProfile from "@/components/suparAdmin/SuparAdminProfile";
+import AllUser from "@/page/AllUser";
 
 const router = createBrowserRouter([
   {
@@ -63,6 +64,10 @@ const router = createBrowserRouter([
             path: "add-admin-users",
             element: <AddAdminUsers />,
           },
+          {
+            path: "all-users",
+            element:<AllUser/>
+          }
         ],
       },
       {
