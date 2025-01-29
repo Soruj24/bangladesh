@@ -41,7 +41,7 @@ const Division = () => {
         if (res.error) {
             toast({
                 title: "Error",
-                description: res?.error?.data?.message,
+                description: 'data' in res.error ? (res.error.data as { message: string }).message : "An error occurred",
                 variant: "destructive",
             });
             return

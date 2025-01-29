@@ -118,7 +118,7 @@ const DistrictShow = () => {
                         <p>{district.name}</p>
                     </CardContent>
                     <CardFooter className="flex space-x-2">
-                        <Button onClick={() => handleDelete(district._id)}>Delete</Button>
+                        <Button onClick={() => handleDelete(district.id)}>Delete</Button>
                         <Button onClick={() => handleUpdate(district)}>Update</Button>
                     </CardFooter>
                 </Card>

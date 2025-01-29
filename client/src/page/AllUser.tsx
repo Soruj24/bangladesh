@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { useSelector } from "react-redux";
 
 const AllUsers = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,6 +37,14 @@ const AllUsers = () => {
     limit: itemsPerPage,
     search: searchQuery,
   });
+
+  const user = useSelector(
+    (state: {
+      auth: { user: { id: string; name: string; email: string; role: string } };
+    }) => state.auth.user
+  );
+
+  console.log(user);
 
   const [roleUpdate] = useRoleUpdateMutation();
   const [deleteUser] = useDeleteUserMutation();
@@ -97,11 +106,11 @@ const AllUsers = () => {
       <p className="text-red-500">Failed to fetch users. Please try again.</p>
     );
 
-  const handleRoleChange = async (id: string, newRole: string) => {
-    console.log(`User ID: ${id}, New Role: ${newRole}`);
+  const handleRoleChange = async (id: string, role: string) => {
+    console.log(`User ID: ${id}, New Role: ${role}`);
 
     try {
-      const res = await roleUpdate({ id, newRole });
+      const res = await roleUpdate({ id, role });
       console.log(res);
 
       if (res?.error) {
@@ -143,7 +152,6 @@ const AllUsers = () => {
           description: "User deleted successfully",
         });
       }
-
       refetch();
     } catch (error) {
       toast({

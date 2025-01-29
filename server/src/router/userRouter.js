@@ -7,11 +7,11 @@ const userRouter = require('express').Router()
 
 
 userRouter.post('/register', isLoggedOut, validateUserRegister, runValidation, registerUser)
-userRouter.get('/', getAllUsers)
-userRouter.get('/:id', getSingalUser)
-userRouter.put('/:id', updateUser)
-userRouter.delete('/:id', userDelete)
-userRouter.put('/manage-state/:id', handelAdminUpdateUser)
+userRouter.get('/',isLoggedIn,isAdmin, getAllUsers)
+userRouter.get('/:id',isLoggedIn, getSingalUser)
+userRouter.put('/:id',isLoggedIn,isAdmin, updateUser)
+userRouter.delete('/:id',isLoggedIn,isAdmin, userDelete)
+userRouter.put('/manage-state/:id',isLoggedIn, handelAdminUpdateUser)
 
 
 

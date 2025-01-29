@@ -5,12 +5,12 @@ const { validateName } = require('../validators/division')
 
 const districtRoutes = require('express').Router()
 
-districtRoutes.post('/:divisionId', createDistrict)
-districtRoutes.get('/:divisionId', handelGetAllDistricts)
-districtRoutes.get('/:divisionId/:districtId', handelSingalDistrict)
-districtRoutes.delete('/:districtId', handelDistrictDelete)
-districtRoutes.put('/:districtId', handelDistrictUpdate)
-districtRoutes.get("/",handelDistrictWithOutDivision)
+districtRoutes.post('/:divisionId', isLoggedIn, isSuperAdmin, validateName, runValidation, createDistrict)
+districtRoutes.get('/:divisionId', isLoggedIn, handelGetAllDistricts)
+districtRoutes.get('/:divisionId/:districtId', isLoggedIn, handelSingalDistrict)
+districtRoutes.delete('/:districtId', isLoggedIn, isSuperAdmin, handelDistrictDelete)
+districtRoutes.put('/:districtId', isLoggedIn, handelDistrictUpdate)
+districtRoutes.get("/", isLoggedIn, handelDistrictWithOutDivision)
 
 module.exports = districtRoutes
 

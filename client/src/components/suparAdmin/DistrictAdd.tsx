@@ -34,11 +34,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {  setDivisionId } from "@/features/divisionSlice";
 
-type Division = {
-  _id: string;
-  value: string;
-  name: string;
-};
+
 
 const districtSchema = z.object({
   name: z
@@ -50,20 +46,20 @@ const districtSchema = z.object({
 type DistrictFormValues = z.infer<typeof districtSchema>;
 
 const DistrictAdd: React.FC = () => {
-  const { data: divisionData, isLoading, refetch } = useGetDivisionsQuery();
+  const { data: divisionData, isLoading } = useGetDivisionsQuery();
   const [addDistrict] = useAddDistrictMutation();
   const [open, setOpen] = useState<boolean>(false);
   const [value, setValue] = useState<string>("");
 
   const dispatch = useDispatch();
 
-  const divisionId = useSelector((state)=>(state?.divisionIdData?.divisionId))
+  const divisionId = useSelector((state: { divisionIdData: { divisionId: string } }) => state.divisionIdData.divisionId);
 
    
   const {
     register,
     handleSubmit,
-    reset,
+   
     formState: { errors },
   } = useForm<DistrictFormValues>({
     resolver: zodResolver(districtSchema),
@@ -82,11 +78,7 @@ const DistrictAdd: React.FC = () => {
         description: "District created successfully.",
       });
 
-      // Refetch division data and reset form
-      // refetch();
-      // reset();
-      // setValue("");
-      // setDivisionId("");
+    
     } catch (err) {
       toast({
         title: "Error",
@@ -126,8 +118,8 @@ const DistrictAdd: React.FC = () => {
                 >
                   {value
                     ? divisionItem?.find(
-                        (division: Division) => division.value === value
-                      )?.label
+                        (division) => division.name === value
+                      )?.name
                     : "Select Division..."}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -141,22 +133,22 @@ const DistrictAdd: React.FC = () => {
                   <CommandList>
                     <CommandEmpty>No division found.</CommandEmpty>
                     <CommandGroup>
-                      {divisionItem?.map((division: Division) => (
+                      {divisionItem?.map((division) => (
                         <CommandItem
-                          key={division._id}
+                          key={division.id}
                           value={division.name}
                           onSelect={(currentValue) => {
                             setValue(
                               currentValue === value ? "" : currentValue
                             );
-                            dispatch( setDivisionId(division._id))
+                            dispatch( setDivisionId(division.id))
                             setOpen(false);
                           }}
                         >
                           <Check
                             className={cn(
                               "mr-2 h-4 w-4",
-                              value === division.value
+                              value === division.name
                                 ? "opacity-100"
                                 : "opacity-0"
                             )}
