@@ -151,10 +151,10 @@ const handelAdminUpdateUser = async (req, res) => {
     try {
         const userId = req.params.id;
         const action = req.body.role
-        console.log(action)
+        console.log("action userId", userId, action)
         let update;
 
-        if (action === 'superadmin') {
+        if (action === 'super-admin') {
             update = { isSuperAdmin: true, }; // Set both true for super admin
         } else if (action === 'admin') {
             update = { isAdmin: true, isSuperAdmin: false }; // Admin without super admin privileges
@@ -168,6 +168,7 @@ const handelAdminUpdateUser = async (req, res) => {
         }
         return res.status(200).json({ message: "User updated successfully", updatedUser });
     } catch (error) {
+        console.log("error", error)
         console.error("Error updating user:", error);
         return res.status(500).json({ message: "Failed to update user" });
     }

@@ -1,11 +1,11 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { BaseQueryApi, createApi, FetchArgs, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 // Base query with token refresh logic
 const baseQuery = fetchBaseQuery({
     baseUrl: 'http://localhost:4000/api', // Replace with your API URL
     credentials: 'include', // Ensures credentials (cookies) are sent with each request
     prepareHeaders: (headers, { getState }) => {
-        const token = (getState() as any).auth?.accessToken; // Access token from your Redux store
+        const token = (getState() as { auth: { accessToken: string } }).auth?.accessToken; // Access token from your Redux store
         if (token) {
             headers.set('Authorization', `Bearer ${token}`);
         }
@@ -14,7 +14,7 @@ const baseQuery = fetchBaseQuery({
 });
 
 // Enhanced base query with refresh token logic
-const baseQueryWithRefresh = async (args, api, extraOptions) => {
+const baseQueryWithRefresh = async (args: string | FetchArgs, api: BaseQueryApi, extraOptions: object) => {
     let result = await baseQuery(args, api, extraOptions);
 
     // If access token expired (401 error), attempt to refresh it
@@ -60,7 +60,7 @@ export const userApi = createApi({
             providesTags: (result) => {
                 if (result?.users) {
                     return [
-                        ...result.users.map(({ id }) => ({ type: 'Users', id })),
+                        ...result.users.map(({ id }: { id: string }) => ({ type: 'Users', id })),
                         { type: 'Users', id: 'LIST' },
                     ];
                 }
@@ -88,7 +88,7 @@ export const userApi = createApi({
             query(data) {
                 const { id, ...body } = data;
                 return {
-                    url: `user/${id}`,
+                    url: `users/${id}`,
                     method: 'PUT',
                     body,
                 };
@@ -99,11 +99,11 @@ export const userApi = createApi({
         deleteUser: build.mutation({
             query(id) {
                 return {
-                    url: `user/${id}`,
+                    url: `users/${id}`,
                     method: 'DELETE',
                 };
             },
-            invalidatesTags: (result, error, id) => [{ type: 'Users', id }],
+            invalidatesTags: (result, error, { id }) => [{ type: 'Users', id }],
         }),
         // Login User
         loginUser: build.mutation({
@@ -113,7 +113,7 @@ export const userApi = createApi({
                 body: credentials,
             }),
             // After a successful login, you might want to store user data, JWT, etc. in the state.
-            onQueryStarted: async (args, { dispatch, queryFulfilled }) => {
+            onQueryStarted: async (args, { queryFulfilled }) => {
                 try {
                     const { data } = await queryFulfilled;
                     // Store JWT or user info if needed (e.g., localStorage or redux state)
@@ -129,7 +129,7 @@ export const userApi = createApi({
                 url: 'auth/logout', // Adjust to your actual logout API endpoint
                 method: 'POST',
             }),
-            onQueryStarted: async (args, { dispatch }) => {
+            onQueryStarted: async () => {
                 try {
                     // Perform logout operations like clearing JWT, user info, etc.
                     localStorage.removeItem('authToken');
@@ -138,6 +138,20 @@ export const userApi = createApi({
                 }
             },
         }),
+
+        roleUpdate: build.mutation({
+            query(data) {
+                const { id, ...body } = data;
+                console.log(data);
+                return {
+                    url: `users/manage-state/${id}`,
+                    method: 'PUT',
+                    body,
+                };
+            },
+            invalidatesTags: (result, error, { id }) => [{ type: 'Users', id }],
+        }),
+
     }),
 });
 
@@ -149,4 +163,5 @@ export const {
     useDeleteUserMutation,
     useLoginUserMutation,
     useLogoutUserMutation,
+    useRoleUpdateMutation,
 } = userApi;
