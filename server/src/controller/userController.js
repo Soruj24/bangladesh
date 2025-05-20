@@ -1,5 +1,11 @@
 const User = require("../model/userModel");
-const { userCreate } = require("../services/userServices");
+const {
+  userCreate,
+  getAllUsers,
+  getSingleUser,
+  updateUser,
+  userDelete,
+} = require("../services/userServices");
 const { successResponse } = require("./responesController");
 
 const handelUserCreate = async (req, res, next) => {
@@ -24,7 +30,7 @@ const handelUserCreate = async (req, res, next) => {
   }
 };
 
-const getAllUsers = async (req, res) => {
+const handelGetAllUsers = async (req, res, next) => {
   try {
     const { search = "", page = 1, limit = 5 } = req.query;
 
@@ -32,105 +38,108 @@ const getAllUsers = async (req, res) => {
     const pageNumber = parseInt(page, 10);
     const limitNumber = parseInt(limit, 10);
 
-    // Build the search query
-    const searchQuery = search
-      ? {
-          $or: [
-            { name: new RegExp(search, "i") },
-            { email: new RegExp(search, "i") },
-          ],
-        }
-      : {};
+    const { users, pagination } = await getAllUsers(
+      search,
+      pageNumber,
+      limitNumber
+    );
 
-    // Fetch users with search and pagination
-    const users = await User.find(searchQuery)
-      .skip((pageNumber - 1) * limitNumber)
-      .limit(limitNumber);
-
-    // Get the total number of users for pagination calculations
-    const totalUsers = await User.countDocuments(searchQuery);
-    const totalPages = Math.ceil(totalUsers / limitNumber);
-
-    // Return the list of users
-    return res.status(200).json({
+    return successResponse(res, {
+      statusCode: 200,
       message: "Users fetched successfully",
-      users,
-      pagination: {
-        totalUsers,
-        currentPage: pageNumber,
-        totalPages,
-        pageSize: limitNumber,
-        hasNextPage: pageNumber < totalPages,
-        hasPreviousPage: pageNumber > 1,
-        nextPage: pageNumber < totalPages ? pageNumber + 1 : null,
-        previousPage: pageNumber > 1 ? pageNumber - 1 : null,
+      payload: {
+        users: users.map((user) => ({
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          isAdmin: user.isAdmin,
+          isSuperAdmin: user.isSuperAdmin,
+        })),
+        pagination: {
+          totalUsers: pagination.totalUsers,
+          totalPages: pagination.totalPages,
+          currentPage: pagination.currentPage,
+          limit: pagination.limit,
+        },
       },
     });
   } catch (error) {
-    console.error("Error fetching users:", error);
-    return res.status(500).json({ message: "Failed to fetch users" });
+    next(error);
   }
 };
 
-const getSingalUser = async (req, res) => {
+const handelGetSingalUser = async (req, res, next) => {
   try {
     const userId = req.params.id;
-    const user = await User.findById(userId);
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    return res.status(200).json({
+    const user = await getSingleUser(userId);
+
+    return successResponse(res, {
+      statusCode: 200,
       message: "User fetched successfully",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
+      payload: {
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          isAdmin: user.isAdmin,
+          isSuperAdmin: user.isSuperAdmin,
+        },
       },
     });
   } catch (error) {
-    return res.status(500).json({ message: "Failed to fetch user" });
+    next(error);
   }
 };
 
-const updateUser = async (req, res) => {
+const handelUpdateUser = async (req, res, next) => {
   try {
     const userId = req.params.id;
-    const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
-      new: true,
+
+    await getSingleUser(userId);
+
+    const updateData = await updateUser(userId, req.body);
+
+    return successResponse(res, {
+      statusCode: 200,
+      message: "User updated successfully",
+      payload: {
+        user: {
+          id: updateData._id,
+          name: updateData.name,
+          email: updateData.email,
+          isAdmin: updateData.isAdmin,
+          isSuperAdmin: updateData.isSuperAdmin,
+        },
+      },
     });
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    return res
-      .status(200)
-      .json({ message: "User updated successfully", user: updatedUser });
   } catch (error) {
-    console.error("Error updating user:", error);
-    return res.status(500).json({ message: "Failed to update user" });
+    next(error);
   }
 };
 
-const userDelete = async (req, res) => {
+const handelUserDelete = async (req, res, next) => {
   try {
-    // Extract the user ID from the request parameters
-    const { id } = req.params;
+    const userId = req.params.id;
+    await getSingleUser(userId);
 
-    // Find and delete the user by ID
-    const deletedUser = await User.findByIdAndDelete(id);
-    console.log(deletedUser);
+    const deletedUser = await userDelete(userId);
 
-    // Check if the user was found and deleted
-    if (!deletedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    return res
-      .status(200)
-      .json({ message: "User deleted successfully", user: deletedUser });
+    return successResponse(res, {
+      statusCode: 200,
+      message: "User deleted successfully",
+      payload: {
+        user: {
+          id: deletedUser._id,
+          name: deletedUser.name,
+          email: deletedUser.email,
+          isAdmin: deletedUser.isAdmin,
+          isSuperAdmin: deletedUser.isSuperAdmin,
+        },
+      },
+    });
   } catch (error) {
-    console.error("Error deleting user:", error);
-    return res.status(500).json({ message: "Server error" });
+    next(error);
   }
 };
 
@@ -167,9 +176,9 @@ const handelAdminUpdateUser = async (req, res) => {
 
 module.exports = {
   handelUserCreate,
-  getAllUsers,
-  getSingalUser,
+  handelGetAllUsers,
+  handelGetSingalUser,
   handelAdminUpdateUser,
-  updateUser,
-  userDelete,
+  handelUpdateUser,
+  handelUserDelete,
 };
