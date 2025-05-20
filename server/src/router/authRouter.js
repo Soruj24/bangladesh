@@ -1,7 +1,7 @@
 const { handelLogIn, handelLogOut, handelRefreshToken, handelProtected } = require('../controller/authController')
 const { isLoggedOut, isLoggedIn } = require('../middleware/auth')
 const { runValidation } = require('../validators')
-const { validateUserLogin } = require('../validators/auth')
+const { validateUserLogin } = require('../validators/userValidators')
 
 const authRouter = require('express').Router()
 

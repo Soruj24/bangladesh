@@ -1,12 +1,12 @@
-const { getAllUsers, registerUser, getSingalUser, updateUser, userDelete, handelAdminUpdateUser } = require('../controller/userController')
+const { getAllUsers,  getSingalUser, updateUser, userDelete, handelAdminUpdateUser, handelUserCreate } = require('../controller/userController')
 const { isLoggedOut, isSuperAdmin, isAdmin, isLoggedIn } = require('../middleware/auth')
 const { runValidation } = require('../validators')
-const { validateUserRegister } = require('../validators/auth')
+const { validateUserRegister } = require('../validators/userValidators')
 
 const userRouter = require('express').Router()
 
 
-userRouter.post('/register', isLoggedOut, validateUserRegister, runValidation, registerUser)
+userRouter.post('/register', isLoggedOut, validateUserRegister, runValidation, handelUserCreate)
 userRouter.get('/',isLoggedIn,isAdmin, getAllUsers)
 userRouter.get('/:id',isLoggedIn, getSingalUser)
 userRouter.put('/:id',isLoggedIn,isAdmin, updateUser)

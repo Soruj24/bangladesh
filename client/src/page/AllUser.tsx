@@ -220,7 +220,7 @@ const AllUsers = () => {
                       <Select
                         onValueChange={(newRole) =>
                           handleRoleChange(user._id, newRole)
-                        } // Add onChange handler here
+                        }  
                       >
                         <SelectTrigger className="w-[180px]">
                           <SelectValue
