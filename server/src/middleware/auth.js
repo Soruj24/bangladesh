@@ -16,7 +16,6 @@ const isLoggedIn = (req, res, next) => {
         message: "user not verified",
       });
     }
-    console.log("decoded", decoded.userExists);
     //! isAdmin Check
     req.user = decoded.userExists;
     next();

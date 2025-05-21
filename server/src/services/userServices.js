@@ -58,7 +58,6 @@ const getSingleUser = async (userId) => {
 
 const updateUser = async (userId, updateData) => {
   try {
-    // Filter allowed fields and validate
     const allowedUpdates = ["name"];
     const updates = {};
 
@@ -81,7 +80,7 @@ const updateUser = async (userId, updateData) => {
       { $set: updates },
       {
         new: true,
-        runValidators: true, // This ensures mongoose validations run
+        runValidators: true,  
       }
     );
 

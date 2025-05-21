@@ -19,7 +19,9 @@ divisionRoutes.post(
   runValidation,
   handelCreateDivision
 );
+
 divisionRoutes.get("/", isLoggedIn, handelGetAllDivisions);
+
 divisionRoutes.delete(
   "/:divisionId",
   isLoggedIn,

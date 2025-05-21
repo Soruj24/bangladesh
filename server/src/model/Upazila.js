@@ -1,44 +1,44 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const upazilaSchema = new mongoose.Schema(
-    {
-        name: {
-            type: String,
-            required: [true, 'Please provide an Upazila name'],
-        },
-        upazila: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Upazila',
-            },
-        ],
-        value: {
-            type: String, 
-        },
-        label: {
-            type: String,  
-        },
-        district: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'District',
-            required: true,
-        },
-        unions: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Union',
-            },
-        ],
+  {
+    name: {
+      type: String,
+      required: [true, "Please provide an Upazila name"],
     },
-    { timestamps: true }
+    upazila: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Upazila",
+      },
+    ],
+    value: {
+      type: String,
+    },
+    label: {
+      type: String,
+    },
+    district: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "District",
+      required: true,
+    },
+    unions: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Union",
+      },
+    ],
+  },
+  { timestamps: true }
 );
 
-upazilaSchema.pre('save', function (next) {
-    this.value = this.name; 
-    this.label = this.name; 
-    next();
+upazilaSchema.pre("save", function (next) {
+  this.value = this.name;
+  this.label = this.name;
+  next();
 });
 
-const Upazila = mongoose.model('Upazila', upazilaSchema);
+const Upazila = mongoose.model("Upazila", upazilaSchema);
 
 module.exports = Upazila;

@@ -3,124 +3,106 @@ const createError = require("http-errors");
 
 const Division = require("../model/Division");
 const {
-  getDivision,
-  divisionCreated,
   singleDivision,
   divisionDeleted,
   divisionUpdated,
+  getDivision,
+  divisionCreated,
 } = require("../services/divisonServices");
+const { successResponse } = require("./responesController");
 
 // Create a Division
-const handelCreateDivision = async (req, res) => {
+const handelCreateDivision = async (req, res, next) => {
   try {
     const { name } = req.body;
-    console.log("name", name);
-    if (!name || name.trim() === "") {
-      return res.status(400).json({ message: "Division name is required" });
-    }
 
-    // Check if division name already exists
-    const nameExists = await Division.findOne({ name });
-    if (nameExists) {
-      return res.status(400).json({ message: "Division already exists" });
-    }
+    const division = await divisionCreated(name);
 
-    // Create new division
-    const division = await Division.create({ name });
-
-    // Return successful response
-    return res.status(201).json({
+    return successResponse(res, {
+      statusCode: 200,
       message: "Division created successfully",
-      division,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Server error" });
-  }
-};
-
-// Get all Divisions with Districts
-
-const handelGetAllDivisions = async (req, res) => {
-  try {
-    const divisions = await Division.find().populate({
-      path: "districts",
-      model: "District",
-      populate: {
-        path: "upazila",
-        model: "Upazila",
-        populate: {
-          path: "unions",
-          model: "Union",
-          populate: {
-            path: "villages",
-            model: "Village",
-          },
+      payload: {
+        division: {
+          id: division._id,
+          name: division.name,
         },
       },
     });
-
-    if (!divisions || divisions.length === 0) {
-      return res.status(404).json({ message: "Divisions not found" });
-    }
-
-    return res.status(200).json({
-      message: "Divisions fetched successfully",
-      divisions,
-    });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Server error" });
+    next(error);
   }
 };
 
-const handelGetSingleDivision = async (req, res) => {
+const handelGetAllDivisions = async (req, res, next) => {
+  try {
+    const divisions = await getDivision();
+
+    return successResponse(res, {
+      statusCode: 200,
+      message: "Division fetched successfully",
+      payload: {
+        divisions,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const handelGetSingleDivision = async (req, res, next) => {
   try {
     const divisionId = req.params.divisionId;
     const division = await singleDivision(divisionId);
 
-    res.status(200).json({
+    return successResponse(res, {
+      statusCode: 200,
       message: "Division fetched successfully",
-      division,
+      payload: {
+        division,
+      },
     });
   } catch (error) {
-    return res.status(500).json({ message: "Server error" });
+    next(error);
   }
 };
 
-const handelDeleteDivision = async (req, res) => {
+const handelDeleteDivision = async (req, res, next) => {
   try {
     const divisionId = req.params.divisionId;
+
+    await singleDivision(divisionId);
 
     const division = await divisionDeleted(divisionId);
 
-    res.status(200).json({
+    return successResponse(res, {
+      statusCode: 200,
       message: "Division deleted successfully",
-      division: division,
+      payload: {
+        division,
+      },
     });
   } catch (error) {
-    res.status(500).json({ message: "Division deletion failed" });
+    next(error);
   }
 };
 
-const handelUpdateDivision = async (req, res) => {
+const handelUpdateDivision = async (req, res, next) => {
   try {
     const divisionId = req.params.divisionId;
-    const { name } = req.body;
+    const updateData = req.body; // Get all possible update fields
+    await singleDivision(divisionId);
 
-    // Call divisionUpdated with the correct order of arguments
-    const division = await divisionUpdated(divisionId, name);
+    const division = await divisionUpdated(divisionId, updateData);
 
-    res.status(200).json({
+    return successResponse(res, {
+      statusCode: 200,
       message: "Division updated successfully",
-      division: division,
+      payload: {
+        division,
+      },
     });
   } catch (error) {
-    // Check if error has status from createError, otherwise default to 500
-    const statusCode = error.status || 500;
-    res
-      .status(statusCode)
-      .json({ message: error.message || "Division update failed" });
+    next(error);
   }
 };
 

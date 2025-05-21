@@ -34,7 +34,6 @@ const handelGetAllUsers = async (req, res, next) => {
   try {
     const { search = "", page = 1, limit = 5 } = req.query;
 
-    // Convert page and limit to integers
     const pageNumber = parseInt(page, 10);
     const limitNumber = parseInt(limit, 10);
 
@@ -143,34 +142,45 @@ const handelUserDelete = async (req, res, next) => {
   }
 };
 
-const handelAdminUpdateUser = async (req, res) => {
+const handelAdminUpdateUser = async (req, res, next) => {
   try {
     const userId = req.params.id;
     const action = req.body.role;
-    console.log("action userId", userId, action);
+    await getSingleUser(userId);
+
     let update;
 
     if (action === "super-admin") {
-      update = { isSuperAdmin: true }; // Set both true for super admin
+      update = { isSuperAdmin: true };
     } else if (action === "admin") {
-      update = { isAdmin: true, isSuperAdmin: false }; // Admin without super admin privileges
+      update = { isAdmin: true, isSuperAdmin: false };
     } else {
-      update = { isAdmin: false, isSuperAdmin: false }; // Remove both roles
+      update = { isAdmin: false, isSuperAdmin: false };
     }
 
     const updatedUser = await User.findByIdAndUpdate(userId, update, {
       new: true,
     });
+
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
-    return res
-      .status(200)
-      .json({ message: "User updated successfully", updatedUser });
+
+    return successResponse(res, {
+      statusCode: 200,
+      message: "User updated successfully",
+      payload: {
+        user: {
+          id: updatedUser._id,
+          name: updatedUser.name,
+          email: updatedUser.email,
+          isAdmin: updatedUser.isAdmin,
+          isSuperAdmin: updatedUser.isSuperAdmin,
+        },
+      },
+    });
   } catch (error) {
-    console.log("error", error);
-    console.error("Error updating user:", error);
-    return res.status(500).json({ message: "Failed to update user" });
+    next(error);
   }
 };
 
