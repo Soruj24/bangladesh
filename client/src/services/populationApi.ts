@@ -28,7 +28,7 @@ export const populationApi = createApi({
         getPopulations: build.query<PopulationResponse, void>({
             query: () => ({
                 url: 'population',
-                params: { populate: 'relatedData' },
+                params: { page: 1, limit: 1000 },
             }),
             providesTags: (result) => {
                 if (result?.users) {

@@ -365,8 +365,8 @@ const Home = () => {
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {populationUsers.slice(0, 8).map((person) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {populationUsers.map((person) => (
                 <Card
                   key={person.id}
                   className="border-0 shadow-md hover:shadow-lg transition-all duration-300 dark:bg-gray-900/50"
