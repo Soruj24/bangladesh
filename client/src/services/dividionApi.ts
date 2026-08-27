@@ -3,6 +3,9 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 export interface Division {
     id: string;
     name: string;
+    _id: string;
+    value: string;
+    label: string;
 }
 
 type DivisionsResponse = { divisions: Division[] };
@@ -30,18 +33,18 @@ export const divisionApi = createApi({
             },
             invalidatesTags: [{ type: 'Divisions', id: 'LIST' }],
         }),
-        getDivision: build.query<Division, number>({
+        getDivision: build.query<Division, string>({
             query: (id) => `division/${id}`,
             providesTags: (_result, _error, id) => [{ type: 'Divisions', id }],
         }),
-        updateDivision: build.mutation<Division, Partial<Division>>({
+        updateDivision: build.mutation<Division, { id: string; name: string }>({
             query(data) {
                 const { id, ...body } = data
                 return { url: `divisions/${id}`, method: 'PUT', body }
             },
             invalidatesTags: (_result, _error, { id }) => [{ type: 'Divisions', id }],
         }),
-        deleteDivision: build.mutation<{ success: boolean; id: number }, number>({
+        deleteDivision: build.mutation<{ success: boolean }, string>({
             query(id) {
                 return { url: `divisions/${id}`, method: 'DELETE' }
             },

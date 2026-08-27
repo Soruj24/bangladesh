@@ -31,6 +31,8 @@ const DistrictCombo = () => {
   const [value, setValue] = useState("");
   const dispatch = useDispatch();
 
+  const districtList = (districtData as { division?: { districts?: { _id: string; name: string; value: string; label: string }[] } })?.division?.districts || [];
+
   return (
     <div>
       <p className="text-sm my-3 font-medium leading-none">Select District</p>
@@ -43,8 +45,8 @@ const DistrictCombo = () => {
             className="justify-between w-full"
           >
             {value
-              ? districtData?.division?.districts?.find(
-                  (district: { value: string }) => district.value === value
+              ? districtList.find(
+                  (district) => district.value === value
                 )?.label
               : "Select District..."}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -56,8 +58,8 @@ const DistrictCombo = () => {
             <CommandList>
               <CommandEmpty>No district found.</CommandEmpty>
               <CommandGroup>
-                {districtData?.division?.districts?.map(
-                  (district: { _id: string; name: string; value: string }) => (
+                {districtList.map(
+                  (district) => (
                     <CommandItem
                       key={district._id}
                       value={district.name}

@@ -37,6 +37,8 @@ const UpazilaCombo = () => {
   const [value, setValue] = useState("");
   const dispatch = useDispatch();
 
+  const upazilaList = (upazilaData as { upazila?: { _id: string; name: string; value: string; label: string }[] })?.upazila || [];
+
   return (
     <div>
       <p className="text-sm font-medium leading-none">Select Upazila</p>
@@ -49,10 +51,7 @@ const UpazilaCombo = () => {
             className="justify-between w-full"
           >
             {value
-              ? upazilaData?.upazila?.find(
-                  (upazila: { value: string; label: string }) =>
-                    upazila.value === value
-                )?.label
+              ? upazilaList.find((u) => u.value === value)?.label
               : "Select Upazila..."}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
@@ -63,28 +62,26 @@ const UpazilaCombo = () => {
             <CommandList>
               <CommandEmpty>No upazila found.</CommandEmpty>
               <CommandGroup>
-                {upazilaData?.upazila?.map(
-                  (upazila: { _id: string; name: string; value: string }) => (
-                    <CommandItem
-                      key={upazila._id}
-                      value={upazila.name}
-                      onSelect={(currentValue) => {
-                        setValue(currentValue === value ? "" : currentValue);
-                        dispatch(setUpazilaId(upazila._id));
-                        dispatch(setUpazilaName(upazila.name));
-                        setOpen(false);
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          value === upazila.value ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {upazila.name}
-                    </CommandItem>
-                  )
-                )}
+                {upazilaList.map((upazila) => (
+                  <CommandItem
+                    key={upazila._id}
+                    value={upazila.name}
+                    onSelect={(currentValue) => {
+                      setValue(currentValue === value ? "" : currentValue);
+                      dispatch(setUpazilaId(upazila._id));
+                      dispatch(setUpazilaName(upazila.name));
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === upazila.value ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {upazila.name}
+                  </CommandItem>
+                ))}
               </CommandGroup>
             </CommandList>
           </Command>

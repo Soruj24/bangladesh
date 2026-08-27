@@ -31,7 +31,7 @@ const UnionShow = () => {
       return;
     }
     try {
-      await updateUnion({ ...current, unionId: current._id }).unwrap();
+      await updateUnion({ unionId: current._id, name: current.name }).unwrap();
       toast({ title: "Success", description: "Union updated" });
       refetch();
       setIsDialogOpen(false);
@@ -52,11 +52,13 @@ const UnionShow = () => {
 
   if (isError) return <div className="text-center py-12 text-red-500">Failed to load unions</div>;
 
+  const unions = data?.union || [];
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Unions</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {data?.union?.map((union: { _id: string; name: string }) => (
+        {unions.map((union: { _id: string; name: string }) => (
           <Card key={union._id} className="border-0 shadow-sm dark:bg-gray-900/50">
             <CardHeader className="pb-3">
               <h3 className="font-semibold text-gray-900 dark:text-white">{union.name}</h3>

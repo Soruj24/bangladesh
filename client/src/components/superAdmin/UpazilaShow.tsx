@@ -13,7 +13,7 @@ const UpazilaShow = () => {
   const [updateUpozila] = useUpdateUpozilaMutation();
   const [deleteUpozila] = useDeleteUpozilaMutation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [current, setCurrent] = useState<{ _id: number; name: string } | null>(null);
+  const [current, setCurrent] = useState<{ _id: string; name: string } | null>(null);
 
   const handleDelete = async (id: string) => {
     const res = await deleteUpozila(id);
@@ -31,7 +31,7 @@ const UpazilaShow = () => {
       return;
     }
     try {
-      await updateUpozila({ ...current, upazilaId: current._id.toString() }).unwrap();
+      await updateUpozila({ upazilaId: current._id.toString(), name: current.name }).unwrap();
       toast({ title: "Success", description: "Upazila updated" });
       refetch();
       setIsDialogOpen(false);
@@ -52,21 +52,23 @@ const UpazilaShow = () => {
 
   if (isError) return <div className="text-center py-12 text-red-500">Failed to load upazilas</div>;
 
+  const upazilas = data?.UpazilaWithOutDistrict || [];
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Upazilas</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {data?.UpazilaWithOutDistrict?.map((upazila: { _id: number; name: string }) => (
-          <Card key={upazila._id} className="border-0 shadow-sm dark:bg-gray-900/50">
+        {upazilas.map((upazila) => (
+          <Card key={upazila._id || String(Math.random())} className="border-0 shadow-sm dark:bg-gray-900/50">
             <CardHeader className="pb-3">
               <h3 className="font-semibold text-gray-900 dark:text-white">{upazila.name}</h3>
             </CardHeader>
             <CardContent className="pt-0">
               <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => { setCurrent(upazila); setIsDialogOpen(true); }}>
+                <Button size="sm" variant="outline" onClick={() => { setCurrent({ _id: upazila._id || '', name: upazila.name }); setIsDialogOpen(true); }}>
                   <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
                 </Button>
-                <Button size="sm" variant="destructive" onClick={() => handleDelete(upazila._id.toString())}>
+                <Button size="sm" variant="destructive" onClick={() => handleDelete(upazila._id || '')}>
                   <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
                 </Button>
               </div>

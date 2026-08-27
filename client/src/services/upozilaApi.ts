@@ -3,9 +3,10 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export interface Upozila {
     id: string;
     name: string;
+    _id: string;
 }
 
-type UpazilasResponse = Upozila[];
+type UpazilasResponse = { upazila: Upozila[] } | { UpazilaWithOutDistrict: Upozila[] } | Upozila[];
 
 export const upozilaApi = createApi({
     reducerPath: 'upozilasApi',
@@ -14,24 +15,12 @@ export const upozilaApi = createApi({
     endpoints: (build) => ({
         getUpazilas: build.query<UpazilasResponse, { divisionId: string; districtId: string }>({
             query: ({ divisionId, districtId }) => `upazilas/${divisionId}/${districtId}`,
-            providesTags: (result) =>
-                Array.isArray(result)
-                    ? [
-                        ...result.map(({ id }) => ({ type: 'Upazilas' as const, id })),
-                        { type: 'Upazilas' as const, id: 'LIST' },
-                    ]
-                    : [{ type: 'Upazilas' as const, id: 'LIST' }],
+            providesTags: [{ type: 'Upazilas', id: 'LIST' }],
         }),
 
-        getAllUpazilas: build.query<UpazilasResponse, void>({
+        getAllUpazilas: build.query<{ UpazilaWithOutDistrict: Upozila[] }, void>({
             query: () => 'upazilas/withOutDistrict',
-            providesTags: (result) =>
-                Array.isArray(result)
-                    ? [
-                        ...result.map(({ id }) => ({ type: 'Upazilas' as const, id })),
-                        { type: 'Upazilas' as const, id: 'LIST' },
-                    ]
-                    : [{ type: 'Upazilas' as const, id: 'LIST' }],
+            providesTags: [{ type: 'Upazilas', id: 'LIST' }],
         }),
 
         addUpozila: build.mutation<Upozila, { body: Partial<Upozila>; divisionId: string; districtId: string }>({
@@ -50,26 +39,25 @@ export const upozilaApi = createApi({
             providesTags: (_result, _error, id) => [{ type: 'Upazilas', id }],
         }),
 
-        updateUpozila: build.mutation<Upozila, { upazilaId: string } & Partial<Upozila>>({
-            query(data) {
-                const { upazilaId, ...body } = data;
+        updateUpozila: build.mutation<Upozila, { upazilaId: string; name: string }>({
+            query({ upazilaId, ...body }) {
                 return {
                     url: `upazilas/${upazilaId}`,
                     method: 'PUT',
                     body,
                 };
             },
-            invalidatesTags: (_result, _error, { upazilaId }) => [{ type: 'Upazilas', id: upazilaId }],
+            invalidatesTags: [{ type: 'Upazilas', id: 'LIST' }],
         }),
 
-        deleteUpozila: build.mutation<{ success: boolean; upazilaId: string }, string>({
+        deleteUpozila: build.mutation<{ success: boolean }, string>({
             query(upazilaId) {
                 return {
                     url: `upazilas/${upazilaId}`,
                     method: 'DELETE',
                 };
             },
-            invalidatesTags: (_result, _error, upazilaId) => [{ type: 'Upazilas', id: upazilaId }],
+            invalidatesTags: [{ type: 'Upazilas', id: 'LIST' }],
         }),
     }),
 });

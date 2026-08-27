@@ -3,35 +3,24 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export interface District {
     id: string;
     name: string;
+    _id?: string;
 }
 
-type DistrictsResponse = District[];
+type DistrictsResponse = { division: { districts: District[] } } | District[];
 
 export const districtApi = createApi({
     reducerPath: 'districtsApi',
     baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api', credentials: 'include' }),
     tagTypes: ['Districts'],
     endpoints: (build) => ({
-        getDistricts: build.query<DistrictsResponse, { divisionId: string }>({
+        getDistricts: build.query<DistrictsResponse, string>({
             query: (divisionId) => `districts/${divisionId}`,
-            providesTags: (result) =>
-                Array.isArray(result) && result.length > 0
-                    ? [
-                        ...result.map(({ id }) => ({ type: 'Districts' as const, id })),
-                        { type: 'Districts' as const, id: 'LIST' },
-                    ]
-                    : [{ type: 'Districts' as const, id: 'LIST' }],
+            providesTags: [{ type: 'Districts', id: 'LIST' }],
         }),
 
-        getAllDistricts: build.query<DistrictsResponse, void>({
+        getAllDistricts: build.query<{ district: District[] }, void>({
             query: () => 'districts',
-            providesTags: (result) =>
-                Array.isArray(result) && result.length > 0
-                    ? [
-                        ...result.map(({ id }) => ({ type: 'Districts' as const, id })),
-                        { type: 'Districts' as const, id: 'LIST' },
-                    ]
-                    : [{ type: 'Districts' as const, id: 'LIST' }],
+            providesTags: [{ type: 'Districts', id: 'LIST' }],
         }),
 
         addDistrict: build.mutation<District, { name: string; divisionId: string }>({

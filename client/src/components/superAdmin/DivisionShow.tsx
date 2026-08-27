@@ -1,24 +1,24 @@
 import { useState } from "react";
-import { useGetDivisionsQuery, useDeleteDivisionMutation, useUpdateDivisionMutation, Division } from "@/services/dividionApi";
+import { useGetDivisionsQuery, useDeleteDivisionMutation, useUpdateDivisionMutation } from "@/services/dividionApi";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
-import { Pencil, Trash2, Loader2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 const DivisionShow = () => {
   const { data, isError, isLoading, refetch } = useGetDivisionsQuery();
   const [deleteDivision] = useDeleteDivisionMutation();
   const [updateDivision] = useUpdateDivisionMutation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentDivision, setCurrentDivision] = useState<Division | null>(null);
+  const [currentDivision, setCurrentDivision] = useState<{ id: string; name: string } | null>(null);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     const res = await deleteDivision(id);
     if (res.error) {
-      toast({ title: "Error", description: res?.error?.data?.message, variant: "destructive" });
+      toast({ title: "Error", description: "Failed to delete", variant: "destructive" });
       return;
     }
     toast({ title: "Success", description: "Division deleted" });
@@ -31,7 +31,7 @@ const DivisionShow = () => {
       return;
     }
     try {
-      await updateDivision({ ...currentDivision, id: currentDivision.id }).unwrap();
+      await updateDivision({ id: currentDivision.id, name: currentDivision.name }).unwrap();
       toast({ title: "Success", description: "Division updated" });
       refetch();
       setIsDialogOpen(false);

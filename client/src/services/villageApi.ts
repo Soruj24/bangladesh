@@ -3,9 +3,10 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export interface Village {
     id: string;
     name: string;
+    _id: string;
+    value: string;
+    label: string;
 }
-
-type VillagesResponse = Village[];
 
 interface GetVillagesParams {
     divisionId: string;
@@ -27,27 +28,15 @@ export const villageApi = createApi({
     baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api', credentials: 'include' }),
     tagTypes: ['Villages'],
     endpoints: (build) => ({
-        getVillages: build.query<VillagesResponse, GetVillagesParams>({
+        getVillages: build.query<{ villages: Village[] }, GetVillagesParams>({
             query: ({ divisionId, districtId, upazilaId, unionId }) =>
                 `villages/${divisionId}/${districtId}/${upazilaId}/${unionId}`,
-            providesTags: (result) =>
-                result && Array.isArray(result)
-                    ? [
-                        ...result.map(({ id }) => ({ type: 'Villages' as const, id })),
-                        { type: 'Villages' as const, id: 'LIST' },
-                    ]
-                    : [{ type: 'Villages' as const, id: 'LIST' }],
+            providesTags: [{ type: 'Villages', id: 'LIST' }],
         }),
 
-        getAllVillages: build.query<VillagesResponse, void>({
+        getAllVillages: build.query<{ villagesWithOutUnion: Village[] }, void>({
             query: () => 'villages/villagesWithOutUnion',
-            providesTags: (result) =>
-                result && Array.isArray(result)
-                    ? [
-                        ...result.map(({ id }) => ({ type: 'Villages' as const, id })),
-                        { type: 'Villages' as const, id: 'LIST' },
-                    ]
-                    : [{ type: 'Villages' as const, id: 'LIST' }],
+            providesTags: [{ type: 'Villages', id: 'LIST' }],
         }),
 
         addVillage: build.mutation<Village, AddVillageParams>({
@@ -64,21 +53,21 @@ export const villageApi = createApi({
             providesTags: (_result, _error, id) => [{ type: 'Villages', id }],
         }),
 
-        updateVillage: build.mutation<Village, Partial<Village>>({
+        updateVillage: build.mutation<Village, { id: string; name: string }>({
             query: ({ id, ...body }) => ({
                 url: `villages/${id}`,
                 method: 'PUT',
                 body,
             }),
-            invalidatesTags: (_result, _error, { id }) => [{ type: 'Villages', id }],
+            invalidatesTags: [{ type: 'Villages', id: 'LIST' }],
         }),
 
-        deleteVillage: build.mutation<{ success: boolean; id: string }, string>({
+        deleteVillage: build.mutation<{ success: boolean }, number>({
             query: (id) => ({
                 url: `villages/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: (_result, _error, id) => [{ type: 'Villages', id }],
+            invalidatesTags: [{ type: 'Villages', id: 'LIST' }],
         }),
     }),
 });

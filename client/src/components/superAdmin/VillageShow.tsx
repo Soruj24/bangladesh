@@ -13,10 +13,10 @@ const VillageShow = () => {
   const [updateVillage] = useUpdateVillageMutation();
   const [deleteVillage] = useDeleteVillageMutation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [current, setCurrent] = useState<{ _id: number; name: string } | null>(null);
+  const [current, setCurrent] = useState<{ _id: string; name: string } | null>(null);
 
-  const handleDelete = async (id: number) => {
-    const res = await deleteVillage(id);
+  const handleDelete = async (id: string) => {
+    const res = await deleteVillage(Number(id));
     if (res?.error) {
       toast({ title: "Error", description: "Failed to delete", variant: "destructive" });
       return;
@@ -31,7 +31,7 @@ const VillageShow = () => {
       return;
     }
     try {
-      await updateVillage({ ...current, id: current._id }).unwrap();
+      await updateVillage({ id: current._id, name: current.name }).unwrap();
       toast({ title: "Success", description: "Village updated" });
       refetch();
       setIsDialogOpen(false);
@@ -52,7 +52,7 @@ const VillageShow = () => {
 
   if (isError) return <div className="text-center py-12 text-red-500">Failed to load villages</div>;
 
-  const villageData = data as unknown as { villagesWithOutUnion: { _id: number; name: string }[] };
+  const villageData = data as { villagesWithOutUnion?: { _id: string; name: string }[] } | undefined;
 
   return (
     <div>

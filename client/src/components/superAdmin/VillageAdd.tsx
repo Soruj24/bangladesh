@@ -34,6 +34,9 @@ const VillageAdd = () => {
   const { data: unionData, isLoading: unionLoading } = useGetUnionsQuery({ divisionId, districtId, upazilaId });
   const [addVillage, { isLoading }] = useAddVillageMutation();
 
+  const unionDataTyped = unionData as { unions?: { _id: string; name: string }[] } | undefined;
+  const unions = unionDataTyped?.unions || [];
+
   const { register, handleSubmit, reset, formState: { errors } } = useForm<VillageFormValues>({
     resolver: zodResolver(villageSchema),
   });
@@ -67,7 +70,7 @@ const VillageAdd = () => {
           <PopoverTrigger asChild>
             <Button variant="outline" role="combobox" className="w-full justify-between mt-1 h-10">
               {selectedUnion
-                ? unionData?.unions?.find((u: { _id: string }) => u._id === selectedUnion)?.name
+                ? unions.find((u) => u._id === selectedUnion)?.name
                 : "Select union..."}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
@@ -78,9 +81,9 @@ const VillageAdd = () => {
               <CommandList>
                 {unionLoading ? (
                   <p className="p-4 text-sm">Loading...</p>
-                ) : unionData?.unions?.length ? (
+                ) : unions.length ? (
                   <CommandGroup>
-                    {unionData.unions.map((union: { _id: string; name: string }) => (
+                    {unions.map((union) => (
                       <CommandItem
                         key={union._id}
                         value={union.name}

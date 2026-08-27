@@ -3,7 +3,6 @@ import Home from "@/page/Home";
 import SignIn from "@/page/SignIn";
 import SignUp from "@/page/SignUp";
 import { createBrowserRouter } from "react-router-dom";
-import ProtectedRoute from "./ProtectedRoute";
 import AdminRoute from "./AdminRoute";
 import SuperAdminRoute from "./SuperAdminRoute";
 import DashboardLayout from "@/layout/DashboardLayout";

@@ -38,7 +38,8 @@ const UnionAdd = () => {
     resolver: zodResolver(unionSchema),
   });
 
-  const upazilas = upazilaData?.upazila || [];
+  const upazilaDataTyped = upazilaData as { upazila?: { _id: string; name: string }[] } | undefined;
+  const upazilas = upazilaDataTyped?.upazila || [];
 
   const onSubmit = async (formData: UnionFormValues) => {
     if (!selectedUpazilaId) {

@@ -1,3 +1,1 @@
-import { RootState } from '@/app/store'
-
-export default RootState
+export type { RootState } from '@/app/store'

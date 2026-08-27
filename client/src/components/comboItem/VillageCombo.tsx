@@ -45,6 +45,8 @@ const VillageCombo = () => {
   const [value, setValue] = useState("");
   const dispatch = useDispatch();
 
+  const villageList = (villageData as { villages?: { _id: string; name: string; value: string; label: string }[] })?.villages || [];
+
   return (
     <div>
       <p className="text-sm my-4 font-medium leading-none">Select Village</p>
@@ -57,9 +59,7 @@ const VillageCombo = () => {
             className="justify-between w-full"
           >
             {value
-              ? villageData?.villages?.find(
-                  (village: { value: string }) => village.value === value
-                )?.label
+              ? villageList.find((v) => v.value === value)?.label
               : "Select Village..."}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
@@ -70,8 +70,8 @@ const VillageCombo = () => {
             <CommandList>
               <CommandEmpty>No village found.</CommandEmpty>
               <CommandGroup>
-                {villageData?.villages?.map(
-                  (village: { _id: string; name: string; value: string }) => (
+                {villageList.map(
+                  (village) => (
                     <CommandItem
                       key={village._id}
                       value={village.name}

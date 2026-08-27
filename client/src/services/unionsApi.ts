@@ -3,25 +3,18 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 export interface Union {
     id: string
     name: string
+    _id: string
 }
-
-type UnionsResponse = Union[]
 
 export const unionApi = createApi({
     reducerPath: 'unionsApi',
     baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api', credentials: 'include' }),
     tagTypes: ['Unions'],
     endpoints: (build) => ({
-        getUnions: build.query<UnionsResponse, { divisionId: string; districtId: string; upazilaId: string }>({
+        getUnions: build.query<{ unions: Union[] }, { divisionId: string; districtId: string; upazilaId: string }>({
             query: ({ divisionId, districtId, upazilaId }) =>
                 `unions/${divisionId}/${districtId}/${upazilaId}`,
-            providesTags: (result) =>
-                Array.isArray(result)
-                    ? [
-                        ...result.map(({ id }) => ({ type: 'Unions' as const, id })),
-                        { type: 'Unions' as const, id: 'LIST' },
-                    ]
-                    : [{ type: 'Unions' as const, id: 'LIST' }],
+            providesTags: [{ type: 'Unions', id: 'LIST' }],
         }),
 
         addUnion: build.mutation<Union, { body: Partial<Union>; divisionId: string; districtId: string; upazilaId: string }>({
@@ -35,15 +28,9 @@ export const unionApi = createApi({
             invalidatesTags: [{ type: 'Unions', id: 'LIST' }],
         }),
 
-        getAllUnions: build.query<UnionsResponse, void>({
+        getAllUnions: build.query<{ union: Union[] }, void>({
             query: () => 'unions',
-            providesTags: (result) =>
-                Array.isArray(result)
-                    ? [
-                        ...result.map(({ id }) => ({ type: 'Unions' as const, id })),
-                        { type: 'Unions' as const, id: 'LIST' },
-                    ]
-                    : [{ type: 'Unions' as const, id: 'LIST' }],
+            providesTags: [{ type: 'Unions', id: 'LIST' }],
         }),
 
         getUnion: build.query<Union, string>({
@@ -51,23 +38,22 @@ export const unionApi = createApi({
             providesTags: (_result, _error, id) => [{ type: 'Unions', id }],
         }),
 
-        updateUnion: build.mutation<Union, { unionId: string } & Partial<Union>>({
-            query(data) {
-                const { unionId, ...body } = data;
+        updateUnion: build.mutation<Union, { unionId: string; name: string }>({
+            query({ unionId, ...body }) {
                 return {
                     url: `unions/${unionId}`,
                     method: 'PUT',
                     body,
                 };
             },
-            invalidatesTags: (_result, _error, { unionId }) => [{ type: 'Unions', id: unionId }],
+            invalidatesTags: [{ type: 'Unions', id: 'LIST' }],
         }),
 
-        deleteUnion: build.mutation<{ success: boolean; id: string }, string>({
+        deleteUnion: build.mutation<{ success: boolean }, string>({
             query(id) {
                 return { url: `unions/${id}`, method: 'DELETE' };
             },
-            invalidatesTags: (_result, _error, id) => [{ type: 'Unions', id }],
+            invalidatesTags: [{ type: 'Unions', id: 'LIST' }],
         }),
     }),
 });
