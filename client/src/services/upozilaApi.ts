@@ -9,7 +9,7 @@ type UpazilasResponse = Upozila[];
 
 export const upozilaApi = createApi({
     reducerPath: 'upozilasApi',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api/' }),
+    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api', credentials: 'include' }),
     tagTypes: ['Upazilas'],
     endpoints: (build) => ({
         getUpazilas: build.query<UpazilasResponse, { divisionId: string; districtId: string }>({
@@ -17,10 +17,10 @@ export const upozilaApi = createApi({
             providesTags: (result) =>
                 Array.isArray(result)
                     ? [
-                        ...result.map(({ id }) => ({ type: 'Upazilas', id }) as const),
-                        { type: 'Upazilas', id: 'LIST' },
+                        ...result.map(({ id }) => ({ type: 'Upazilas' as const, id })),
+                        { type: 'Upazilas' as const, id: 'LIST' },
                     ]
-                    : [{ type: 'Upazilas', id: 'LIST' }],
+                    : [{ type: 'Upazilas' as const, id: 'LIST' }],
         }),
 
         getAllUpazilas: build.query<UpazilasResponse, void>({
@@ -28,10 +28,10 @@ export const upozilaApi = createApi({
             providesTags: (result) =>
                 Array.isArray(result)
                     ? [
-                        ...result.map(({ id }) => ({ type: 'Upazilas', id }) as const),
-                        { type: 'Upazilas', id: 'LIST' },
+                        ...result.map(({ id }) => ({ type: 'Upazilas' as const, id })),
+                        { type: 'Upazilas' as const, id: 'LIST' },
                     ]
-                    : [{ type: 'Upazilas', id: 'LIST' }],
+                    : [{ type: 'Upazilas' as const, id: 'LIST' }],
         }),
 
         addUpozila: build.mutation<Upozila, { body: Partial<Upozila>; divisionId: string; districtId: string }>({
@@ -47,7 +47,7 @@ export const upozilaApi = createApi({
 
         getUpozila: build.query<Upozila, string>({
             query: (id) => `upazila/${id}`,
-            providesTags: (result, error, id) => [{ type: 'Upazilas', id }],
+            providesTags: (_result, _error, id) => [{ type: 'Upazilas', id }],
         }),
 
         updateUpozila: build.mutation<Upozila, { upazilaId: string } & Partial<Upozila>>({
@@ -59,7 +59,7 @@ export const upozilaApi = createApi({
                     body,
                 };
             },
-            invalidatesTags: (result, error, { id }) => [{ type: 'Upazilas', id }],
+            invalidatesTags: (_result, _error, { upazilaId }) => [{ type: 'Upazilas', id: upazilaId }],
         }),
 
         deleteUpozila: build.mutation<{ success: boolean; upazilaId: string }, string>({
@@ -69,9 +69,8 @@ export const upozilaApi = createApi({
                     method: 'DELETE',
                 };
             },
-            invalidatesTags: (result, error,upazilaId) => [{ type: 'Upazilas', upazilaId }],
+            invalidatesTags: (_result, _error, upazilaId) => [{ type: 'Upazilas', id: upazilaId }],
         }),
-        
     }),
 });
 

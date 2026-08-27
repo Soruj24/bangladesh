@@ -17,34 +17,24 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
 import { useGetUpazilasQuery } from "@/services/upozilaApi";
-import { setUpazilaId, setUpazilaName } from "@/features/upazilaSlice";
-
+import { setUpazilaId, setUpazilaName } from "@/features/geoSlice";
+import { RootState } from "@/app/store";
 
 const UpazilaCombo = () => {
-
-   // Selectors to get IDs from Redux
   const divisionId = useSelector(
-    (state: { divisionIdData: { divisionId: string } }) =>
-      state?.divisionIdData?.divisionId
+    (state: RootState) => state.geo.divisionId
   );
-  
   const districtId = useSelector(
-    (state: { districtIdData: { districtId: string } }) =>
-      state?.districtIdData?.districtId
+    (state: RootState) => state.geo.districtId
   );
 
-   
   const { data: upazilaData } = useGetUpazilasQuery({
     divisionId,
     districtId,
   });
 
-  console.log("divisionId", divisionId, "districtId", districtId);
-
-  console.log(upazilaData);
-
-  const [open, setOpen] = useState<boolean>(false);
-  const [value, setValue] = useState<string>("");
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
   const dispatch = useDispatch();
 
   return (
@@ -63,36 +53,38 @@ const UpazilaCombo = () => {
                   (upazila: { value: string; label: string }) =>
                     upazila.value === value
                 )?.label
-              : "Select Division..."}
+              : "Select Upazila..."}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="p-0 w-full">
           <Command>
-            <CommandInput placeholder="Search division..." className="h-9" />
+            <CommandInput placeholder="Search upazila..." className="h-9" />
             <CommandList>
-              <CommandEmpty>No division found.</CommandEmpty>
+              <CommandEmpty>No upazila found.</CommandEmpty>
               <CommandGroup>
-                {upazilaData?.upazila?.map((upazila: { _id: string; name: string; value: string; label: string }) => (
-                  <CommandItem
-                    key={upazila._id}
-                    value={upazila.name}
-                    onSelect={(currentValue) => {
-                      setValue(currentValue === value ? "" : currentValue);
-                      dispatch(setUpazilaId(upazila._id));
-                      dispatch(setUpazilaName(upazila.name));
-                      setOpen(false);
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        value === upazila.value ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {upazila.name}
-                  </CommandItem>
-                ))}
+                {upazilaData?.upazila?.map(
+                  (upazila: { _id: string; name: string; value: string }) => (
+                    <CommandItem
+                      key={upazila._id}
+                      value={upazila.name}
+                      onSelect={(currentValue) => {
+                        setValue(currentValue === value ? "" : currentValue);
+                        dispatch(setUpazilaId(upazila._id));
+                        dispatch(setUpazilaName(upazila.name));
+                        setOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          value === upazila.value ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {upazila.name}
+                    </CommandItem>
+                  )
+                )}
               </CommandGroup>
             </CommandList>
           </Command>

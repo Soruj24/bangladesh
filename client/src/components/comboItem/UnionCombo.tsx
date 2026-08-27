@@ -16,27 +16,25 @@ import {
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
-import { RootState } from "@/app/store"; // Ensure your RootState is correctly imported
+import { RootState } from "@/app/store";
 import { useGetUnionsQuery } from "@/services/unionsApi";
-import { setUnionId, setUnionName } from "@/features/unionSlice";
+import { setUnionId, setUnionName } from "@/features/geoSlice";
 
 const UnionCombo = () => {
-  // Selectors for division, district, and upazila IDs
   const divisionId = useSelector(
-    (state: RootState) => state.divisionIdData?.divisionId
+    (state: RootState) => state.geo.divisionId
   );
   const districtId = useSelector(
-    (state: RootState) => state.districtIdData?.districtId
+    (state: RootState) => state.geo.districtId
   );
   const upazilaId = useSelector(
-    (state: RootState) => state.upazilaIdData?.upazilaId
+    (state: RootState) => state.geo.upazilaId
   );
 
-  const [open, setOpen] = useState<boolean>(false);
-  const [selectedUnion, setSelectedUnion] = useState<string | null>(null); // State for selected union
+  const [open, setOpen] = useState(false);
+  const [selectedUnion, setSelectedUnion] = useState<string | null>(null);
   const dispatch = useDispatch();
 
-  // Fetch union data
   const { data: unionData, isLoading: unionLoading } = useGetUnionsQuery({
     divisionId,
     districtId,
@@ -58,7 +56,7 @@ const UnionCombo = () => {
               ? unionData?.unions?.find(
                   (union: { _id: string }) => union._id === selectedUnion
                 )?.name
-              : "Select union..."}
+              : "Select Union..."}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -76,10 +74,10 @@ const UnionCombo = () => {
                         key={union._id}
                         value={union.name}
                         onSelect={() => {
-                          setSelectedUnion(union._id); // Update state
-                          dispatch(setUnionId(union._id)); // Dispatch Redux action
-                          dispatch(setUnionName(union.name)); // Dispatch Redux action
-                          setOpen(false); // Close popover
+                          setSelectedUnion(union._id);
+                          dispatch(setUnionId(union._id));
+                          dispatch(setUnionName(union.name));
+                          setOpen(false);
                         }}
                       >
                         <Check

@@ -3,9 +3,9 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import SignIn from "@/page/SignIn";
 
-const ProtectedRoute = ({ children }: { children: ReactNode }) => {
+const SuperAdminRoute = ({ children }: { children: ReactNode }) => {
   const user = useSelector((state: RootState) => state.auth.user);
-  return user ? <>{children}</> : <SignIn />;
+  return user?.isSuperAdmin ? <>{children}</> : <SignIn />;
 };
 
-export default ProtectedRoute;
+export default SuperAdminRoute;

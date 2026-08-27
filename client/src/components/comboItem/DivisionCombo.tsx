@@ -8,13 +8,12 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { setDivisionId, setDivisionName } from "@/features/divisionSlice";
+import { setDivisionId, setDivisionName } from "@/features/geoSlice";
 import { useGetDivisionsQuery } from "@/services/dividionApi";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
@@ -22,18 +21,18 @@ import { Button } from "../ui/button";
 
 const DivisionCombo = () => {
   const { data: divisionData, isLoading } = useGetDivisionsQuery();
-  const [open, setOpen] = useState<boolean>(false);
-  const [value, setValue] = useState<string>("");
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
   const dispatch = useDispatch();
 
   if (isLoading) {
     return <div>Loading...</div>;
-  } 
+  }
 
   return (
     <div>
       <p className="text-sm my-4 font-medium leading-none">Select Division</p>
-      <Popover open={open}  onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"

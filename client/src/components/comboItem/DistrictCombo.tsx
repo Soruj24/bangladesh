@@ -17,18 +17,18 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
 import { useGetDistrictsQuery } from "@/services/districtApi";
-import RootState from "@/app/action";
-import { setDistrictId, setDistrictName } from "@/features/districtSlice";
+import { setDistrictId, setDistrictName } from "@/features/geoSlice";
+import { RootState } from "@/app/store";
 
 const DistrictCombo = () => {
   const divisionId = useSelector(
-    (state: RootState) => state?.divisionIdData?.divisionId
+    (state: RootState) => state.geo.divisionId
   );
 
   const { data: districtData } = useGetDistrictsQuery(divisionId);
 
-  const [open, setOpen] = useState<boolean>(false);
-  const [value, setValue] = useState<string>("");
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
   const dispatch = useDispatch();
 
   return (
@@ -44,37 +44,37 @@ const DistrictCombo = () => {
           >
             {value
               ? districtData?.division?.districts?.find(
-                  (division: { value: string }) => division.value === value
+                  (district: { value: string }) => district.value === value
                 )?.label
-              : "Select Division..."}
+              : "Select District..."}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="p-0 w-full">
           <Command>
-            <CommandInput placeholder="Search division..." className="h-9" />
+            <CommandInput placeholder="Search district..." className="h-9" />
             <CommandList>
-              <CommandEmpty>No division found.</CommandEmpty>
+              <CommandEmpty>No district found.</CommandEmpty>
               <CommandGroup>
                 {districtData?.division?.districts?.map(
-                  (division: { _id: string; name: string; value: string }) => (
+                  (district: { _id: string; name: string; value: string }) => (
                     <CommandItem
-                      key={division._id}
-                      value={division.name}
+                      key={district._id}
+                      value={district.name}
                       onSelect={(currentValue) => {
                         setValue(currentValue === value ? "" : currentValue);
-                        dispatch(setDistrictId(division._id));
-                        dispatch(setDistrictName(division.name));
+                        dispatch(setDistrictId(district._id));
+                        dispatch(setDistrictName(district.name));
                         setOpen(false);
                       }}
                     >
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          value === division.value ? "opacity-100" : "opacity-0"
+                          value === district.value ? "opacity-100" : "opacity-0"
                         )}
                       />
-                      {division.name}
+                      {district.name}
                     </CommandItem>
                   )
                 )}

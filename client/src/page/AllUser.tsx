@@ -1,31 +1,12 @@
 import React, { useState } from "react";
-import {
-  useDeleteUserMutation,
-  useGetUsersQuery,
-  useRoleUpdateMutation,
-} from "@/services/userApi";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableCell,
-  TableHead,
-} from "@/components/ui/table";
+import { useDeleteUserMutation, useGetUsersQuery, useRoleUpdateMutation } from "@/services/userApi";
+import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
-import { useSelector } from "react-redux";
+import { Loader2, Search, Trash2 } from "lucide-react";
 
 const AllUsers = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,14 +19,6 @@ const AllUsers = () => {
     search: searchQuery,
   });
 
-  const user = useSelector(
-    (state: {
-      auth: { user: { id: string; name: string; email: string; role: string } };
-    }) => state.auth.user
-  );
-
-  console.log(user);
-
   const [roleUpdate] = useRoleUpdateMutation();
   const [deleteUser] = useDeleteUserMutation();
 
@@ -54,240 +27,154 @@ const AllUsers = () => {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-    setCurrentPage(1); // Reset to the first page when searching
-  };
-
-  const handleCurrentChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
-
-  const handlePreviousChange = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextChange = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handleFirstPage = () => {
     setCurrentPage(1);
   };
 
-  const handleLastPage = () => {
-    setCurrentPage(totalPages);
-  };
-
-  const getVisiblePageNumbers = () => {
-    const visiblePages = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(visiblePages / 2));
-    const endPage = Math.min(totalPages, startPage + visiblePages - 1);
-
-    if (endPage - startPage < visiblePages - 1) {
-      startPage = Math.max(1, endPage - visiblePages + 1);
-    }
-
-    const pages = [];
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-
-    return pages;
-  };
-
-  const visiblePageNumbers = getVisiblePageNumbers();
-
-  if (isLoading) return <p>Loading users...</p>;
-  if (error)
-    return (
-      <p className="text-red-500">Failed to fetch users. Please try again.</p>
-    );
-
   const handleRoleChange = async (id: string, role: string) => {
-    console.log(`User ID: ${id}, New Role: ${role}`);
-
-    try {
-      const res = await roleUpdate({ id, role });
-      console.log(res);
-
-      if (res?.error) {
-        toast({
-          title: "error",
-          description: "Failed to update role",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "success",
-          description: "Role updated successfully",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "error",
-        description: "Failed to update role",
-        variant: "destructive",
-      });
-
-      console.error("Failed to update role", error);
+    const res = await roleUpdate({ id, role });
+    if (res?.error) {
+      toast({ title: "Error", description: "Failed to update role", variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: "Role updated" });
     }
   };
 
-  const handelDeleteUser = async (id: string) => {
-    try {
-      const res = await deleteUser(id);
-      console.log(res);
-      if (res?.error) {
-        toast({
-          title: "error",
-          description: "Failed to delete user",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "success",
-          description: "User deleted successfully",
-        });
-      }
-      refetch();
-    } catch (error) {
-      toast({
-        title: "error",
-        description: "Failed to delete user",
-        variant: "destructive",
-      });
-      console.error("Failed to delete user", error);
+  const handleDeleteUser = async (id: string) => {
+    const res = await deleteUser(id);
+    if (res?.error) {
+      toast({ title: "Error", description: "Failed to delete user", variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: "User deleted" });
     }
+    refetch();
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="text-center py-12 text-red-500">Failed to fetch users</div>;
+  }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">All Users</h1>
-
-      {/* Filters */}
-      <div className="flex justify-between items-center mb-4">
-        <Input
-          type="text"
-          placeholder="Search by name or email"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          className="w-1/3"
-        />
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">User Management</h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">Manage user roles and accounts</p>
       </div>
 
-      {/* User Table */}
-      {data?.users?.length > 0 ? (
-        <>
-          <Table className="table-auto border-collapse">
-            <TableHeader className="sticky top-0">
-              <TableRow>
-                <TableHead>#</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.users.map(
-                (
-                  user: {
-                    _id: string;
-                    name: string;
-                    email: string;
-                    role: string;
-                  },
-                  index: number
-                ) => (
-                  <TableRow key={user._id}>
-                    <TableCell>
-                      {index + 1 + (currentPage - 1) * itemsPerPage}
-                    </TableCell>
-                    <TableCell>{user.name}</TableCell>
-                    <TableCell>
-                      {user.email}{" "}
-                      <Badge
-                        onClick={() => handelDeleteUser(user._id)}
-                        className="ml-5 cursor-pointer"
-                        variant="outline"
-                      >
-                        Delete
-                      </Badge>{" "}
-                    </TableCell>
-                    <TableCell>
-                      <Select
-                        onValueChange={(newRole) =>
-                          handleRoleChange(user._id, newRole)
-                        }  
-                      >
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue
-                            placeholder={user.role} // Display the current role as placeholder
-                          />
-                          <SelectValue placeholder="Select a Role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Role</SelectLabel>
-                            <SelectItem value="admin">Admin</SelectItem>
-                            <SelectItem value="super-admin">
-                              Super Admin
-                            </SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
+      <Card className="border-0 shadow-sm dark:bg-gray-900/50">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+          <CardTitle className="text-lg">All Users</CardTitle>
+          <div className="relative w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search by name or email..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="pl-9 h-10"
+            />
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          {data?.users?.length > 0 ? (
+            <>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>#</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                )
-              )}
-            </TableBody>
-          </Table>
+                </TableHeader>
+                <TableBody>
+                  {data.users.map(
+                    (user: { _id: string; name: string; email: string; role: string }, index: number) => (
+                      <TableRow key={user._id}>
+                        <TableCell className="text-gray-500">
+                          {index + 1 + (currentPage - 1) * itemsPerPage}
+                        </TableCell>
+                        <TableCell className="font-medium">{user.name}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>
+                          <Select onValueChange={(newRole) => handleRoleChange(user._id, newRole)}>
+                            <SelectTrigger className="w-[160px] h-9">
+                              <SelectValue placeholder={user.role || "Select role"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                <SelectLabel>Role</SelectLabel>
+                                <SelectItem value="admin">Admin</SelectItem>
+                                <SelectItem value="super-admin">Super Admin</SelectItem>
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleDeleteUser(user._id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  )}
+                </TableBody>
+              </Table>
 
-          {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="my-3 space-x-3 text-center">
-              <Button disabled={currentPage === 1} onClick={handleFirstPage}>
-                First Page
-              </Button>
-              <Button
-                onClick={handlePreviousChange}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </Button>
-              {visiblePageNumbers.map((pageNumber) => (
-                <Button
-                  key={pageNumber}
-                  onClick={() => handleCurrentChange(pageNumber)}
-                  className={`mx-2 px-2 py-2 rounded-md transition-colors ${
-                    currentPage === pageNumber
-                      ? "bg-black text-white font-bold"
-                      : "bg-blue-500 text-white hover:bg-blue-600"
-                  }`}
-                >
-                  {pageNumber}
-                </Button>
-              ))}
-              <Button
-                onClick={handleNextChange}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </Button>
-              <Button
-                disabled={currentPage === totalPages}
-                onClick={handleLastPage}
-              >
-                Last Page
-              </Button>
-            </div>
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between px-4 py-3 border-t">
+                  <p className="text-sm text-gray-500">
+                    Page {currentPage} of {totalPages}
+                  </p>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
+                      First
+                    </Button>
+                    <Button variant="outline" size="sm" disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>
+                      Prev
+                    </Button>
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      const start = Math.max(1, Math.min(currentPage - 2, totalPages - 4));
+                      const page = start + i;
+                      if (page > totalPages) return null;
+                      return (
+                        <Button
+                          key={page}
+                          variant={currentPage === page ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setCurrentPage(page)}
+                          className={currentPage === page ? "bg-emerald-600 hover:bg-emerald-700" : ""}
+                        >
+                          {page}
+                        </Button>
+                      );
+                    })}
+                    <Button variant="outline" size="sm" disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}>
+                      Next
+                    </Button>
+                    <Button variant="outline" size="sm" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
+                      Last
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="text-center py-8 text-gray-500">No users found.</p>
           )}
-        </>
-      ) : (
-        <p className="text-gray-500">No users found.</p>
-      )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -1,64 +1,51 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
-
 export interface Division {
     id: string;
     name: string;
 }
 
-type DivisionsResponse = { divisions: Division[] }; 
+type DivisionsResponse = { divisions: Division[] };
+
 export const divisionApi = createApi({
     reducerPath: 'divisionsApi',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api' }),
+    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api', credentials: 'include' }),
     tagTypes: ['Divisions'],
     endpoints: (build) => ({
         getDivisions: build.query<DivisionsResponse, void>({
             query: () => 'divisions',
             providesTags: (result) => {
-                // Ensure result is an array before calling map()
-                if (Array.isArray(result)) {
+                if (result?.divisions) {
                     return [
-                        ...result.map(({ id }) => ({ type: 'Divisions', id }) as const),
-                        { type: 'Divisions', id: 'LIST' },
+                        ...result.divisions.map(({ id }) => ({ type: 'Divisions' as const, id })),
+                        { type: 'Divisions' as const, id: 'LIST' },
                     ]
                 }
-                // If result is not an array, return the LIST tag to ensure invalidation
-                return [{ type: 'Divisions', id: 'LIST' }]
+                return [{ type: 'Divisions' as const, id: 'LIST' }]
             },
         }),
         addDivision: build.mutation<Division, Partial<Division>>({
             query(body) {
-                return {
-                    url: 'divisions', // Adjusted the endpoint to 'division'
-                    method: 'POST',
-                    body,
-                }
+                return { url: 'divisions', method: 'POST', body }
             },
             invalidatesTags: [{ type: 'Divisions', id: 'LIST' }],
         }),
         getDivision: build.query<Division, number>({
-            query: (id) => `division/${id}`, // Adjusted the endpoint to 'division/{id}'
-            providesTags: (result, error, id) => [{ type: 'Divisions', id }],
+            query: (id) => `division/${id}`,
+            providesTags: (_result, _error, id) => [{ type: 'Divisions', id }],
         }),
         updateDivision: build.mutation<Division, Partial<Division>>({
             query(data) {
                 const { id, ...body } = data
-                return {
-                    url: `divisions/${id}`, // Adjusted the endpoint to 'division/{id}'
-                    method: 'PUT',
-                    body,
-                }
+                return { url: `divisions/${id}`, method: 'PUT', body }
             },
-            invalidatesTags: (result, error, { id }) => [{ type: 'Divisions', id }],
+            invalidatesTags: (_result, _error, { id }) => [{ type: 'Divisions', id }],
         }),
         deleteDivision: build.mutation<{ success: boolean; id: number }, number>({
             query(id) {
-                return {
-                    url: `divisions/${id}`, // Adjusted the endpoint to 'division/{id}'
-                    method: 'DELETE',
-                }
+                return { url: `divisions/${id}`, method: 'DELETE' }
             },
-            invalidatesTags: (result, error, id) => [{ type: 'Divisions', id }],
+            invalidatesTags: (_result, _error, id) => [{ type: 'Divisions', id }],
         }),
     }),
 })

@@ -5,19 +5,20 @@ import SignUp from "@/page/SignUp";
 import { createBrowserRouter } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminRoute from "./AdminRoute";
+import SuperAdminRoute from "./SuperAdminRoute";
+import DashboardLayout from "@/layout/DashboardLayout";
+import ErrorPage from "@/page/ErrorPage";
 import AdminProfile from "@/components/admin/AdminProfile";
 import AdminAllUser from "@/components/admin/AdminAllUser";
-import SuparAdminRoute from "./SuparAdminRoute";
-import SuparProfile from "@/components/suparAdmin/SuparProfile";
-import ErrorPage from "@/page/ErrorPage";
-import DivisionShow from "@/components/suparAdmin/DivisionShow";
-import DistrictShow from "@/components/suparAdmin/DistrictShow";
-import UpazilaShow from "@/components/suparAdmin/UpazilaShow";
-import UnionShow from "@/components/suparAdmin/UnionShow";
-import VillageShow from "@/components/suparAdmin/VillageShow";
 import AddAdminUsers from "@/components/admin/AddAdminUsers";
-import SuparAdminProfile from "@/components/suparAdmin/SuparAdminProfile";
 import AllUser from "@/page/AllUser";
+import SuperAdminProfile from "@/components/superAdmin/SuperAdminProfile";
+import CreateItems from "@/components/superAdmin/CreateItems";
+import DivisionShow from "@/components/superAdmin/DivisionShow";
+import DistrictShow from "@/components/superAdmin/DistrictShow";
+import UpazilaShow from "@/components/superAdmin/UpazilaShow";
+import UnionShow from "@/components/superAdmin/UnionShow";
+import VillageShow from "@/components/superAdmin/VillageShow";
 
 const router = createBrowserRouter([
   {
@@ -26,7 +27,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        path: "/",
+        index: true,
         element: <Home />,
       },
       {
@@ -37,72 +38,73 @@ const router = createBrowserRouter([
         path: "sign-in",
         element: <SignIn />,
       },
+    ],
+  },
+  {
+    path: "/dashboard/admin",
+    element: (
+      <AdminRoute>
+        <DashboardLayout />
+      </AdminRoute>
+    ),
+    children: [
       {
-        path: "dashboard/user",
-        element: <ProtectedRoute />,
-        children: [
-          {
-            path: "profile",
-            element: <Home />,
-          },
-        ],
+        path: "profile",
+        element: <AdminProfile />,
       },
       {
-        path: "dashboard/admin",
-        element: <AdminRoute />,
-        children: [
-          {
-            path: "profile",
-            element: <AdminProfile />,
-          },
-
-          {
-            path: "users",
-            element: <AdminAllUser />,
-          },
-          {
-            path: "add-admin-users",
-            element: <AddAdminUsers />,
-          },
-          {
-            path: "all-users",
-            element:<AllUser/>
-          }
-        ],
+        path: "users",
+        element: <AdminAllUser />,
       },
       {
-        path: "dashboard/supar-admin",
-        element: <SuparAdminRoute />,
-        children: [
-          {
-            path: "profile",
-            element: <SuparProfile />,
-          },
-          {
-            path: "supar-profile",
-            element: <SuparAdminProfile />,
-          },
-          {
-            path: "division-show-all",
-            element: <DivisionShow />,
-          },
-          {
-            path: "district-show-all",
-            element: <DistrictShow />,
-          },
-          {
-            path: "upazila-show-all",
-            element: <UpazilaShow />,
-          },
-          {
-            path: "union-show-all",
-            element: <UnionShow />,
-          },
-          {
-            path: "village-show-all",
-            element: <VillageShow />,
-          },
-        ],
+        path: "add-admin-users",
+        element: <AddAdminUsers />,
+      },
+      {
+        path: "all-users",
+        element: <AllUser />,
+      },
+    ],
+  },
+  {
+    path: "/dashboard/super-admin",
+    element: (
+      <SuperAdminRoute>
+        <DashboardLayout />
+      </SuperAdminRoute>
+    ),
+    children: [
+      {
+        path: "profile",
+        element: <SuperAdminProfile />,
+      },
+      {
+        path: "super-profile",
+        element: <SuperAdminProfile />,
+      },
+      {
+        path: "create",
+        element: <CreateItems />,
+      },
+      {
+        path: "divisions",
+        element: <DivisionShow />,
+      },
+      {
+        path: "districts",
+        element: <DistrictShow />,
+      },
+      {
+        path: "upazilas",
+        element: <UpazilaShow />,
+      },
+      {
+        path: "unions",
+        element: <UnionShow />,
+      },
+      {
+        path: "villages",
+        element: <VillageShow />,
       },
     ],
   },

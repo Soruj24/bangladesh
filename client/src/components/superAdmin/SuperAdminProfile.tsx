@@ -2,9 +2,9 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Mail, User } from "lucide-react";
+import { Crown, Mail, User } from "lucide-react";
 
-const AdminProfile = () => {
+const SuperAdminProfile = () => {
   const user = useSelector((state: RootState) => state.auth.user);
 
   return (
@@ -18,15 +18,15 @@ const AdminProfile = () => {
         <Card className="lg:col-span-1 border-0 shadow-sm dark:bg-gray-900/50">
           <CardContent className="pt-6">
             <div className="flex flex-col items-center text-center">
-              <div className="w-24 h-24 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
-                <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+              <div className="w-24 h-24 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-4">
+                <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
                   {user?.name?.charAt(0)?.toUpperCase()}
                 </span>
               </div>
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{user?.name}</h2>
               <p className="text-gray-500 dark:text-gray-400 mt-1">{user?.email}</p>
-              <Badge className="mt-3 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                <Shield className="h-3 w-3 mr-1" /> Admin
+              <Badge className="mt-3 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                <Crown className="h-3 w-3 mr-1" /> Super Admin
               </Badge>
             </div>
           </CardContent>
@@ -52,10 +52,10 @@ const AdminProfile = () => {
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-              <Shield className="h-5 w-5 text-gray-400" />
+              <Crown className="h-5 w-5 text-gray-400" />
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Role</p>
-                <p className="font-medium text-gray-900 dark:text-white">Administrator</p>
+                <p className="font-medium text-gray-900 dark:text-white">Super Administrator</p>
               </div>
             </div>
           </CardContent>
@@ -65,4 +65,4 @@ const AdminProfile = () => {
   );
 };
 
-export default AdminProfile;
+export default SuperAdminProfile;

@@ -1,19 +1,3 @@
-interface RootState {
-    divisionIdData: {
-      divisionId: string;
-    };
-    districtIdData: {
-      districtId: string;
-    };
-    upazilaIdData: {
-      upazilaId: string;
-    };
-    unionIdData: {
-      unionId: string;
-    };
-    villageIdData: {
-      villageId: string;
-    };
-  }
+import { RootState } from '@/app/store'
 
 export default RootState

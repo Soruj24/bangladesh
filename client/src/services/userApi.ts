@@ -1,9 +1,8 @@
 import { BaseQueryApi, createApi, FetchArgs, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-// Base query with token refresh logic
 const baseQuery = fetchBaseQuery({
-    baseUrl: 'http://localhost:4000/api', // Replace with your API URL
-    credentials: 'include', // Ensures credentials (cookies) are sent with each request
+    baseUrl: 'http://localhost:4000/api',
+    credentials: 'include',
     prepareHeaders: (headers, { getState }) => {
         const token = (getState() as { auth: { user: { accessToken: string } | null } }).auth?.user?.accessToken;
         if (token) {
@@ -13,11 +12,9 @@ const baseQuery = fetchBaseQuery({
     },
 });
 
-// Enhanced base query with refresh token logic
 const baseQueryWithRefresh = async (args: string | FetchArgs, api: BaseQueryApi, extraOptions: object) => {
     let result = await baseQuery(args, api, extraOptions);
 
-    // If access token expired (401 error), attempt to refresh it
     if (result.error && result.error.status === 401) {
         const refreshResult = await baseQuery(
             { url: '/auth/refresh-token', method: 'POST' },
@@ -26,15 +23,11 @@ const baseQueryWithRefresh = async (args: string | FetchArgs, api: BaseQueryApi,
         );
 
         if (refreshResult.data) {
-            // Store the new access token
             const { accessToken } = refreshResult.data as { accessToken: string };
-            api.dispatch({ type: 'auth/tokenUpdated', payload: accessToken }); // Ensure you have an action creator for this
-
-            // Retry the original query with the new token
+            api.dispatch({ type: 'auth/tokenUpdated', payload: accessToken });
             result = await baseQuery(args, api, extraOptions);
         } else {
-            // Refresh token failed, log out user
-            api.dispatch({ type: 'auth/logout' }); // Ensure you have an action creator for this
+            api.dispatch({ type: 'auth/logout' });
         }
     }
 
@@ -43,114 +36,79 @@ const baseQueryWithRefresh = async (args: string | FetchArgs, api: BaseQueryApi,
 
 export const userApi = createApi({
     reducerPath: 'usersApi',
-    baseQuery: baseQueryWithRefresh, // Use the base query with refresh logic
+    baseQuery: baseQueryWithRefresh,
     tagTypes: ['Users'],
     endpoints: (build) => ({
-        // Get Users
         getUsers: build.query({
             query: ({ page = 1, limit = 5, search = "" }) => ({
                 url: `users`,
                 method: 'GET',
-                params: {
-                    page,
-                    limit,
-                    search,
-                },
+                params: { page, limit, search },
             }),
             providesTags: (result) => {
                 if (result?.users) {
                     return [
-                        ...result.users.map(({ id }: { id: string }) => ({ type: 'Users', id })),
-                        { type: 'Users', id: 'LIST' },
+                        ...result.users.map(({ id }: { id: string }) => ({ type: 'Users' as const, id })),
+                        { type: 'Users' as const, id: 'LIST' },
                     ];
                 }
-                return [{ type: 'Users', id: 'LIST' }];
+                return [{ type: 'Users' as const, id: 'LIST' }];
             },
         }),
-        // Add User
         addUser: build.mutation({
             query(body) {
-                return {
-                    url: `/users/register`,
-                    method: 'POST',
-                    body,
-                };
+                return { url: `/users/register`, method: 'POST', body };
             },
             invalidatesTags: [{ type: 'Users', id: 'LIST' }],
         }),
-        // Get Single User
         getUser: build.query({
-            query: (id) => `user/${id}`,
-            providesTags: (result, error, id) => [{ type: 'Users', id }],
+            query: (id: string) => `users/${id}`,
+            providesTags: (_result, _error, id) => [{ type: 'Users', id }],
         }),
-        // Update User
         updateUser: build.mutation({
-            query(data) {
+            query(data: { id: string; [key: string]: unknown }) {
                 const { id, ...body } = data;
-                return {
-                    url: `users/${id}`,
-                    method: 'PUT',
-                    body,
-                };
+                return { url: `users/${id}`, method: 'PUT', body };
             },
-            invalidatesTags: (result, error, { id }) => [{ type: 'Users', id }],
+            invalidatesTags: (_result, _error, { id }) => [{ type: 'Users', id }],
         }),
-        // Delete User
         deleteUser: build.mutation({
-            query(id) {
-                return {
-                    url: `users/${id}`,
-                    method: 'DELETE',
-                };
+            query(id: string) {
+                return { url: `users/${id}`, method: 'DELETE' };
             },
-            invalidatesTags: (result, error, { id }) => [{ type: 'Users', id }],
+            invalidatesTags: (_result, _error, id) => [{ type: 'Users', id }],
         }),
-        // Login User
         loginUser: build.mutation({
             query: (credentials) => ({
-                url: 'auth/login', // Adjust to your actual login API endpoint
+                url: 'auth/login',
                 method: 'POST',
                 body: credentials,
             }),
-            // After a successful login, you might want to store user data, JWT, etc. in the state.
-            onQueryStarted: async (args, { queryFulfilled }) => {
+            onQueryStarted: async (_args, { queryFulfilled }) => {
                 try {
                     const { data } = await queryFulfilled;
                     localStorage.setItem('authToken', data?.user?.accessToken || '');
-                } catch (error) {
-                    console.error('Login failed', error);
+                } catch {
+                    // login failed
                 }
             },
         }),
-        // Logout User
         logoutUser: build.mutation({
             query: () => ({
-                url: 'auth/logout', // Adjust to your actual logout API endpoint
+                url: 'auth/logout',
                 method: 'POST',
             }),
             onQueryStarted: async () => {
-                try {
-                    // Perform logout operations like clearing JWT, user info, etc.
-                    localStorage.removeItem('authToken');
-                } catch (error) {
-                    console.error('Logout failed', error);
-                }
+                localStorage.removeItem('authToken');
             },
         }),
-
         roleUpdate: build.mutation({
-            query(data) {
+            query(data: { id: string; role: string }) {
                 const { id, ...body } = data;
-                console.log(data);
-                return {
-                    url: `users/manage-state/${id}`,
-                    method: 'PUT',
-                    body,
-                };
+                return { url: `users/manage-state/${id}`, method: 'PUT', body };
             },
-            invalidatesTags: (result, error, { id }) => [{ type: 'Users', id }],
+            invalidatesTags: (_result, _error, { id }) => [{ type: 'Users', id }],
         }),
-
     }),
 });
 

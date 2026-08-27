@@ -1,15 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import SignIn from "@/page/SignIn";
+import { ReactNode } from "react";
 import { useSelector } from "react-redux";
-import { Outlet } from "react-router-dom";
+import { RootState } from "@/app/store";
+import SignIn from "@/page/SignIn";
 
-const AdminRoute = () => {
-    const user = useSelector((state: { auth: { user: any } }) => state.auth.user);
-    
-    const isSignedIn = user;
-    const isAdmin = user?.isAdmin
+const AdminRoute = ({ children }: { children: ReactNode }) => {
+  const user = useSelector((state: RootState) => state.auth.user);
+  return user?.isAdmin ? <>{children}</> : <SignIn />;
+};
 
-    return isSignedIn && isAdmin ? <Outlet /> : <SignIn />
-}
-
-export default AdminRoute
+export default AdminRoute;
