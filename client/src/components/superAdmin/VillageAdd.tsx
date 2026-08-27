@@ -31,7 +31,7 @@ const VillageAdd = () => {
   const districtId = useSelector((state: RootState) => state.geo.districtId);
   const upazilaId = useSelector((state: RootState) => state.geo.upazilaId);
 
-  const { data: unionData, isLoading: unionLoading } = useGetUnionsQuery({ divisionId, districtId, upazilaId });
+  const { data: unionData, isLoading: unionLoading } = useGetUnionsQuery({ divisionId, districtId, upazilaId }, { skip: !divisionId || !districtId || !upazilaId });
   const [addVillage, { isLoading }] = useAddVillageMutation();
 
   const unionDataTyped = unionData as { unions?: { _id: string; name: string }[] } | undefined;

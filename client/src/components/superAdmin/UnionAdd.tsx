@@ -31,7 +31,7 @@ const UnionAdd = () => {
   const divisionId = useSelector((state: RootState) => state.geo.divisionId);
   const districtId = useSelector((state: RootState) => state.geo.districtId);
 
-  const { data: upazilaData, isLoading: loadingUpazilas } = useGetUpazilasQuery({ divisionId, districtId });
+  const { data: upazilaData, isLoading: loadingUpazilas } = useGetUpazilasQuery({ divisionId, districtId }, { skip: !divisionId || !districtId });
   const [addUnion, { isLoading }] = useAddUnionMutation();
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<UnionFormValues>({

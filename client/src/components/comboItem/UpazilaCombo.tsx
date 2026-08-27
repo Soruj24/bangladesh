@@ -28,10 +28,10 @@ const UpazilaCombo = () => {
     (state: RootState) => state.geo.districtId
   );
 
-  const { data: upazilaData } = useGetUpazilasQuery({
-    divisionId,
-    districtId,
-  });
+  const { data: upazilaData } = useGetUpazilasQuery(
+    { divisionId, districtId },
+    { skip: !divisionId || !districtId }
+  );
 
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");

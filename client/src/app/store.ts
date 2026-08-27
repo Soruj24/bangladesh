@@ -9,6 +9,7 @@ import { upozilaApi } from '@/services/upozilaApi'
 import { unionApi } from '@/services/unionsApi'
 import { villageApi } from '@/services/villageApi'
 import { populationApi } from '@/services/populationApi'
+import { publicApi } from '@/services/publicApi'
 
 export const store = configureStore({
   reducer: {
@@ -21,6 +22,7 @@ export const store = configureStore({
     [unionApi.reducerPath]: unionApi.reducer,
     [villageApi.reducerPath]: villageApi.reducer,
     [populationApi.reducerPath]: populationApi.reducer,
+    [publicApi.reducerPath]: publicApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
@@ -31,6 +33,7 @@ export const store = configureStore({
       .concat(unionApi.middleware)
       .concat(villageApi.middleware)
       .concat(populationApi.middleware)
+      .concat(publicApi.middleware)
 })
 
 export type RootState = ReturnType<typeof store.getState>

@@ -35,11 +35,10 @@ const UnionCombo = () => {
   const [selectedUnion, setSelectedUnion] = useState<string | null>(null);
   const dispatch = useDispatch();
 
-  const { data: unionData, isLoading: unionLoading } = useGetUnionsQuery({
-    divisionId,
-    districtId,
-    upazilaId,
-  });
+  const { data: unionData, isLoading: unionLoading } = useGetUnionsQuery(
+    { divisionId, districtId, upazilaId },
+    { skip: !divisionId || !districtId || !upazilaId }
+  );
 
   return (
     <div>

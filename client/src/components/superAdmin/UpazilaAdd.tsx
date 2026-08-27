@@ -29,7 +29,7 @@ const UpazilaAdd = () => {
   const [selectedDistrictId, setSelectedDistrictId] = useState("");
 
   const divisionId = useSelector((state: RootState) => state.geo.divisionId);
-  const { data: districtData, isLoading: loadingDistricts } = useGetDistrictsQuery(divisionId);
+  const { data: districtData, isLoading: loadingDistricts } = useGetDistrictsQuery(divisionId, { skip: !divisionId });
   const [addUpozila, { isLoading }] = useAddUpozilaMutation();
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<UpazilaFormValues>({

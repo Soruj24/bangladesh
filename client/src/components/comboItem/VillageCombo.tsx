@@ -34,12 +34,10 @@ const VillageCombo = () => {
     (state: RootState) => state.geo.unionId
   );
 
-  const { data: villageData } = useGetVillagesQuery({
-    divisionId,
-    districtId,
-    upazilaId,
-    unionId,
-  });
+  const { data: villageData } = useGetVillagesQuery(
+    { divisionId, districtId, upazilaId, unionId },
+    { skip: !divisionId || !districtId || !upazilaId || !unionId }
+  );
 
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");

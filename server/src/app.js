@@ -11,6 +11,7 @@ const villageRoutes = require("./router/villageRoutes");
 const userRouter = require("./router/userRouter");
 const authRouter = require("./router/authRouter");
 const populationRoute = require("./router/populationRoute");
+const publicRouter = require("./router/publicRouter");
 const { errorResponse } = require("./controller/responesController");
 
 const app = express();
@@ -26,6 +27,8 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use("/api/public", publicRouter);
 
 app.use("/api/unions", unionRoutes);
 app.use("/api/users", userRouter);

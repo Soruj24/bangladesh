@@ -25,7 +25,7 @@ const DistrictCombo = () => {
     (state: RootState) => state.geo.divisionId
   );
 
-  const { data: districtData } = useGetDistrictsQuery(divisionId);
+  const { data: districtData } = useGetDistrictsQuery(divisionId, { skip: !divisionId });
 
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
