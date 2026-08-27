@@ -13,13 +13,14 @@ const authRouter = require("./router/authRouter");
 const populationRoute = require("./router/populationRoute");
 const publicRouter = require("./router/publicRouter");
 const { errorResponse } = require("./controller/responesController");
+const { frontendUrl } = require("./secret");
 
 const app = express();
 
 app.use(
   cors({
     credentials: true,
-    origin: "http://localhost:5173",
+    origin: frontendUrl,
   })
 );
 
@@ -39,16 +40,16 @@ app.use("/api/districts", districtRoutes);
 app.use("/api/upazilas", upazilaRoutes);
 app.use("/api/villages", villageRoutes);
 
-//route  error handler
+// route error handler
 app.use((req, res, next) => {
   next(createError(404, "route not found"));
 });
 
-// server err handler
+// server error handler
 app.use((err, req, res, next) => {
   return errorResponse(res, {
-    statusCode: err.status,
-    message: err.message,
+    statusCode: err.status || 500,
+    message: err.message || "Internal server error",
   });
 });
 

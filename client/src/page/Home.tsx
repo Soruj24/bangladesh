@@ -11,6 +11,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SearchInput } from "@/components/ui/search-input";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import {
   Users,
   MapPin,
@@ -24,8 +34,6 @@ import {
   Shield,
   BarChart3,
   TrendingUp,
-  ChevronLeft,
-  Search,
 } from "lucide-react";
 
 const ITEMS_PER_PAGE = 12;
@@ -373,16 +381,12 @@ const Home = () => {
               )}
             </div>
 
-            <div className="relative max-w-md mb-6">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search by name, email or phone..."
-                value={popSearch}
-                onChange={(e) => { setPopSearch(e.target.value); setPopPage(1); }}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              />
-            </div>
+            <SearchInput
+              value={popSearch}
+              onChange={(v) => { setPopSearch(v); setPopPage(1); }}
+              placeholder="Search by name, email, phone or tag..."
+              className="max-w-md mb-6"
+            />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {loadingPop
@@ -432,40 +436,53 @@ const Home = () => {
             </div>
 
             {popPagination && popPagination.totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-8">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={!popPagination.hasPreviousPage}
-                  onClick={() => setPopPage((p) => p - 1)}
-                >
-                  <ChevronLeft className="h-4 w-4 mr-1" /> Prev
-                </Button>
-                {Array.from({ length: Math.min(5, popPagination.totalPages) }, (_, i) => {
-                  const start = Math.max(1, Math.min(popPage - 2, popPagination.totalPages - 4));
-                  const page = start + i;
-                  if (page > popPagination.totalPages) return null;
-                  return (
-                    <Button
-                      key={page}
-                      variant={popPage === page ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setPopPage(page)}
-                      className={popPage === page ? "bg-emerald-600 hover:bg-emerald-700" : ""}
-                    >
-                      {page}
-                    </Button>
-                  );
-                })}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={!popPagination.hasNextPage}
-                  onClick={() => setPopPage((p) => p + 1)}
-                >
-                  Next <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-              </div>
+              <Pagination className="mt-8">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => setPopPage((p) => p - 1)}
+                      className={!popPagination.hasPreviousPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                  {Array.from({ length: Math.min(5, popPagination.totalPages) }, (_, i) => {
+                    const start = Math.max(1, Math.min(popPage - 2, popPagination.totalPages - 4));
+                    const page = start + i;
+                    if (page > popPagination.totalPages) return null;
+                    return (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          isActive={popPage === page}
+                          onClick={() => setPopPage(page)}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  })}
+                  {popPagination.totalPages > 5 && popPage < popPagination.totalPages - 2 && (
+                    <>
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                      <PaginationItem>
+                        <PaginationLink
+                          onClick={() => setPopPage(popPagination.totalPages)}
+                          className="cursor-pointer"
+                        >
+                          {popPagination.totalPages}
+                        </PaginationLink>
+                      </PaginationItem>
+                    </>
+                  )}
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => setPopPage((p) => p + 1)}
+                      className={!popPagination.hasNextPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             )}
           </div>
         </section>

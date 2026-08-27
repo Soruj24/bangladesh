@@ -1,45 +1,46 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-// Helper function to safely parse JSON
-const safeParseJSON = (value: string | null) => {
-    try {
-        return value ? JSON.parse(value) : null;
-    } catch (error) {
-        console.error("Error parsing JSON from localStorage:", error);
-        return null;
-    }
-};
+interface User {
+    id: string;
+    name: string;
+    email: string;
+    isAdmin: boolean;
+    isSuperAdmin: boolean;
+    accessToken: string;
+}
 
-// Define the initial state
-const initialState = {
-    user: safeParseJSON(localStorage.getItem('user')),
-    isAuthenticated: !!localStorage.getItem('token'), // Check if a token exists
+interface AuthState {
+    user: User | null;
+    isAuthenticated: boolean;
+    isInitializing: boolean;
+}
+
+const initialState: AuthState = {
+    user: null,
+    isAuthenticated: false,
+    isInitializing: true,
 };
 
 const userSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        setUser: (state, action) => {
+        setUser: (state, action: PayloadAction<User>) => {
             state.user = action.payload;
             state.isAuthenticated = true;
-            localStorage.setItem('token', state.user?.accessToken || '');
-            localStorage.setItem('accessToken', state.user?.accessToken || '');
-            localStorage.setItem('refreshToken', state.user?.refreshToken || '');
-            localStorage.setItem('user', JSON.stringify(state.user || {})); // Store user in localStorage
+            state.isInitializing = false;
         },
-        
         logout: (state) => {
             state.user = null;
             state.isAuthenticated = false;
-            localStorage.removeItem('token');
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('user'); // Remove user from localStorage
+            state.isInitializing = false;
+        },
+        setInitializing: (state, action: PayloadAction<boolean>) => {
+            state.isInitializing = action.payload;
         },
     },
 });
 
-export const { setUser, logout } = userSlice.actions;
+export const { setUser, logout, setInitializing } = userSlice.actions;
 
 export default userSlice.reducer;

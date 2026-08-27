@@ -1,23 +1,30 @@
 const setAccessTokenCookie = (res, accessToken) => {
-    res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 15 * 60 * 1000,
-        sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax',
-        path: '/',
-    });
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 15 * 60 * 1000, // 15 minutes
+    sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+    path: "/",
+  });
 };
 
 const setRefreshTokenCookie = (res, refreshToken) => {
-    res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax',
-        path: '/',
-    });
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+    path: "/",
+  });
 };
 
+const clearRefreshCookie = (res) => {
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+    path: "/",
+  });
+};
 
-
-module.exports = { setAccessTokenCookie, setRefreshTokenCookie }
+module.exports = { setAccessTokenCookie, setRefreshTokenCookie, clearRefreshCookie };

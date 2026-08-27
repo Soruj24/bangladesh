@@ -5,31 +5,37 @@ const { jwtAccessKey, jwtRefreshKey } = require("../secret");
 const {
   setAccessTokenCookie,
   setRefreshTokenCookie,
+  clearRefreshCookie,
 } = require("../helper/cookie");
 const jwt = require("jsonwebtoken");
 
 const handelLogIn = async (req, res, next) => {
   try {
-    // email.password
     const { email, password } = req.body;
-    // isExists
+
     const userExists = await User.findOne({ email });
     if (!userExists) {
       return res.status(404).json({
-        message: "User dose not exist with this email",
+        success: false,
+        message: "User does not exist with this email",
       });
     }
-    // compare the password
+
     const isMatch = await bcrypt.compare(password, userExists.password);
     if (!isMatch) {
       return res.status(401).json({
+        success: false,
         message: "Password does not match",
       });
     }
 
-    const accessToken = createJSONWebToken({ userExists }, jwtAccessKey, "15m");
+    const accessToken = createJSONWebToken(
+      { id: userExists._id, email: userExists.email, isAdmin: userExists.isAdmin, isSuperAdmin: userExists.isSuperAdmin },
+      jwtAccessKey,
+      "15m"
+    );
     const refreshToken = createJSONWebToken(
-      { userExists },
+      { id: userExists._id },
       jwtRefreshKey,
       "7d"
     );
@@ -37,7 +43,8 @@ const handelLogIn = async (req, res, next) => {
     setAccessTokenCookie(res, accessToken);
     setRefreshTokenCookie(res, refreshToken);
 
-    res.status(200).json({
+    return res.status(200).json({
+      success: true,
       message: "User logged in successfully",
       user: {
         id: userExists._id,
@@ -46,13 +53,13 @@ const handelLogIn = async (req, res, next) => {
         isAdmin: userExists.isAdmin,
         isSuperAdmin: userExists.isSuperAdmin,
         accessToken,
-        refreshToken,
       },
     });
   } catch (error) {
-    console.log(error);
+    console.error("[AUTH] Login error:", error.message);
     return res.status(500).json({
-      message: "user login failed",
+      success: false,
+      message: "User login failed",
     });
   }
 };
@@ -62,82 +69,106 @@ const handelRefreshToken = async (req, res, next) => {
     const oldRefreshToken = req.cookies.refreshToken;
     if (!oldRefreshToken) {
       return res.status(401).json({
+        success: false,
         message: "Refresh token not found",
       });
     }
 
-    const decoded = jwt.verify(oldRefreshToken, jwtRefreshKey);
-
-    if (!decoded) {
+    let decoded;
+    try {
+      decoded = jwt.verify(oldRefreshToken, jwtRefreshKey);
+    } catch {
+      clearRefreshCookie(res);
       return res.status(401).json({
-        message: "Invalid refresh token",
+        success: false,
+        message: "Invalid or expired refresh token",
       });
     }
 
-    const accessToken = createJSONWebToken(
-      { userExists: decoded.userExists },
+    if (!decoded || !decoded.id) {
+      clearRefreshCookie(res);
+      return res.status(401).json({
+        success: false,
+        message: "Invalid refresh token payload",
+      });
+    }
+
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      clearRefreshCookie(res);
+      return res.status(401).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const newAccessToken = createJSONWebToken(
+      { id: user._id, email: user.email, isAdmin: user.isAdmin, isSuperAdmin: user.isSuperAdmin },
       jwtAccessKey,
       "15m"
     );
 
-    setAccessTokenCookie(res, accessToken);
+    const newRefreshToken = createJSONWebToken(
+      { id: user._id },
+      jwtRefreshKey,
+      "7d"
+    );
 
-    return res.status(201).json({
-      message: "new access token created successfully",
-      accessToken,
+    setAccessTokenCookie(res, newAccessToken);
+    setRefreshTokenCookie(res, newRefreshToken);
+
+    return res.status(200).json({
+      success: true,
+      message: "Access token refreshed successfully",
+      accessToken: newAccessToken,
     });
   } catch (error) {
-    console.log(error);
+    console.error("[AUTH] Refresh error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Token refresh failed",
+    });
   }
 };
 
 const handelProtected = async (req, res, next) => {
   try {
-    const accessToken = req.cookies.accessToken;
-    if (!accessToken) {
-      return res.status(401).json({
-        message: "Access token not found",
-      });
-    }
-
-    const decoded = jwt.verify(accessToken, jwtAccessKey);
-
-    if (!decoded) {
-      return res.status(401).json({
-        message: "Invalid access token",
-      });
-    }
-
-    const user = await User.find({});
-
-    return res.status(201).json({
+    const user = await User.find({}).select("-password");
+    return res.status(200).json({
+      success: true,
       message: "Protected route accessed successfully",
       user,
     });
   } catch (error) {
-    console.log(error);
+    console.error("[AUTH] Protected route error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 };
 
 const handelLogOut = async (req, res, next) => {
   try {
+    clearRefreshCookie(res);
     res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
 
     return res.status(200).json({
-      message: "User logout  successfully",
+      success: true,
+      message: "User logged out successfully",
     });
   } catch (error) {
-    console.log(error);
+    console.error("[AUTH] Logout error:", error.message);
     return res.status(500).json({
-      message: "user logout failed",
+      success: false,
+      message: "User logout failed",
     });
   }
 };
 
 module.exports = {
   handelLogIn,
-  handelLogOut,
   handelRefreshToken,
   handelProtected,
+  handelLogOut,
 };

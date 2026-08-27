@@ -1,12 +1,21 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDeleteUserMutation, useGetUsersQuery, useRoleUpdateMutation } from "@/services/userApi";
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Search, Trash2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
+import { SearchInput } from "@/components/ui/search-input";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 type ApiUser = { id: string; name: string; email: string; isAdmin: boolean; isSuperAdmin: boolean };
 type ApiResponse = { payload?: { users?: ApiUser[]; pagination?: { totalUsers: number; totalPages: number; currentPage: number; limit: number } } };
@@ -32,8 +41,8 @@ const AllUsers = () => {
 
   const getRole = (user: ApiUser) => user.isSuperAdmin ? "super-admin" : user.isAdmin ? "admin" : "user";
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
     setCurrentPage(1);
   };
 
@@ -78,15 +87,12 @@ const AllUsers = () => {
       <Card className="border-0 shadow-sm dark:bg-gray-900/50">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-lg">All Users</CardTitle>
-          <div className="relative w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Search by name or email..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="pl-9 h-10"
-            />
-          </div>
+          <SearchInput
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder="Search by name or email..."
+            className="w-72"
+          />
         </CardHeader>
         <CardContent className="p-0">
           {users.length > 0 ? (
@@ -140,40 +146,54 @@ const AllUsers = () => {
               </Table>
 
               {totalPages > 1 && (
-                <div className="flex items-center justify-between px-4 py-3 border-t">
-                  <p className="text-sm text-gray-500">
-                    Page {currentPage} of {totalPages}
-                  </p>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
-                      First
-                    </Button>
-                    <Button variant="outline" size="sm" disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>
-                      Prev
-                    </Button>
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      const start = Math.max(1, Math.min(currentPage - 2, totalPages - 4));
-                      const page = start + i;
-                      if (page > totalPages) return null;
-                      return (
-                        <Button
-                          key={page}
-                          variant={currentPage === page ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setCurrentPage(page)}
-                          className={currentPage === page ? "bg-emerald-600 hover:bg-emerald-700" : ""}
-                        >
-                          {page}
-                        </Button>
-                      );
-                    })}
-                    <Button variant="outline" size="sm" disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}>
-                      Next
-                    </Button>
-                    <Button variant="outline" size="sm" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
-                      Last
-                    </Button>
-                  </div>
+                <div className="px-4 py-3 border-t">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          onClick={() => setCurrentPage((p) => p - 1)}
+                          className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        />
+                      </PaginationItem>
+                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                        const start = Math.max(1, Math.min(currentPage - 2, totalPages - 4));
+                        const page = start + i;
+                        if (page > totalPages) return null;
+                        return (
+                          <PaginationItem key={page}>
+                            <PaginationLink
+                              isActive={currentPage === page}
+                              onClick={() => setCurrentPage(page)}
+                              className="cursor-pointer"
+                            >
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        );
+                      })}
+                      {totalPages > 5 && currentPage < totalPages - 2 && (
+                        <>
+                          <PaginationItem>
+                            <PaginationEllipsis />
+                          </PaginationItem>
+                          <PaginationItem>
+                            <PaginationLink
+                              onClick={() => setCurrentPage(totalPages)}
+                              className="cursor-pointer"
+                            >
+                              {totalPages}
+                            </PaginationLink>
+                          </PaginationItem>
+                        </>
+                      )}
+                      <PaginationItem>
+                        <PaginationNext
+                          onClick={() => setCurrentPage((p) => p + 1)}
+                          className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
                 </div>
               )}
             </>
