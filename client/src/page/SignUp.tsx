@@ -23,7 +23,11 @@ const schema = z.object({
             message:
                 "Password must include uppercase, lowercase, number, and special character",
         }),
+    confirmPassword: z.string().min(1, { message: "Please confirm your password" }),
     image: z.any().optional(),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
 });
 
 type FormData = z.infer<typeof schema>;
@@ -178,6 +182,25 @@ const SignUp: React.FC = () => {
                             {errors.password && (
                                 <p className="mt-2 text-sm text-red-600">
                                     {errors.password.message}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Confirm Password */}
+                        <div className="relative">
+                            <Label htmlFor="confirmPassword" className="mb-2 block">
+                                Confirm Password
+                            </Label>
+                            <Input
+                                type={passwordVisible ? "text" : "password"}
+                                id="confirmPassword"
+                                placeholder="Confirm your password"
+                                className="w-full pr-10"
+                                {...register("confirmPassword")}
+                            />
+                            {errors.confirmPassword && (
+                                <p className="mt-2 text-sm text-red-600">
+                                    {errors.confirmPassword.message}
                                 </p>
                             )}
                         </div>

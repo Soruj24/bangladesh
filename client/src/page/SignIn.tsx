@@ -53,9 +53,7 @@ const SignIn = () => {
         // Mock Sign-In Process
 
         const res = await loginUser(data)
-        console.log(res?.data?.user)
 
-        dispatch(setUser(res?.data?.user));
         if (res.error) {
             toast({
                 title: "Error",
@@ -65,16 +63,16 @@ const SignIn = () => {
             return
         }
 
-
+        dispatch(setUser(res?.data?.user));
 
         const user = res?.data?.user;
 
         let path = '';
 
-        if (user.isAdmin) {
-            path = '/dashboard/admin/profile';
-        } else if (user.isSuperAdmin) {  // Example of a third condition
+        if (user.isSuperAdmin) {
             path = '/dashboard/supar-admin/profile';
+        } else if (user.isAdmin) {
+            path = '/dashboard/admin/profile';
         } else {
             path = '/';
         }

@@ -5,7 +5,7 @@ const baseQuery = fetchBaseQuery({
     baseUrl: 'http://localhost:4000/api', // Replace with your API URL
     credentials: 'include', // Ensures credentials (cookies) are sent with each request
     prepareHeaders: (headers, { getState }) => {
-        const token = (getState() as { auth: { accessToken: string } }).auth?.accessToken; // Access token from your Redux store
+        const token = (getState() as { auth: { user: { accessToken: string } | null } }).auth?.user?.accessToken;
         if (token) {
             headers.set('Authorization', `Bearer ${token}`);
         }
@@ -116,8 +116,7 @@ export const userApi = createApi({
             onQueryStarted: async (args, { queryFulfilled }) => {
                 try {
                     const { data } = await queryFulfilled;
-                    // Store JWT or user info if needed (e.g., localStorage or redux state)
-                    localStorage.setItem('authToken', data.token); // Example, adjust to your response format
+                    localStorage.setItem('authToken', data?.user?.accessToken || '');
                 } catch (error) {
                     console.error('Login failed', error);
                 }
