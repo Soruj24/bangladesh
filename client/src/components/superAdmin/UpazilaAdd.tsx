@@ -36,7 +36,7 @@ const UpazilaAdd = () => {
     resolver: zodResolver(upazilaSchema),
   });
 
-  const districts = (districtData as { division?: { districts?: { _id: string; name: string }[] } })?.division?.districts || [];
+  const districts = (districtData as unknown as { payload?: { district?: { _id: string; name: string }[] } })?.payload?.district ?? [];
 
   const onSubmit = async (formData: UpazilaFormValues) => {
     if (!selectedDistrictId) {

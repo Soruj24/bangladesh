@@ -13,7 +13,7 @@ const upload = require('../middleware/imageUploader')
 const populationRoute = require('express').Router()
 
 
-populationRoute.post('/', upload.single('image'), isLoggedIn, isAdmin, addUser)
+populationRoute.post('/', isLoggedIn, isAdmin, addUser)
 populationRoute.get('/', populationGetAllUsers)
 populationRoute.get('/:id', isLoggedIn, populationGetSingalUser)
 populationRoute.put('/:id', isLoggedIn, populationUpdateUser)

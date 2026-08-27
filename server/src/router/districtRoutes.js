@@ -13,44 +13,12 @@ const { validateName } = require("../validators/division");
 
 const districtRoutes = require("express").Router();
 
-
-districtRoutes.get(
-  "/:divisionId/:districtId",
-  isLoggedIn,
-  handelSingalDistrictInDivision
-);
-
-
-districtRoutes.get(
-  "/:districtId",
-  isLoggedIn,
-  handelSingalDistrictWithOutDivision
-);
-
-districtRoutes.post(
-  "/:divisionId",
-  isLoggedIn,
-  isSuperAdmin,
-  validateName,
-  runValidation,
-  handelCreateDistrict
-);
-
-districtRoutes.get("/:divisionId", isLoggedIn, handelGetAllDistricts);
-
-districtRoutes.delete(
-  "/:districtId",
-  isLoggedIn,
-  isSuperAdmin,
-  handelDeleteDistrictWithOutDivision
-);
-
-districtRoutes.put(
-  "/:districtId",
-  isLoggedIn,
-  handelUpdateDistrictWithOutDivision
-);
-
 districtRoutes.get("/", isLoggedIn, handelDistrictWithOutDivision);
+districtRoutes.get("/:divisionId/:districtId", isLoggedIn, handelSingalDistrictInDivision);
+districtRoutes.get("/:divisionId", isLoggedIn, handelGetAllDistricts);
+districtRoutes.post("/:divisionId", isLoggedIn, isSuperAdmin, validateName, runValidation, handelCreateDistrict);
+districtRoutes.delete("/:districtId", isLoggedIn, isSuperAdmin, handelDeleteDistrictWithOutDivision);
+districtRoutes.put("/:districtId", isLoggedIn, handelUpdateDistrictWithOutDivision);
+districtRoutes.get("/:districtId", isLoggedIn, handelSingalDistrictWithOutDivision);
 
 module.exports = districtRoutes;

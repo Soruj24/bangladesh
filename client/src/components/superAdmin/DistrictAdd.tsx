@@ -29,6 +29,8 @@ const DistrictAdd = () => {
   const dispatch = useDispatch();
   const [selectedDivisionId, setSelectedDivisionId] = useState("");
 
+  const divisions = (divisionData as unknown as { payload?: { divisions?: { _id: string; name: string }[] } })?.payload?.divisions ?? [];
+
   const { register, handleSubmit, reset, formState: { errors } } = useForm<DistrictFormValues>({
     resolver: zodResolver(districtSchema),
   });
@@ -62,7 +64,7 @@ const DistrictAdd = () => {
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" role="combobox" className="w-full justify-between mt-1 h-10">
-              {value ? divisionData?.divisions?.find((d: { name: string }) => d.name === value)?.name : "Select division..."}
+              {value ? divisions.find((d: { name: string }) => d.name === value)?.name : "Select division..."}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
@@ -72,7 +74,7 @@ const DistrictAdd = () => {
               <CommandList>
                 <CommandEmpty>No division found.</CommandEmpty>
                 <CommandGroup>
-                  {divisionData?.divisions?.map((division: { _id: string; name: string }) => (
+                  {divisions.map((division: { _id: string; name: string }) => (
                     <CommandItem
                       key={division._id}
                       value={division.name}

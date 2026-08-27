@@ -31,7 +31,7 @@ const DistrictCombo = () => {
   const [value, setValue] = useState("");
   const dispatch = useDispatch();
 
-  const districtList = (districtData as { division?: { districts?: { _id: string; name: string; value: string; label: string }[] } })?.division?.districts || [];
+  const districtList = (districtData as unknown as { payload?: { district?: { _id: string; name: string; value: string; label: string }[] } })?.payload?.district ?? [];
 
   return (
     <div>

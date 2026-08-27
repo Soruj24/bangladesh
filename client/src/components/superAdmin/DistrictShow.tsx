@@ -15,7 +15,7 @@ const DistrictShow = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [current, setCurrent] = useState<{ _id: string; name: string } | null>(null);
 
-  const districts = (data as unknown as { payload?: { district?: { _id: string; name: string }[] } })?.payload?.district ?? [];
+  const districts = data?.payload?.district ?? [];
 
   const handleDelete = async (id: string) => {
     const res = await deleteDistrict({ districtId: id });

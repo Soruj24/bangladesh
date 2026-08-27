@@ -4,7 +4,7 @@ import { baseQuery } from './baseQuery';
 export interface District {
     id: string;
     name: string;
-    _id?: string;
+    _id: string;
 }
 
 type DistrictsResponse = { division: { districts: District[] } } | District[];
@@ -19,7 +19,7 @@ export const districtApi = createApi({
             providesTags: [{ type: 'Districts', id: 'LIST' }],
         }),
 
-        getAllDistricts: build.query<{ district: District[] }, void>({
+        getAllDistricts: build.query<{ success: boolean; message: string; payload: { district: District[] } }, void>({
             query: () => 'districts',
             providesTags: [{ type: 'Districts', id: 'LIST' }],
         }),

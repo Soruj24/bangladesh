@@ -40,7 +40,7 @@ export const populationApi = createApi({
                 return [{ type: 'Population' as const, id: 'LIST' }];
             }
         }),
-        addPopulation: build.mutation<Population, Partial<Population>>({
+        addPopulation: build.mutation<{ message: string; user: Record<string, unknown> }, Record<string, unknown>>({
             query(body) {
                 return { url: `population`, method: 'POST', body };
             },

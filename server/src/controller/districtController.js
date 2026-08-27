@@ -39,20 +39,17 @@ const handelGetAllDistricts = async (req, res, next) => {
   try {
     const { divisionId } = req.params;
 
-    await singleDivision(divisionId).populate("districts");
+    const division = await Division.findById(divisionId).populate("districts");
 
-    // Check if Division exists
-    // const division = await Division.findById(divisionId).populate("districts");
-
-    // if (!division) {
-    //   return res.status(404).json({ message: "Division not found" });
-    // }
+    if (!division) {
+      return res.status(404).json({ message: "Division not found" });
+    }
 
     return successResponse(res, {
       statusCode: 200,
       message: "Districts fetched successfully",
       payload: {
-        district,
+        district: division.districts,
       },
     });
   } catch (error) {

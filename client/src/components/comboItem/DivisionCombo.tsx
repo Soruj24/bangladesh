@@ -25,6 +25,8 @@ const DivisionCombo = () => {
   const [value, setValue] = useState("");
   const dispatch = useDispatch();
 
+  const divisions = (divisionData as unknown as { payload?: { divisions?: { _id: string; name: string; value: string; label: string }[] } })?.payload?.divisions ?? [];
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -41,9 +43,7 @@ const DivisionCombo = () => {
             className="justify-between w-full"
           >
             {value
-              ? divisionData?.divisions?.find(
-                  (division: { value: string }) => division.value === value
-                )?.label
+              ? divisions.find((d) => d.value === value)?.label
               : "Select Division..."}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
@@ -54,28 +54,26 @@ const DivisionCombo = () => {
             <CommandList>
               <CommandEmpty>No division found.</CommandEmpty>
               <CommandGroup>
-                {divisionData?.divisions?.map(
-                  (division: { _id: string; name: string; value: string }) => (
-                    <CommandItem
-                      key={division._id}
-                      value={division.name}
-                      onSelect={(currentValue) => {
-                        setValue(currentValue === value ? "" : currentValue);
-                        dispatch(setDivisionId(division._id));
-                        dispatch(setDivisionName(division.name));
-                        setOpen(false);
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          value === division.value ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {division.name}
-                    </CommandItem>
-                  )
-                )}
+                {divisions.map((division) => (
+                  <CommandItem
+                    key={division._id}
+                    value={division.name}
+                    onSelect={(currentValue) => {
+                      setValue(currentValue === value ? "" : currentValue);
+                      dispatch(setDivisionId(division._id));
+                      dispatch(setDivisionName(division.name));
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === division.value ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {division.name}
+                  </CommandItem>
+                ))}
               </CommandGroup>
             </CommandList>
           </Command>
