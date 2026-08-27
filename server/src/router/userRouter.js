@@ -25,8 +25,6 @@ userRouter.post(
 userRouter.get(
   "/",
   isLoggedIn,
-  validateUserLogin,
-  runValidation,
   isAdmin,
   handelGetAllUsers
 );

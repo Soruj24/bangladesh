@@ -39,9 +39,9 @@ export const userApi = createApi({
                 params: { page, limit, search },
             }),
             providesTags: (result) => {
-                if (result?.users) {
+                if ((result as unknown as { payload?: { users?: { id: string }[] } })?.payload?.users) {
                     return [
-                        ...result.users.map(({ id }: { id: string }) => ({ type: 'Users' as const, id })),
+                        ...(result as unknown as { payload: { users: { id: string }[] } }).payload.users.map(({ id }) => ({ type: 'Users' as const, id })),
                         { type: 'Users' as const, id: 'LIST' },
                     ];
                 }

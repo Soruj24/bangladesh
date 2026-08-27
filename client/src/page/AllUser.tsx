@@ -8,6 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, Search, Trash2 } from "lucide-react";
 
+type ApiUser = { id: string; name: string; email: string; isAdmin: boolean; isSuperAdmin: boolean };
+type ApiResponse = { payload?: { users?: ApiUser[]; pagination?: { totalUsers: number; totalPages: number; currentPage: number; limit: number } } };
+
 const AllUsers = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,8 +25,12 @@ const AllUsers = () => {
   const [roleUpdate] = useRoleUpdateMutation();
   const [deleteUser] = useDeleteUserMutation();
 
-  const totalUsers = data?.pagination?.totalUsers || 0;
+  const apiData = data as unknown as ApiResponse;
+  const users = apiData?.payload?.users ?? [];
+  const totalUsers = apiData?.payload?.pagination?.totalUsers || 0;
   const totalPages = Math.ceil(totalUsers / itemsPerPage);
+
+  const getRole = (user: ApiUser) => user.isSuperAdmin ? "super-admin" : user.isAdmin ? "admin" : "user";
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -82,7 +89,7 @@ const AllUsers = () => {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {data?.users?.length > 0 ? (
+          {users.length > 0 ? (
             <>
               <Table>
                 <TableHeader>
@@ -95,18 +102,18 @@ const AllUsers = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data.users.map(
-                    (user: { _id: string; name: string; email: string; role: string }, index: number) => (
-                      <TableRow key={user._id}>
+                  {users.map(
+                    (user, index) => (
+                      <TableRow key={user.id}>
                         <TableCell className="text-gray-500">
                           {index + 1 + (currentPage - 1) * itemsPerPage}
                         </TableCell>
                         <TableCell className="font-medium">{user.name}</TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>
-                          <Select onValueChange={(newRole) => handleRoleChange(user._id, newRole)}>
+                          <Select onValueChange={(newRole) => handleRoleChange(user.id, newRole)}>
                             <SelectTrigger className="w-[160px] h-9">
-                              <SelectValue placeholder={user.role || "Select role"} />
+                              <SelectValue placeholder={getRole(user)} />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectGroup>
@@ -121,7 +128,7 @@ const AllUsers = () => {
                           <Button
                             size="sm"
                             variant="destructive"
-                            onClick={() => handleDeleteUser(user._id)}
+                            onClick={() => handleDeleteUser(user.id)}
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
