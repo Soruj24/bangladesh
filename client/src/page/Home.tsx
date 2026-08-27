@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { RootState } from "@/app/store";
@@ -23,14 +24,21 @@ import {
   Shield,
   BarChart3,
   TrendingUp,
+  ChevronLeft,
+  Search,
 } from "lucide-react";
+
+const ITEMS_PER_PAGE = 12;
 
 const Home = () => {
   const user = useSelector((state: RootState) => state.auth.user);
+  const [popPage, setPopPage] = useState(1);
+  const [popSearch, setPopSearch] = useState("");
   const { data: statsData, isLoading: loadingStats } = useGetStatsQuery();
   const { data: divisionsData, isLoading: loadingDiv } = useGetPublicDivisionsQuery();
-  const { data: populationData } = useGetPopulationsQuery();
+  const { data: populationData, isLoading: loadingPop } = useGetPopulationsQuery({ page: popPage, limit: ITEMS_PER_PAGE, search: popSearch });
   const populationUsers = (populationData as unknown as { users?: { id: string; name: string; email: string; image: string; division: string }[] })?.users ?? [];
+  const popPagination = (populationData as unknown as { pagination?: { totalUsers: number; totalPages: number; currentPage: number; hasNextPage: boolean; hasPreviousPage: boolean } })?.pagination;
 
   const stats = statsData?.payload;
   const divisions = divisionsData?.payload?.divisions ?? [];
@@ -365,38 +373,100 @@ const Home = () => {
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {populationUsers.map((person) => (
-                <Card
-                  key={person.id}
-                  className="border-0 shadow-md hover:shadow-lg transition-all duration-300 dark:bg-gray-900/50"
-                >
-                  <CardContent className="p-5">
-                    <div className="flex items-start gap-3">
-                      <img
-                        src={person.image}
-                        alt={person.name}
-                        className="w-11 h-11 rounded-full object-cover ring-2 ring-gray-100 dark:ring-gray-800"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-900 dark:text-white truncate text-sm">
-                          {person.name}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
-                          {person.email}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="mt-3 flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
-                      <MapPin className="h-3 w-3 shrink-0" />
-                      <span className="truncate">
-                        {person.division || "N/A"}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="relative max-w-md mb-6">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by name, email or phone..."
+                value={popSearch}
+                onChange={(e) => { setPopSearch(e.target.value); setPopPage(1); }}
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              />
             </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {loadingPop
+                ? Array.from({ length: 12 }).map((_, i) => (
+                    <Card key={i} className="border-0 shadow-md dark:bg-gray-900/50">
+                      <CardContent className="p-5">
+                        <div className="flex items-start gap-3">
+                          <Skeleton className="w-11 h-11 rounded-full" />
+                          <div className="flex-1 space-y-2">
+                            <Skeleton className="h-4 w-24" />
+                            <Skeleton className="h-3 w-32" />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                : populationUsers.map((person) => (
+                    <Card
+                      key={person.id}
+                      className="border-0 shadow-md hover:shadow-lg transition-all duration-300 dark:bg-gray-900/50"
+                    >
+                      <CardContent className="p-5">
+                        <div className="flex items-start gap-3">
+                          <img
+                            src={person.image}
+                            alt={person.name}
+                            className="w-11 h-11 rounded-full object-cover ring-2 ring-gray-100 dark:ring-gray-800"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-gray-900 dark:text-white truncate text-sm">
+                              {person.name}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                              {person.email}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="mt-3 flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
+                          <MapPin className="h-3 w-3 shrink-0" />
+                          <span className="truncate">
+                            {person.division || "N/A"}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+            </div>
+
+            {popPagination && popPagination.totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-8">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={!popPagination.hasPreviousPage}
+                  onClick={() => setPopPage((p) => p - 1)}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" /> Prev
+                </Button>
+                {Array.from({ length: Math.min(5, popPagination.totalPages) }, (_, i) => {
+                  const start = Math.max(1, Math.min(popPage - 2, popPagination.totalPages - 4));
+                  const page = start + i;
+                  if (page > popPagination.totalPages) return null;
+                  return (
+                    <Button
+                      key={page}
+                      variant={popPage === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPopPage(page)}
+                      className={popPage === page ? "bg-emerald-600 hover:bg-emerald-700" : ""}
+                    >
+                      {page}
+                    </Button>
+                  );
+                })}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={!popPagination.hasNextPage}
+                  onClick={() => setPopPage((p) => p + 1)}
+                >
+                  Next <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+            )}
           </div>
         </section>
       )}

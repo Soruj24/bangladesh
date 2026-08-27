@@ -8,7 +8,7 @@ export interface Population {
 
 type PopulationResponse = {
     users: {
-        _id: string;
+        id: string;
         name: string;
         email: string;
         image: string;
@@ -18,6 +18,14 @@ type PopulationResponse = {
         union: string;
         village: string;
     }[];
+    pagination: {
+        totalUsers: number;
+        currentPage: number;
+        totalPages: number;
+        pageSize: number;
+        hasNextPage: boolean;
+        hasPreviousPage: boolean;
+    };
 };
 
 export const populationApi = createApi({
@@ -25,15 +33,15 @@ export const populationApi = createApi({
     baseQuery,
     tagTypes: ['Population'],
     endpoints: (build) => ({
-        getPopulations: build.query<PopulationResponse, void>({
-            query: () => ({
+        getPopulations: build.query<PopulationResponse, { page?: number; limit?: number; search?: string }>({
+            query: ({ page = 1, limit = 12, search = "" } = {}) => ({
                 url: 'population',
-                params: { page: 1, limit: 1000 },
+                params: { page, limit, search },
             }),
             providesTags: (result) => {
                 if (result?.users) {
                     return [
-                        ...result.users.map(({ _id }) => ({ type: 'Population' as const, id: _id })),
+                        ...result.users.map(({ id }) => ({ type: 'Population' as const, id })),
                         { type: 'Population' as const, id: 'LIST' },
                     ];
                 }

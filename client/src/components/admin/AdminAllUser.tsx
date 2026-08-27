@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
 const AdminAllUser = () => {
-  const { data, isLoading, isError } = useGetPopulationsQuery();
+  const { data, isLoading, isError } = useGetPopulationsQuery({ page: 1, limit: 1000 });
 
   if (isLoading) {
     return (
@@ -47,7 +47,7 @@ const AdminAllUser = () => {
               </TableHeader>
               <TableBody>
                 {data?.users?.map((user) => (
-                  <TableRow key={user._id}>
+                  <TableRow key={user.id}>
                     <TableCell>
                       <img src={user?.image} alt="User" className="w-8 h-8 rounded-full object-cover" />
                     </TableCell>

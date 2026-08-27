@@ -84,6 +84,7 @@ const populationGetAllUsers = async (req, res) => {
                     { name: new RegExp(search, 'i') },
                     { email: new RegExp(search, 'i') },
                     { phone: new RegExp(search, 'i') },
+                    { tag: new RegExp(search, 'i') },
                 ]
             }
             : {};
