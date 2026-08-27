@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from './baseQuery';
 
 export interface Population {
     id: number;
@@ -21,7 +22,7 @@ type PopulationResponse = {
 
 export const populationApi = createApi({
     reducerPath: 'populationApi',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api', credentials: 'include' }),
+    baseQuery,
     tagTypes: ['Population'],
     endpoints: (build) => ({
         getPopulations: build.query<PopulationResponse, void>({

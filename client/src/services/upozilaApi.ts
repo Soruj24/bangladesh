@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from './baseQuery';
 
 export interface Upozila {
     id: string;
@@ -10,7 +11,7 @@ type UpazilasResponse = { upazila: Upozila[] } | { UpazilaWithOutDistrict: Upozi
 
 export const upozilaApi = createApi({
     reducerPath: 'upozilasApi',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api', credentials: 'include' }),
+    baseQuery,
     tagTypes: ['Upazilas'],
     endpoints: (build) => ({
         getUpazilas: build.query<UpazilasResponse, { divisionId: string; districtId: string }>({

@@ -1,22 +1,12 @@
-import { BaseQueryApi, createApi, FetchArgs, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-
-const baseQuery = fetchBaseQuery({
-    baseUrl: 'http://localhost:4000/api',
-    credentials: 'include',
-    prepareHeaders: (headers, { getState }) => {
-        const token = (getState() as { auth: { user: { accessToken: string } | null } }).auth?.user?.accessToken;
-        if (token) {
-            headers.set('Authorization', `Bearer ${token}`);
-        }
-        return headers;
-    },
-});
+import { BaseQueryApi, createApi, FetchArgs } from '@reduxjs/toolkit/query/react';
+import { baseQuery as sharedBaseQuery } from './baseQuery';
+import { logout } from '@/features/userSlice';
 
 const baseQueryWithRefresh = async (args: string | FetchArgs, api: BaseQueryApi, extraOptions: object) => {
-    let result = await baseQuery(args, api, extraOptions);
+    let result = await sharedBaseQuery(args, api, extraOptions);
 
     if (result.error && result.error.status === 401) {
-        const refreshResult = await baseQuery(
+        const refreshResult = await sharedBaseQuery(
             { url: '/auth/refresh-token', method: 'POST' },
             api,
             extraOptions
@@ -24,10 +14,13 @@ const baseQueryWithRefresh = async (args: string | FetchArgs, api: BaseQueryApi,
 
         if (refreshResult.data) {
             const { accessToken } = refreshResult.data as { accessToken: string };
-            api.dispatch({ type: 'auth/tokenUpdated', payload: accessToken });
-            result = await baseQuery(args, api, extraOptions);
+            const currentUser = (api.getState() as { auth: { user: Record<string, unknown> | null } }).auth?.user;
+            if (currentUser) {
+                api.dispatch({ type: 'auth/setUser', payload: { ...currentUser, accessToken } });
+            }
+            result = await sharedBaseQuery(args, api, extraOptions);
         } else {
-            api.dispatch({ type: 'auth/logout' });
+            api.dispatch(logout());
         }
     }
 

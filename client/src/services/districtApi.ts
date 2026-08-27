@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from './baseQuery';
 
 export interface District {
     id: string;
@@ -10,7 +11,7 @@ type DistrictsResponse = { division: { districts: District[] } } | District[];
 
 export const districtApi = createApi({
     reducerPath: 'districtsApi',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api', credentials: 'include' }),
+    baseQuery,
     tagTypes: ['Districts'],
     endpoints: (build) => ({
         getDistricts: build.query<DistrictsResponse, string>({

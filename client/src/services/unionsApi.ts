@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi } from '@reduxjs/toolkit/query/react'
+import { baseQuery } from './baseQuery'
 
 export interface Union {
     id: string
@@ -8,7 +9,7 @@ export interface Union {
 
 export const unionApi = createApi({
     reducerPath: 'unionsApi',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api', credentials: 'include' }),
+    baseQuery,
     tagTypes: ['Unions'],
     endpoints: (build) => ({
         getUnions: build.query<{ unions: Union[] }, { divisionId: string; districtId: string; upazilaId: string }>({

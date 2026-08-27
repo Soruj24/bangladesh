@@ -2,7 +2,10 @@ const jwt = require("jsonwebtoken");
 const { jwtAccessKey } = require("../secret");
 const isLoggedIn = (req, res, next) => {
   try {
-    const token = req.cookies.accessToken;
+    let token = req.cookies.accessToken;
+    if (!token && req.headers.authorization?.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
     if (!token) {
       return res.status(401).json({
         success: false,

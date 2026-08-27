@@ -13,7 +13,9 @@ const DivisionShow = () => {
   const [deleteDivision] = useDeleteDivisionMutation();
   const [updateDivision] = useUpdateDivisionMutation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentDivision, setCurrentDivision] = useState<{ id: string; name: string } | null>(null);
+  const [currentDivision, setCurrentDivision] = useState<{ _id: string; name: string } | null>(null);
+
+  const divisions = (data as unknown as { payload?: { divisions?: { _id: string; name: string }[] } })?.payload?.divisions ?? [];
 
   const handleDelete = async (id: string) => {
     const res = await deleteDivision(id);
@@ -31,7 +33,7 @@ const DivisionShow = () => {
       return;
     }
     try {
-      await updateDivision({ id: currentDivision.id, name: currentDivision.name }).unwrap();
+      await updateDivision({ id: currentDivision._id, name: currentDivision.name }).unwrap();
       toast({ title: "Success", description: "Division updated" });
       refetch();
       setIsDialogOpen(false);
@@ -42,10 +44,13 @@ const DivisionShow = () => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {[...Array(4)].map((_, i) => (
-          <Card key={i} className="border-0 shadow-sm"><CardHeader><Skeleton className="h-5 w-32" /></CardHeader><CardContent><Skeleton className="h-4 w-full" /></CardContent></Card>
-        ))}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Divisions</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {[...Array(8)].map((_, i) => (
+            <Card key={i} className="border-0 shadow-sm"><CardHeader><Skeleton className="h-5 w-32" /></CardHeader><CardContent><Skeleton className="h-4 w-full" /></CardContent></Card>
+          ))}
+        </div>
       </div>
     );
   }
@@ -63,8 +68,8 @@ const DivisionShow = () => {
     <div>
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Divisions</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {data?.divisions?.map((division) => (
-          <Card key={division.id} className="border-0 shadow-sm dark:bg-gray-900/50">
+        {divisions.map((division) => (
+          <Card key={division._id} className="border-0 shadow-sm dark:bg-gray-900/50">
             <CardHeader className="pb-3">
               <h3 className="font-semibold text-gray-900 dark:text-white">{division.name}</h3>
             </CardHeader>
@@ -73,7 +78,7 @@ const DivisionShow = () => {
                 <Button size="sm" variant="outline" onClick={() => { setCurrentDivision(division); setIsDialogOpen(true); }}>
                   <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
                 </Button>
-                <Button size="sm" variant="destructive" onClick={() => handleDelete(division.id)}>
+                <Button size="sm" variant="destructive" onClick={() => handleDelete(division._id)}>
                   <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
                 </Button>
               </div>

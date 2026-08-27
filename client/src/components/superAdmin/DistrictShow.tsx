@@ -13,7 +13,9 @@ const DistrictShow = () => {
   const [updateDistrict] = useUpdateDistrictMutation();
   const [deleteDistrict] = useDeleteDistrictMutation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [current, setCurrent] = useState<{ id: string; name: string } | null>(null);
+  const [current, setCurrent] = useState<{ _id: string; name: string } | null>(null);
+
+  const districts = (data as unknown as { payload?: { district?: { _id: string; name: string }[] } })?.payload?.district ?? [];
 
   const handleDelete = async (id: string) => {
     const res = await deleteDistrict({ districtId: id });
@@ -31,7 +33,7 @@ const DistrictShow = () => {
       return;
     }
     try {
-      await updateDistrict({ districtId: current.id, name: current.name }).unwrap();
+      await updateDistrict({ districtId: current._id, name: current.name }).unwrap();
       toast({ title: "Success", description: "District updated" });
       refetch();
       setIsDialogOpen(false);
@@ -42,10 +44,13 @@ const DistrictShow = () => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {[...Array(4)].map((_, i) => (
-          <Card key={i} className="border-0 shadow-sm"><CardHeader><Skeleton className="h-5 w-32" /></CardHeader><CardContent><Skeleton className="h-4 w-full" /></CardContent></Card>
-        ))}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Districts</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {[...Array(8)].map((_, i) => (
+            <Card key={i} className="border-0 shadow-sm"><CardHeader><Skeleton className="h-5 w-32" /></CardHeader><CardContent><Skeleton className="h-4 w-full" /></CardContent></Card>
+          ))}
+        </div>
       </div>
     );
   }
@@ -56,17 +61,17 @@ const DistrictShow = () => {
     <div>
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Districts</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {data?.district?.map((district: { id: string; name: string }) => (
-          <Card key={district.id} className="border-0 shadow-sm dark:bg-gray-900/50">
+        {districts.map((district) => (
+          <Card key={district._id} className="border-0 shadow-sm dark:bg-gray-900/50">
             <CardHeader className="pb-3">
               <h3 className="font-semibold text-gray-900 dark:text-white">{district.name}</h3>
             </CardHeader>
             <CardContent className="pt-0">
               <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => { setCurrent({ id: district.id, name: district.name }); setIsDialogOpen(true); }}>
+                <Button size="sm" variant="outline" onClick={() => { setCurrent({ _id: district._id, name: district.name }); setIsDialogOpen(true); }}>
                   <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
                 </Button>
-                <Button size="sm" variant="destructive" onClick={() => handleDelete(district.id)}>
+                <Button size="sm" variant="destructive" onClick={() => handleDelete(district._id)}>
                   <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
                 </Button>
               </div>

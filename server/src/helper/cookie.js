@@ -1,19 +1,20 @@
 const setAccessTokenCookie = (res, accessToken) => {
     res.cookie('accessToken', accessToken, {
-        httpOnly: true,      // Prevents client-side JavaScript from accessing the token
-        secure: process.env.NODE_ENV === 'production', // Ensure it's sent only over HTTPS in production
-        maxAge: 15 * 60 * 1000, // 15 minutes
-        sameSite: 'Strict',  // Prevents sending cookies with cross-site requests
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 15 * 60 * 1000,
+        sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax',
+        path: '/',
     });
 };
 
-// Set the refresh token cookie
 const setRefreshTokenCookie = (res, refreshToken) => {
     res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,      // Prevents client-side JavaScript from accessing the token
-        secure: process.env.NODE_ENV === 'production', // Ensure it's sent only over HTTPS in production
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days for refresh token
-        sameSite: 'Strict',  // Prevents sending cookies with cross-site requests
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax',
+        path: '/',
     });
 };
 

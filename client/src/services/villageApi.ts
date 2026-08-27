@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from './baseQuery';
 
 export interface Village {
     id: string;
@@ -25,7 +26,7 @@ interface AddVillageParams {
 
 export const villageApi = createApi({
     reducerPath: 'villagesApi',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api', credentials: 'include' }),
+    baseQuery,
     tagTypes: ['Villages'],
     endpoints: (build) => ({
         getVillages: build.query<{ villages: Village[] }, GetVillagesParams>({
