@@ -41,7 +41,7 @@ const handelCreateUpazila = async (req, res) => {
 
 
         const upazila = await Upazila.create({ name, district: districtId });
-        await District.findByIdAndUpdate(districtId, { $push: { upazila: upazila._id } });
+        await District.findByIdAndUpdate(districtId, { $push: { upazilas: upazila._id } });
 
         return res.status(201).json({
             message: 'Upazila created successfully',
@@ -76,7 +76,7 @@ const handelGetAllUpazila = async (req, res) => {
         }
 
         // Check if District exists
-        const districtExists = await District.findById(districtId).populate('upazila');
+        const districtExists = await District.findById(districtId).populate('upazilas');
         if (!districtExists) {
             return res.status(404).json({ message: "District not found" });
         }
@@ -84,7 +84,7 @@ const handelGetAllUpazila = async (req, res) => {
 
         return res.status(200).json({
             message: 'Upazila fetched successfully',
-            upazila: districtExists.upazila
+            upazila: districtExists.upazilas
         });
 
     } catch (error) {

@@ -6,12 +6,6 @@ const upazilaSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide an Upazila name"],
     },
-    upazila: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Upazila",
-      },
-    ],
     value: {
       type: String,
     },

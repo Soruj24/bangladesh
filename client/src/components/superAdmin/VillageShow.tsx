@@ -16,7 +16,7 @@ const VillageShow = () => {
   const [current, setCurrent] = useState<{ _id: string; name: string } | null>(null);
 
   const handleDelete = async (id: string) => {
-    const res = await deleteVillage(Number(id));
+    const res = await deleteVillage(id);
     if (res?.error) {
       toast({ title: "Error", description: "Failed to delete", variant: "destructive" });
       return;

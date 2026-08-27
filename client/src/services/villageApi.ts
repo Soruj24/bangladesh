@@ -63,7 +63,7 @@ export const villageApi = createApi({
             invalidatesTags: [{ type: 'Villages', id: 'LIST' }],
         }),
 
-        deleteVillage: build.mutation<{ success: boolean }, number>({
+        deleteVillage: build.mutation<{ success: boolean }, string>({
             query: (id) => ({
                 url: `villages/${id}`,
                 method: 'DELETE',

@@ -30,6 +30,7 @@ const Home = () => {
   const { data: statsData, isLoading: loadingStats } = useGetStatsQuery();
   const { data: divisionsData, isLoading: loadingDiv } = useGetPublicDivisionsQuery();
   const { data: populationData } = useGetPopulationsQuery();
+  const populationUsers = (populationData as unknown as { users?: { id: string; name: string; email: string; image: string; division: string }[] })?.users ?? [];
 
   const stats = statsData?.payload;
   const divisions = divisionsData?.payload?.divisions ?? [];
@@ -337,7 +338,7 @@ const Home = () => {
       </section>
 
       {/* Population Preview */}
-      {populationData?.users && populationData.users.length > 0 && (
+      {populationUsers.length > 0 && (
         <section className="bg-gray-50 dark:bg-gray-900/50 py-16 sm:py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between mb-10">
@@ -346,7 +347,7 @@ const Home = () => {
                   Registered Population
                 </h2>
                 <p className="mt-2 text-gray-500 dark:text-gray-400">
-                  {populationData.users.length} records across Bangladesh
+                  {stats?.population ?? populationUsers.length} records across Bangladesh
                 </p>
               </div>
               {user && (
@@ -365,9 +366,9 @@ const Home = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {populationData.users.slice(0, 8).map((person) => (
+              {populationUsers.slice(0, 8).map((person) => (
                 <Card
-                  key={person._id}
+                  key={person.id}
                   className="border-0 shadow-md hover:shadow-lg transition-all duration-300 dark:bg-gray-900/50"
                 >
                   <CardContent className="p-5">
