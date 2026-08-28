@@ -47,8 +47,9 @@ export const baseQuery = async (args: string | FetchArgs, api: BaseQueryApi, ext
             return result;
         }
 
-        // If access token is not expired (e.g., invalid token), don't refresh — logout
-        if (errorCode && errorCode !== 'ACCESS_TOKEN_EXPIRED') {
+        // Only refresh if the access token expired.
+        // For NO_ACCESS_TOKEN, INVALID_ACCESS_TOKEN, or refresh endpoint failure — logout immediately.
+        if (errorCode !== 'ACCESS_TOKEN_EXPIRED' && errorCode !== undefined) {
             api.dispatch(logout());
             return result;
         }

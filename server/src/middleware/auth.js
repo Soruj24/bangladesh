@@ -19,6 +19,7 @@ const isLoggedIn = (req, res, next) => {
     if (!token) {
       return res.status(401).json({
         success: false,
+        code: "NO_ACCESS_TOKEN",
         message: "Please login first",
       });
     }
@@ -44,6 +45,7 @@ const isLoggedIn = (req, res, next) => {
     if (!decoded) {
       return res.status(401).json({
         success: false,
+        code: "INVALID_ACCESS_TOKEN",
         message: "Invalid access token",
       });
     }

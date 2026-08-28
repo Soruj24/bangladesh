@@ -12,7 +12,7 @@ const { validateName } = require('../validators/division')
 
 const unionRoutes = require('express').Router()
 
-unionRoutes.post("/:divisionId/:districtId/:upazilaId",isSuperAdmin,validateName,runValidation, handelCreateUnionInUpazila)
+unionRoutes.post("/:divisionId/:districtId/:upazilaId", isLoggedIn, isSuperAdmin, validateName, runValidation, handelCreateUnionInUpazila)
 unionRoutes.get("/:divisionId/:districtId/:upazilaId", isLoggedIn,handelGetUnions)
 unionRoutes.get("/:divisionId/:districtId/:upazilaId/:unionId", isLoggedIn,handelGetSingleUnion)
 unionRoutes.delete("/:unionId",isLoggedIn,isSuperAdmin, handelUnionDelete)
