@@ -2,8 +2,10 @@ import { fetchBaseQuery, BaseQueryApi, FetchArgs } from '@reduxjs/toolkit/query/
 import type { RootState } from '@/app/store';
 import { logout, setUser } from '@/features/userSlice';
 
-const rawBaseQuery = fetchBaseQuery({
-    baseUrl: 'http://localhost:4000/api',
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+
+export const rawBaseQuery = fetchBaseQuery({
+    baseUrl: API_BASE_URL,
     credentials: 'include',
     prepareHeaders: (headers, { getState }) => {
         const token = (getState() as RootState).auth?.user?.accessToken;

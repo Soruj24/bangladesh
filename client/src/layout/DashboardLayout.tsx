@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "@/features/userSlice";
 import { useLogoutUserMutation } from "@/services/userApi";
@@ -54,6 +54,7 @@ const DashboardLayout = () => {
     () => window.matchMedia("(prefers-color-scheme: dark)").matches
   );
   const location = useLocation();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [logoutUser] = useLogoutUserMutation();
   const user = useSelector((state: RootState) => state.auth.user);
@@ -67,6 +68,7 @@ const DashboardLayout = () => {
   const handleLogout = async () => {
     await logoutUser({});
     dispatch(logout());
+    navigate("/sign-in");
   };
 
   const toggleDarkMode = () => {

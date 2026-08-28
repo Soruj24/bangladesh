@@ -6,6 +6,7 @@ const {
   setAccessTokenCookie,
   setRefreshTokenCookie,
   clearRefreshCookie,
+  clearAccessTokenCookie,
 } = require("../helper/cookie");
 const jwt = require("jsonwebtoken");
 
@@ -35,7 +36,7 @@ const handelLogIn = async (req, res, next) => {
       "15m"
     );
     const refreshToken = createJSONWebToken(
-      { id: userExists._id },
+      { id: userExists._id, tokenVersion: userExists.tokenVersion },
       jwtRefreshKey,
       "7d"
     );
@@ -70,6 +71,7 @@ const handelRefreshToken = async (req, res, next) => {
     if (!oldRefreshToken) {
       return res.status(401).json({
         success: false,
+        code: "NO_REFRESH_TOKEN",
         message: "Refresh token not found",
       });
     }
@@ -81,6 +83,7 @@ const handelRefreshToken = async (req, res, next) => {
       clearRefreshCookie(res);
       return res.status(401).json({
         success: false,
+        code: "INVALID_REFRESH_TOKEN",
         message: "Invalid or expired refresh token",
       });
     }
@@ -89,6 +92,7 @@ const handelRefreshToken = async (req, res, next) => {
       clearRefreshCookie(res);
       return res.status(401).json({
         success: false,
+        code: "INVALID_REFRESH_TOKEN",
         message: "Invalid refresh token payload",
       });
     }
@@ -98,7 +102,17 @@ const handelRefreshToken = async (req, res, next) => {
       clearRefreshCookie(res);
       return res.status(401).json({
         success: false,
+        code: "INVALID_REFRESH_TOKEN",
         message: "User not found",
+      });
+    }
+
+    if (decoded.tokenVersion !== user.tokenVersion) {
+      clearRefreshCookie(res);
+      return res.status(401).json({
+        success: false,
+        code: "INVALID_REFRESH_TOKEN",
+        message: "Refresh token has been revoked",
       });
     }
 
@@ -109,7 +123,7 @@ const handelRefreshToken = async (req, res, next) => {
     );
 
     const newRefreshToken = createJSONWebToken(
-      { id: user._id },
+      { id: user._id, tokenVersion: user.tokenVersion },
       jwtRefreshKey,
       "7d"
     );
@@ -133,11 +147,23 @@ const handelRefreshToken = async (req, res, next) => {
 
 const handelProtected = async (req, res, next) => {
   try {
-    const user = await User.find({}).select("-password");
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
     return res.status(200).json({
       success: true,
       message: "Protected route accessed successfully",
-      user,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        isSuperAdmin: user.isSuperAdmin,
+      },
     });
   } catch (error) {
     console.error("[AUTH] Protected route error:", error.message);
@@ -150,8 +176,20 @@ const handelProtected = async (req, res, next) => {
 
 const handelLogOut = async (req, res, next) => {
   try {
+    const oldRefreshToken = req.cookies.refreshToken;
+    if (oldRefreshToken) {
+      try {
+        const decoded = jwt.verify(oldRefreshToken, jwtRefreshKey);
+        if (decoded && decoded.id) {
+          await User.findByIdAndUpdate(decoded.id, { $inc: { tokenVersion: 1 } });
+        }
+      } catch {
+        // Token invalid/expired — proceed with clearing cookies
+      }
+    }
+
     clearRefreshCookie(res);
-    res.clearCookie("accessToken");
+    clearAccessTokenCookie(res);
 
     return res.status(200).json({
       success: true,

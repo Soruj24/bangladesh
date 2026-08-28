@@ -27,4 +27,13 @@ const clearRefreshCookie = (res) => {
   });
 };
 
-module.exports = { setAccessTokenCookie, setRefreshTokenCookie, clearRefreshCookie };
+const clearAccessTokenCookie = (res) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+    path: "/",
+  });
+};
+
+module.exports = { setAccessTokenCookie, setRefreshTokenCookie, clearRefreshCookie, clearAccessTokenCookie };
