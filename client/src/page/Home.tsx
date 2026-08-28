@@ -34,6 +34,7 @@ import {
   Shield,
   BarChart3,
   TrendingUp,
+  SearchX,
 } from "lucide-react";
 
 const ITEMS_PER_PAGE = 12;
@@ -354,139 +355,166 @@ const Home = () => {
       </section>
 
       {/* Population Preview */}
-      {populationUsers.length > 0 && (
-        <section className="bg-gray-50 dark:bg-gray-900/50 py-16 sm:py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between mb-10">
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                  Registered Population
-                </h2>
-                <p className="mt-2 text-gray-500 dark:text-gray-400">
-                  {stats?.population ?? populationUsers.length} records across Bangladesh
-                </p>
-              </div>
-              {user && (
-                <Link
-                  to={
-                    user.isSuperAdmin
-                      ? "/dashboard/super-admin/profile"
-                      : "/dashboard/admin/profile"
-                  }
-                >
-                  <Button variant="outline" className="gap-2">
-                    View All <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-              )}
+      <section className="bg-gray-50 dark:bg-gray-900/50 py-16 sm:py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-10">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+                Registered Population
+              </h2>
+              <p className="mt-2 text-gray-500 dark:text-gray-400">
+                {stats?.population ?? populationUsers.length} records across Bangladesh
+              </p>
             </div>
-
-            <SearchInput
-              value={popSearch}
-              onChange={(v) => { setPopSearch(v); setPopPage(1); }}
-              placeholder="Search by name, email, phone or tag..."
-              className="max-w-md mb-6"
-            />
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {loadingPop
-                ? Array.from({ length: 12 }).map((_, i) => (
-                    <Card key={i} className="border-0 shadow-md dark:bg-gray-900/50">
-                      <CardContent className="p-5">
-                        <div className="flex items-start gap-3">
-                          <Skeleton className="w-11 h-11 rounded-full" />
-                          <div className="flex-1 space-y-2">
-                            <Skeleton className="h-4 w-24" />
-                            <Skeleton className="h-3 w-32" />
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
-                : populationUsers.map((person) => (
-                    <Card
-                      key={person.id}
-                      className="border-0 shadow-md hover:shadow-lg transition-all duration-300 dark:bg-gray-900/50"
-                    >
-                      <CardContent className="p-5">
-                        <div className="flex items-start gap-3">
-                          <img
-                            src={person.image}
-                            alt={person.name}
-                            className="w-11 h-11 rounded-full object-cover ring-2 ring-gray-100 dark:ring-gray-800"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-gray-900 dark:text-white truncate text-sm">
-                              {person.name}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
-                              {person.email}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="mt-3 flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
-                          <MapPin className="h-3 w-3 shrink-0" />
-                          <span className="truncate">
-                            {person.division || "N/A"}
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-            </div>
-
-            {popPagination && popPagination.totalPages > 1 && (
-              <Pagination className="mt-8">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      onClick={() => setPopPage((p) => p - 1)}
-                      className={!popPagination.hasPreviousPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                    />
-                  </PaginationItem>
-                  {Array.from({ length: Math.min(5, popPagination.totalPages) }, (_, i) => {
-                    const start = Math.max(1, Math.min(popPage - 2, popPagination.totalPages - 4));
-                    const page = start + i;
-                    if (page > popPagination.totalPages) return null;
-                    return (
-                      <PaginationItem key={page}>
-                        <PaginationLink
-                          isActive={popPage === page}
-                          onClick={() => setPopPage(page)}
-                          className="cursor-pointer"
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    );
-                  })}
-                  {popPagination.totalPages > 5 && popPage < popPagination.totalPages - 2 && (
-                    <>
-                      <PaginationItem>
-                        <PaginationEllipsis />
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationLink
-                          onClick={() => setPopPage(popPagination.totalPages)}
-                          className="cursor-pointer"
-                        >
-                          {popPagination.totalPages}
-                        </PaginationLink>
-                      </PaginationItem>
-                    </>
-                  )}
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={() => setPopPage((p) => p + 1)}
-                      className={!popPagination.hasNextPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
+            {user && (
+              <Link
+                to={
+                  user.isSuperAdmin
+                    ? "/dashboard/super-admin/profile"
+                    : "/dashboard/admin/profile"
+                }
+              >
+                <Button variant="outline" className="gap-2">
+                  View All <ChevronRight className="h-4 w-4" />
+                </Button>
+              </Link>
             )}
           </div>
-        </section>
-      )}
+
+          <SearchInput
+            value={popSearch}
+            onChange={(v) => { setPopSearch(v); setPopPage(1); }}
+            placeholder="Search by name, email, phone or tag..."
+            className="max-w-md mb-6"
+          />
+
+          {loadingPop ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <Card key={i} className="border-0 shadow-md dark:bg-gray-900/50">
+                  <CardContent className="p-5">
+                    <div className="flex items-start gap-3">
+                      <Skeleton className="w-11 h-11 rounded-full" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-3 w-32" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : populationUsers.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {populationUsers.map((person) => (
+                <Card
+                  key={person.id}
+                  className="border-0 shadow-md hover:shadow-lg transition-all duration-300 dark:bg-gray-900/50"
+                >
+                  <CardContent className="p-5">
+                    <div className="flex items-start gap-3">
+                      <img
+                        src={person.image}
+                        alt={person.name}
+                        className="w-11 h-11 rounded-full object-cover ring-2 ring-gray-100 dark:ring-gray-800"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-900 dark:text-white truncate text-sm">
+                          {person.name}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                          {person.email}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
+                      <MapPin className="h-3 w-3 shrink-0" />
+                      <span className="truncate">
+                        {person.division || "N/A"}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : popSearch.trim() ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="p-4 rounded-full bg-gray-100 dark:bg-gray-800 mb-5">
+                <SearchX className="h-10 w-10 text-gray-400 dark:text-gray-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                No results found
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 max-w-sm mb-5">
+                We couldn't find anything matching "{popSearch}". Try searching with a different keyword.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => { setPopSearch(""); setPopPage(1); }}
+              >
+                Clear Search
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <p className="text-gray-500 dark:text-gray-400">
+                No population records available.
+              </p>
+            </div>
+          )}
+
+          {popPagination && popPagination.totalPages > 1 && (
+            <Pagination className="mt-8">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => setPopPage((p) => p - 1)}
+                    className={!popPagination.hasPreviousPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+                {Array.from({ length: Math.min(5, popPagination.totalPages) }, (_, i) => {
+                  const start = Math.max(1, Math.min(popPage - 2, popPagination.totalPages - 4));
+                  const page = start + i;
+                  if (page > popPagination.totalPages) return null;
+                  return (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        isActive={popPage === page}
+                        onClick={() => setPopPage(page)}
+                        className="cursor-pointer"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
+                {popPagination.totalPages > 5 && popPage < popPagination.totalPages - 2 && (
+                  <>
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationLink
+                        onClick={() => setPopPage(popPagination.totalPages)}
+                        className="cursor-pointer"
+                      >
+                        {popPagination.totalPages}
+                      </PaginationLink>
+                    </PaginationItem>
+                  </>
+                )}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => setPopPage((p) => p + 1)}
+                    className={!popPagination.hasNextPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          )}
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
