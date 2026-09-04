@@ -1,81 +1,83 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Globe, MapPin, Building2, Users, Home } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Globe, MapPin, Landmark, Home, TreePine } from "lucide-react";
 import DivisionAdd from "./DivisionAdd";
 import DistrictAdd from "./DistrictAdd";
 import UpazilaAdd from "./UpazilaAdd";
 import UnionAdd from "./UnionAdd";
 import VillageAdd from "./VillageAdd";
 
+const steps = [
+  {
+    numeral: "01",
+    icon: Globe,
+    title: "Division",
+    description: "Top-level region. Stands alone — start here.",
+    form: <DivisionAdd />,
+  },
+  {
+    numeral: "02",
+    icon: MapPin,
+    title: "District",
+    description: "Lives inside a division. Pick its parent first.",
+    form: <DistrictAdd />,
+  },
+  {
+    numeral: "03",
+    icon: Landmark,
+    title: "Upazila",
+    description: "Lives inside a district under the chosen division.",
+    form: <UpazilaAdd />,
+  },
+  {
+    numeral: "04",
+    icon: Home,
+    title: "Union",
+    description: "Lives inside an upazila further down the chain.",
+    form: <UnionAdd />,
+  },
+  {
+    numeral: "05",
+    icon: TreePine,
+    title: "Village",
+    description: "Deepest level — needs the full chain above it.",
+    form: <VillageAdd />,
+  },
+];
+
 const CreateItems = () => {
   return (
-    <div className="space-y-4">
+    <div className="mx-auto w-full max-w-3xl space-y-5">
       <div>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">Geography</p>
-        <h1 className="text-xl font-semibold tracking-tight">Create Items</h1>
-        <p className="text-sm text-muted-foreground mt-1">Add new geographic entities to the hierarchy</p>
+        <p className="eyebrow">Geography</p>
+        <h1 className="page-title">Create Items</h1>
+        <p className="page-sub">Build the hierarchy top to bottom — each level unlocks the next</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <Card className="border bg-card shadow-none">
-          <CardHeader className="flex flex-row items-center gap-3 space-y-0">
-            <div className="rounded-md bg-primary/10 p-2 text-primary">
-              <Globe className="h-5 w-5" />
-            </div>
-            <CardTitle className="text-[15px] font-semibold tracking-tight">Division</CardTitle>
-          </CardHeader>
-          <CardContent className="p-5">
-            <DivisionAdd />
-          </CardContent>
-        </Card>
-
-        <Card className="border bg-card shadow-none">
-          <CardHeader className="flex flex-row items-center gap-3 space-y-0">
-            <div className="rounded-md bg-primary/10 p-2 text-primary">
-              <MapPin className="h-5 w-5" />
-            </div>
-            <CardTitle className="text-[15px] font-semibold tracking-tight">District</CardTitle>
-          </CardHeader>
-          <CardContent className="p-5">
-            <DistrictAdd />
-          </CardContent>
-        </Card>
-
-        <Card className="border bg-card shadow-none">
-          <CardHeader className="flex flex-row items-center gap-3 space-y-0">
-            <div className="rounded-md bg-primary/10 p-2 text-primary">
-              <Building2 className="h-5 w-5" />
-            </div>
-            <CardTitle className="text-[15px] font-semibold tracking-tight">Upazila</CardTitle>
-          </CardHeader>
-          <CardContent className="p-5">
-            <UpazilaAdd />
-          </CardContent>
-        </Card>
-
-        <Card className="border bg-card shadow-none">
-          <CardHeader className="flex flex-row items-center gap-3 space-y-0">
-            <div className="rounded-md bg-primary/10 p-2 text-primary">
-              <Users className="h-5 w-5" />
-            </div>
-            <CardTitle className="text-[15px] font-semibold tracking-tight">Union</CardTitle>
-          </CardHeader>
-          <CardContent className="p-5">
-            <UnionAdd />
-          </CardContent>
-        </Card>
-
-        <Card className="border bg-card shadow-none lg:col-span-2">
-          <CardHeader className="flex flex-row items-center gap-3 space-y-0">
-            <div className="rounded-md bg-primary/10 p-2 text-primary">
-              <Home className="h-5 w-5" />
-            </div>
-            <CardTitle className="text-[15px] font-semibold tracking-tight">Village</CardTitle>
-          </CardHeader>
-          <CardContent className="p-5">
-            <VillageAdd />
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="overflow-hidden border bg-card shadow-none">
+        <CardContent className="p-0">
+          <ol className="divide-y divide-border">
+            {steps.map((step) => (
+              <li key={step.numeral} className="p-5 sm:p-6">
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="text-xs tabular text-muted-foreground" aria-hidden="true">
+                    {step.numeral}
+                  </span>
+                  <span className="rounded-md bg-primary/10 p-2 text-primary" aria-hidden="true">
+                    <step.icon className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0">
+                    <h2 className="section-title">{step.title}</h2>
+                    <p className="truncate text-xs text-muted-foreground sm:text-sm sm:whitespace-normal">
+                      {step.description}
+                    </p>
+                  </div>
+                </div>
+                {step.form}
+              </li>
+            ))}
+          </ol>
+        </CardContent>
+      </Card>
     </div>
   );
 };

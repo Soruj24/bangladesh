@@ -60,27 +60,36 @@ const VillageAdd = () => {
     }
   };
 
-  if (unionLoading) return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading unions...</div>;
+  const parentsReady = divisionId && districtId && upazilaId;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <Label className="text-sm font-medium">Select Union</Label>
+      <div className="space-y-1.5">
+        <Label htmlFor="village-parent">Parent union</Label>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" role="combobox" className="w-full justify-between mt-1 h-10">
-              {selectedUnion
-                ? unions.find((u) => u._id === selectedUnion)?.name
-                : "Select union..."}
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <Button
+              id="village-parent"
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              disabled={unionLoading || !parentsReady}
+              className="h-10 w-full justify-between font-normal"
+            >
+              {unionLoading
+                ? "Loading unions…"
+                : selectedUnion
+                  ? unions.find((u) => u._id === selectedUnion)?.name ?? "Select union…"
+                  : "Select union…"}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" aria-hidden="true" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="p-0 w-full">
+          <PopoverContent className="w-full p-0">
             <Command>
-              <CommandInput placeholder="Search union..." />
+              <CommandInput placeholder="Search union..." className="h-9" />
               <CommandList>
                 {unionLoading ? (
-                  <p className="p-4 text-sm text-muted-foreground">Loading...</p>
+                  <p className="p-4 text-sm text-muted-foreground">Loading…</p>
                 ) : unions.length ? (
                   <CommandGroup>
                     {unions.map((union) => (
@@ -88,12 +97,16 @@ const VillageAdd = () => {
                         key={union._id}
                         value={union.name}
                         onSelect={() => {
-                          setSelectedUnion(union._id);
-                          dispatch(setUnionId(union._id));
+                          if (selectedUnion === union._id) {
+                            setSelectedUnion("");
+                          } else {
+                            setSelectedUnion(union._id);
+                            dispatch(setUnionId(union._id));
+                          }
                           setOpen(false);
                         }}
                       >
-                        <Check className={cn("mr-2 h-4 w-4", selectedUnion === union._id ? "opacity-100" : "opacity-0")} />
+                        <Check className={cn("mr-2 h-4 w-4", selectedUnion === union._id ? "opacity-100" : "opacity-0")} aria-hidden="true" />
                         {union.name}
                       </CommandItem>
                     ))}
@@ -105,15 +118,26 @@ const VillageAdd = () => {
             </Command>
           </PopoverContent>
         </Popover>
+        {!parentsReady ? (
+          <p className="text-xs text-muted-foreground">Choose an upazila in step 04 first — unions live under it.</p>
+        ) : !unionLoading && unions.length === 0 ? (
+          <p className="text-xs text-muted-foreground">No unions under this upazila yet.</p>
+        ) : null}
       </div>
-      <div>
-        <Label htmlFor="village-name" className="text-sm font-medium">Name</Label>
-        <Input id="village-name" placeholder="e.g. Savar Village" {...register("name")} className="mt-1 h-10" />
-        {errors.name && <p className="text-xs text-destructive mt-1">{errors.name.message}</p>}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="flex-1 space-y-1.5">
+          <Label htmlFor="village-name">Name</Label>
+          <Input id="village-name" placeholder="e.g. Savar Village" autoComplete="off" {...register("name")} />
+          {errors.name && <p className="field-error">{errors.name.message}</p>}
+        </div>
+        <Button type="submit" disabled={isLoading} className="w-full shrink-0 sm:w-auto">
+          {isLoading ? (
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> Creating…</>
+          ) : (
+            "Create Village"
+          )}
+        </Button>
       </div>
-      <Button type="submit" disabled={isLoading}>
-        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Village"}
-      </Button>
     </form>
   );
 };

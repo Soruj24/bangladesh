@@ -242,11 +242,13 @@ const AddAdminUsers = () => {
               </section>
 
               {/* 03 · Placement */}
-              <fieldset className="mt-8 border-t pt-6">
-                <div className="flex items-baseline gap-2.5">
-                  <span className="text-xs tabular text-muted-foreground" aria-hidden="true">03</span>
-                  <legend className="section-title">Placement</legend>
-                </div>
+              <fieldset className="mt-8 min-w-0 border-t pt-6">
+                <legend className="px-0">
+                  <span className="flex items-baseline gap-2.5">
+                    <span className="text-xs tabular text-muted-foreground" aria-hidden="true">03</span>
+                    <span className="section-title">Placement</span>
+                  </span>
+                </legend>
                 <p className="mb-5 mt-1 text-sm text-muted-foreground">
                   Work top to bottom — each level unlocks the next.
                 </p>

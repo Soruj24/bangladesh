@@ -25,7 +25,6 @@ type UpazilaFormValues = z.infer<typeof upazilaSchema>;
 const UpazilaAdd = () => {
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
   const [selectedDistrictId, setSelectedDistrictId] = useState("");
 
   const divisionId = useSelector((state: RootState) => state.geo.divisionId);
@@ -37,6 +36,7 @@ const UpazilaAdd = () => {
   });
 
   const districts = (districtData as unknown as { payload?: { district?: { _id: string; name: string }[] } })?.payload?.district ?? [];
+  const selectedDistrictName = districts.find((d) => d._id === selectedDistrictId)?.name;
 
   const onSubmit = async (formData: UpazilaFormValues) => {
     if (!selectedDistrictId) {
@@ -47,7 +47,6 @@ const UpazilaAdd = () => {
       await addUpozila({ body: formData, divisionId, districtId: selectedDistrictId }).unwrap();
       toast({ title: "Success", description: "Upazila created" });
       reset();
-      setValue("");
       setSelectedDistrictId("");
     } catch (err) {
       toast({
@@ -58,20 +57,29 @@ const UpazilaAdd = () => {
     }
   };
 
-  if (loadingDistricts) return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading districts...</div>;
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <Label className="text-sm font-medium">Select District</Label>
+      <div className="space-y-1.5">
+        <Label htmlFor="upazila-parent">Parent district</Label>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" role="combobox" className="w-full justify-between mt-1 h-10">
-              {value ? districts.find((d: { name: string }) => d.name === value)?.name : "Select district..."}
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <Button
+              id="upazila-parent"
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              disabled={loadingDistricts || !divisionId}
+              className="h-10 w-full justify-between font-normal"
+            >
+              {loadingDistricts
+                ? "Loading districts…"
+                : selectedDistrictId
+                  ? selectedDistrictName ?? "Select district…"
+                  : "Select district…"}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" aria-hidden="true" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="p-0 w-full">
+          <PopoverContent className="w-full p-0">
             <Command>
               <CommandInput placeholder="Search district..." className="h-9" />
               <CommandList>
@@ -81,14 +89,17 @@ const UpazilaAdd = () => {
                     <CommandItem
                       key={district._id}
                       value={district.name}
-                      onSelect={(currentValue) => {
-                        setValue(currentValue === value ? "" : currentValue);
-                        setSelectedDistrictId(district._id);
-                        dispatch(setDistrictId(district._id));
+                      onSelect={() => {
+                        if (selectedDistrictId === district._id) {
+                          setSelectedDistrictId("");
+                        } else {
+                          setSelectedDistrictId(district._id);
+                          dispatch(setDistrictId(district._id));
+                        }
                         setOpen(false);
                       }}
                     >
-                      <Check className={cn("mr-2 h-4 w-4", value === district.name ? "opacity-100" : "opacity-0")} />
+                      <Check className={cn("mr-2 h-4 w-4", selectedDistrictId === district._id ? "opacity-100" : "opacity-0")} aria-hidden="true" />
                       {district.name}
                     </CommandItem>
                   ))}
@@ -97,15 +108,26 @@ const UpazilaAdd = () => {
             </Command>
           </PopoverContent>
         </Popover>
+        {!divisionId ? (
+          <p className="text-xs text-muted-foreground">Choose a division in step 02 first — districts live under it.</p>
+        ) : !loadingDistricts && districts.length === 0 ? (
+          <p className="text-xs text-muted-foreground">No districts under this division yet.</p>
+        ) : null}
       </div>
-      <div>
-        <Label htmlFor="upa-name" className="text-sm font-medium">Name</Label>
-        <Input id="upa-name" placeholder="e.g. Savar" {...register("name")} className="mt-1 h-10" />
-        {errors.name && <p className="text-xs text-destructive mt-1">{errors.name.message}</p>}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="flex-1 space-y-1.5">
+          <Label htmlFor="upa-name">Name</Label>
+          <Input id="upa-name" placeholder="e.g. Savar" autoComplete="off" {...register("name")} />
+          {errors.name && <p className="field-error">{errors.name.message}</p>}
+        </div>
+        <Button type="submit" disabled={isLoading} className="w-full shrink-0 sm:w-auto">
+          {isLoading ? (
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> Creating…</>
+          ) : (
+            "Create Upazila"
+          )}
+        </Button>
       </div>
-      <Button type="submit" disabled={isLoading}>
-        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Upazila"}
-      </Button>
     </form>
   );
 };

@@ -25,11 +25,11 @@ const DistrictAdd = () => {
   const { data: divisionData, isLoading: loadingDivisions } = useGetDivisionsQuery();
   const [addDistrict, { isLoading }] = useAddDistrictMutation();
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
   const dispatch = useDispatch();
   const [selectedDivisionId, setSelectedDivisionId] = useState("");
 
   const divisions = (divisionData as unknown as { payload?: { divisions?: { _id: string; name: string }[] } })?.payload?.divisions ?? [];
+  const selectedDivisionName = divisions.find((d) => d._id === selectedDivisionId)?.name;
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<DistrictFormValues>({
     resolver: zodResolver(districtSchema),
@@ -44,7 +44,6 @@ const DistrictAdd = () => {
       await addDistrict({ divisionId: selectedDivisionId, name: formData.name }).unwrap();
       toast({ title: "Success", description: "District created" });
       reset();
-      setValue("");
       setSelectedDivisionId("");
     } catch (err) {
       toast({
@@ -55,20 +54,29 @@ const DistrictAdd = () => {
     }
   };
 
-  if (loadingDivisions) return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading divisions...</div>;
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <Label className="text-sm font-medium">Select Division</Label>
+      <div className="space-y-1.5">
+        <Label htmlFor="district-parent">Parent division</Label>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" role="combobox" className="w-full justify-between mt-1 h-10">
-              {value ? divisions.find((d: { name: string }) => d.name === value)?.name : "Select division..."}
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <Button
+              id="district-parent"
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              disabled={loadingDivisions}
+              className="h-10 w-full justify-between font-normal"
+            >
+              {loadingDivisions
+                ? "Loading divisions…"
+                : selectedDivisionId
+                  ? selectedDivisionName ?? "Select division…"
+                  : "Select division…"}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" aria-hidden="true" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="p-0 w-full">
+          <PopoverContent className="w-full p-0">
             <Command>
               <CommandInput placeholder="Search division..." className="h-9" />
               <CommandList>
@@ -78,14 +86,17 @@ const DistrictAdd = () => {
                     <CommandItem
                       key={division._id}
                       value={division.name}
-                      onSelect={(currentValue) => {
-                        setValue(currentValue === value ? "" : currentValue);
-                        setSelectedDivisionId(division._id);
-                        dispatch(setDivisionId(division._id));
+                      onSelect={() => {
+                        if (selectedDivisionId === division._id) {
+                          setSelectedDivisionId("");
+                        } else {
+                          setSelectedDivisionId(division._id);
+                          dispatch(setDivisionId(division._id));
+                        }
                         setOpen(false);
                       }}
                     >
-                      <Check className={cn("mr-2 h-4 w-4", value === division.name ? "opacity-100" : "opacity-0")} />
+                      <Check className={cn("mr-2 h-4 w-4", selectedDivisionId === division._id ? "opacity-100" : "opacity-0")} aria-hidden="true" />
                       {division.name}
                     </CommandItem>
                   ))}
@@ -94,15 +105,24 @@ const DistrictAdd = () => {
             </Command>
           </PopoverContent>
         </Popover>
+        {!loadingDivisions && divisions.length === 0 && (
+          <p className="text-xs text-muted-foreground">No divisions yet — create one in step 01 above.</p>
+        )}
       </div>
-      <div>
-        <Label htmlFor="dist-name" className="text-sm font-medium">Name</Label>
-        <Input id="dist-name" placeholder="e.g. Dhaka" {...register("name")} className="mt-1 h-10" />
-        {errors.name && <p className="text-xs text-destructive mt-1">{errors.name.message}</p>}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="flex-1 space-y-1.5">
+          <Label htmlFor="dist-name">Name</Label>
+          <Input id="dist-name" placeholder="e.g. Dhaka" autoComplete="off" {...register("name")} />
+          {errors.name && <p className="field-error">{errors.name.message}</p>}
+        </div>
+        <Button type="submit" disabled={isLoading} className="w-full shrink-0 sm:w-auto">
+          {isLoading ? (
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> Creating…</>
+          ) : (
+            "Create District"
+          )}
+        </Button>
       </div>
-      <Button type="submit" disabled={isLoading}>
-        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create District"}
-      </Button>
     </form>
   );
 };

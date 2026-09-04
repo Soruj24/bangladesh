@@ -25,7 +25,6 @@ type UnionFormValues = z.infer<typeof unionSchema>;
 const UnionAdd = () => {
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
   const [selectedUpazilaId, setSelectedUpazilaId] = useState("");
 
   const divisionId = useSelector((state: RootState) => state.geo.divisionId);
@@ -40,6 +39,7 @@ const UnionAdd = () => {
 
   const upazilaDataTyped = upazilaData as { upazila?: { _id: string; name: string }[] } | undefined;
   const upazilas = upazilaDataTyped?.upazila || [];
+  const selectedUpazilaName = upazilas.find((u) => u._id === selectedUpazilaId)?.name;
 
   const onSubmit = async (formData: UnionFormValues) => {
     if (!selectedUpazilaId) {
@@ -50,7 +50,6 @@ const UnionAdd = () => {
       await addUnion({ body: formData, divisionId, districtId, upazilaId: selectedUpazilaId }).unwrap();
       toast({ title: "Success", description: "Union created" });
       reset();
-      setValue("");
       setSelectedUpazilaId("");
     } catch (err) {
       toast({
@@ -61,20 +60,31 @@ const UnionAdd = () => {
     }
   };
 
-  if (loadingUpazilas) return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading upazilas...</div>;
+  const parentsReady = divisionId && districtId;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <Label className="text-sm font-medium">Select Upazila</Label>
+      <div className="space-y-1.5">
+        <Label htmlFor="union-parent">Parent upazila</Label>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" role="combobox" className="w-full justify-between mt-1 h-10">
-              {value ? upazilas.find((u: { name: string }) => u.name === value)?.name : "Select upazila..."}
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <Button
+              id="union-parent"
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              disabled={loadingUpazilas || !parentsReady}
+              className="h-10 w-full justify-between font-normal"
+            >
+              {loadingUpazilas
+                ? "Loading upazilas…"
+                : selectedUpazilaId
+                  ? selectedUpazilaName ?? "Select upazila…"
+                  : "Select upazila…"}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" aria-hidden="true" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="p-0 w-full">
+          <PopoverContent className="w-full p-0">
             <Command>
               <CommandInput placeholder="Search upazila..." className="h-9" />
               <CommandList>
@@ -84,14 +94,17 @@ const UnionAdd = () => {
                     <CommandItem
                       key={upazila._id}
                       value={upazila.name}
-                      onSelect={(currentValue) => {
-                        setValue(currentValue === value ? "" : currentValue);
-                        setSelectedUpazilaId(upazila._id);
-                        dispatch(setUpazilaId(upazila._id));
+                      onSelect={() => {
+                        if (selectedUpazilaId === upazila._id) {
+                          setSelectedUpazilaId("");
+                        } else {
+                          setSelectedUpazilaId(upazila._id);
+                          dispatch(setUpazilaId(upazila._id));
+                        }
                         setOpen(false);
                       }}
                     >
-                      <Check className={cn("mr-2 h-4 w-4", value === upazila.name ? "opacity-100" : "opacity-0")} />
+                      <Check className={cn("mr-2 h-4 w-4", selectedUpazilaId === upazila._id ? "opacity-100" : "opacity-0")} aria-hidden="true" />
                       {upazila.name}
                     </CommandItem>
                   ))}
@@ -100,15 +113,26 @@ const UnionAdd = () => {
             </Command>
           </PopoverContent>
         </Popover>
+        {!parentsReady ? (
+          <p className="text-xs text-muted-foreground">Choose a district in step 03 first — upazilas live under it.</p>
+        ) : !loadingUpazilas && upazilas.length === 0 ? (
+          <p className="text-xs text-muted-foreground">No upazilas under this district yet.</p>
+        ) : null}
       </div>
-      <div>
-        <Label htmlFor="union-name" className="text-sm font-medium">Name</Label>
-        <Input id="union-name" placeholder="e.g. Savar Union" {...register("name")} className="mt-1 h-10" />
-        {errors.name && <p className="text-xs text-destructive mt-1">{errors.name.message}</p>}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="flex-1 space-y-1.5">
+          <Label htmlFor="union-name">Name</Label>
+          <Input id="union-name" placeholder="e.g. Savar Union" autoComplete="off" {...register("name")} />
+          {errors.name && <p className="field-error">{errors.name.message}</p>}
+        </div>
+        <Button type="submit" disabled={isLoading} className="w-full shrink-0 sm:w-auto">
+          {isLoading ? (
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> Creating…</>
+          ) : (
+            "Create Union"
+          )}
+        </Button>
       </div>
-      <Button type="submit" disabled={isLoading}>
-        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Union"}
-      </Button>
     </form>
   );
 };

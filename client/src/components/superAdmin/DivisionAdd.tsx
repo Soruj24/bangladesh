@@ -42,14 +42,18 @@ const DivisionAdd = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <Label htmlFor="div-name" className="text-sm font-medium">Name</Label>
-        <Input id="div-name" placeholder="e.g. Dhaka" {...register("name")} className="mt-1 h-10" />
-        {errors.name && <p className="text-xs text-destructive mt-1">{errors.name.message}</p>}
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3 sm:flex-row sm:items-end">
+      <div className="flex-1 space-y-1.5">
+        <Label htmlFor="div-name">Name</Label>
+        <Input id="div-name" placeholder="e.g. Dhaka" autoComplete="off" {...register("name")} />
+        {errors.name && <p className="field-error">{errors.name.message}</p>}
       </div>
-      <Button type="submit" disabled={isLoading}>
-        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Division"}
+      <Button type="submit" disabled={isLoading} className="w-full shrink-0 sm:w-auto">
+        {isLoading ? (
+          <><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> Creating…</>
+        ) : (
+          "Create Division"
+        )}
       </Button>
     </form>
   );
