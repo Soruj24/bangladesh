@@ -123,7 +123,7 @@ const AllUsers = () => {
 
   if (error) {
     return (
-      <div className="space-y-5">
+      <div className="animate-enter space-y-5">
         <div>
           <p className="eyebrow">Administration</p>
           <h1 className="page-title">Users</h1>
@@ -150,7 +150,7 @@ const AllUsers = () => {
   const searching = searchQuery.trim().length > 0;
 
   return (
-    <div className="space-y-5">
+    <div className="animate-enter space-y-5">
       {/* Page header — count badge carries the meta, sub stays quiet */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>

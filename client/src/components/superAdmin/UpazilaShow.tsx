@@ -71,7 +71,7 @@ const UpazilaShow = () => {
   }
 
   if (isError) return (
-    <div className="space-y-5">
+    <div className="animate-enter space-y-5">
       <div>
         <p className="eyebrow">Geography</p>
         <h1 className="page-title">Upazilas</h1>
@@ -95,7 +95,7 @@ const UpazilaShow = () => {
   const upazilas = data?.UpazilaWithOutDistrict || [];
 
   return (
-    <div className="space-y-5">
+    <div className="animate-enter space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
           <p className="eyebrow">Geography</p>

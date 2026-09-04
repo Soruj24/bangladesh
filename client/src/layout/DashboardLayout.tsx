@@ -214,7 +214,9 @@ const DashboardLayout = () => {
 
         {/* Page content */}
         <main className="mx-auto w-full max-w-[1200px] p-4 sm:p-6 lg:p-8">
-          <Outlet />
+          <div key={location.pathname} className="animate-enter">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
