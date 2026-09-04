@@ -121,36 +121,36 @@ const AddAdminUsers = () => {
                 <p className="mt-2 text-sm text-muted-foreground">Click to upload photo</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField name="name" render={({ field }) => (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <FormField control={formMethods.control} name="name" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-sm font-medium">Name</FormLabel>
                     <FormControl><Input placeholder="Enter name" {...field} className="h-10" /></FormControl>
                     <FormMessage className="text-xs text-destructive" />
                   </FormItem>
                 )} />
-                <FormField name="email" render={({ field }) => (
+                <FormField control={formMethods.control} name="email" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-sm font-medium">Email</FormLabel>
                     <FormControl><Input placeholder="Enter email" {...field} className="h-10" /></FormControl>
                     <FormMessage className="text-xs text-destructive" />
                   </FormItem>
                 )} />
-                <FormField name="tag" render={({ field }) => (
+                <FormField control={formMethods.control} name="tag" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-sm font-medium">Tag</FormLabel>
                     <FormControl><Input placeholder="Enter tag" {...field} className="h-10" /></FormControl>
                     <FormMessage className="text-xs text-destructive" />
                   </FormItem>
                 )} />
-                <FormField name="phone" render={({ field }) => (
+                <FormField control={formMethods.control} name="phone" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-sm font-medium">Phone</FormLabel>
                     <FormControl><Input placeholder="Enter phone" {...field} className="h-10" /></FormControl>
                     <FormMessage className="text-xs text-destructive" />
                   </FormItem>
                 )} />
-                <FormField name="bio" render={({ field }) => (
+                <FormField control={formMethods.control} name="bio" render={({ field }) => (
                   <FormItem className="md:col-span-2">
                     <FormLabel className="text-sm font-medium">Bio</FormLabel>
                     <FormControl><Textarea placeholder="Enter bio" {...field} className="min-h-[80px]" /></FormControl>

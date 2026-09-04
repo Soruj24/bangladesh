@@ -54,7 +54,7 @@ const AdminAllUser = () => {
                 {data?.users?.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell>
-                      <img src={user?.image} alt="User" className="w-8 h-8 rounded-full object-cover" />
+                      <img src={user?.image} alt={user?.name ?? "User"} loading="lazy" className="h-8 w-8 rounded-full object-cover ring-1 ring-border" />
                     </TableCell>
                     <TableCell className="font-medium">{user?.name}</TableCell>
                     <TableCell className="tabular-nums">{user?.email}</TableCell>

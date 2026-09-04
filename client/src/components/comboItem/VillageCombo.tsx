@@ -58,7 +58,7 @@ const VillageCombo = () => {
             className="w-full justify-between font-normal"
           >
             {value
-              ? villageList.find((v) => v.value === value)?.label
+              ? selectedName ?? "Select Village..."
               : "Select Village..."}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
@@ -74,8 +74,8 @@ const VillageCombo = () => {
                     <CommandItem
                       key={village._id}
                       value={village.name}
-                      onSelect={(currentValue) => {
-                        setValue(currentValue === value ? "" : currentValue);
+                      onSelect={() => {
+                        setValue((prev) => (prev === village._id ? "" : village._id));
                         dispatch(setVillageId(village._id));
                         dispatch(setVillageName(village.name));
                         setOpen(false);
@@ -84,7 +84,7 @@ const VillageCombo = () => {
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          value === village.value ? "opacity-100" : "opacity-0"
+                          value === village._id ? "opacity-100" : "opacity-0"
                         )}
                       />
                       {village.name}
