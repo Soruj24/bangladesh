@@ -68,25 +68,33 @@ const AllUsers = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
       </div>
     );
   }
 
   if (error) {
-    return <div className="text-center py-12 text-red-500">Failed to fetch users</div>;
+    return (
+      <div className="py-12 text-center">
+        <p className="text-sm text-destructive">Failed to fetch users</p>
+        <Button variant="outline" size="sm" onClick={() => refetch()} className="mt-3">
+          Retry
+        </Button>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">User Management</h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">Manage user roles and accounts</p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">Administration</p>
+        <h1 className="text-xl font-semibold tracking-tight">User Management</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Manage user roles and accounts</p>
       </div>
 
-      <Card className="border-0 shadow-sm dark:bg-gray-900/50">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle className="text-lg">All Users</CardTitle>
+      <Card className="border bg-card shadow-none overflow-hidden">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 p-5">
+          <CardTitle className="text-[15px] font-semibold tracking-tight">All Users</CardTitle>
           <SearchInput
             value={searchQuery}
             onChange={handleSearchChange}
@@ -97,6 +105,7 @@ const AllUsers = () => {
         <CardContent className="p-0">
           {users.length > 0 ? (
             <>
+              <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -111,11 +120,11 @@ const AllUsers = () => {
                   {users.map(
                     (user, index) => (
                       <TableRow key={user.id}>
-                        <TableCell className="text-gray-500">
+                        <TableCell className="tabular-nums text-muted-foreground">
                           {index + 1 + (currentPage - 1) * itemsPerPage}
                         </TableCell>
                         <TableCell className="font-medium">{user.name}</TableCell>
-                        <TableCell>{user.email}</TableCell>
+                        <TableCell className="tabular-nums">{user.email}</TableCell>
                         <TableCell>
                           <Select onValueChange={(newRole) => handleRoleChange(user.id, newRole)}>
                             <SelectTrigger className="w-[160px] h-9">
@@ -144,9 +153,10 @@ const AllUsers = () => {
                   )}
                 </TableBody>
               </Table>
+              </div>
 
               {totalPages > 1 && (
-                <div className="px-4 py-3 border-t">
+                <div className="border-t border-border px-4 py-3">
                   <Pagination>
                     <PaginationContent>
                       <PaginationItem>
@@ -198,7 +208,7 @@ const AllUsers = () => {
               )}
             </>
           ) : (
-            <p className="text-center py-8 text-gray-500">No users found.</p>
+            <p className="py-14 text-center text-sm text-muted-foreground">No users found.</p>
           )}
         </CardContent>
       </Card>

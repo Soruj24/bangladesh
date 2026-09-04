@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/popover";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { useGetVillagesQuery } from "@/services/villageApi";
 import { setVillageId, setVillageName } from "@/features/geoSlice";
 import { RootState } from "@/app/store";
@@ -43,18 +43,19 @@ const VillageCombo = () => {
   const [value, setValue] = useState("");
   const dispatch = useDispatch();
 
-  const villageList = (villageData as { villages?: { _id: string; name: string; value: string; label: string }[] })?.villages || [];
+  const villageList = (villageData as { villages?: { _id: string; name: string }[] })?.villages || [];
+  const selectedName = villageList.find((v) => v._id === value)?.name;
 
   return (
     <div>
-      <p className="text-sm my-4 font-medium leading-none">Select Village</p>
+      <p className="mb-1.5 block text-sm font-medium">Select Village</p>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="justify-between w-full"
+            className="w-full justify-between font-normal"
           >
             {value
               ? villageList.find((v) => v.value === value)?.label
@@ -62,7 +63,7 @@ const VillageCombo = () => {
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="p-0 w-full">
+        <PopoverContent className="w-full p-0">
           <Command>
             <CommandInput placeholder="Search village..." className="h-9" />
             <CommandList>

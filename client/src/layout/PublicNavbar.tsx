@@ -1,49 +1,48 @@
 import { Link } from "react-router-dom";
 import { Sun, Moon } from "lucide-react";
-import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useTheme } from "next-themes";
 import { RootState } from "@/app/store";
+import { Button } from "@/components/ui/button";
 
 const PublicNavbar = () => {
-  const [darkMode, setDarkMode] = useState(
-    () => window.matchMedia("(prefers-color-scheme: dark)").matches
-  );
+  const { resolvedTheme, setTheme } = useTheme();
+  const dark = resolvedTheme === "dark";
   const user = useSelector((state: RootState) => state.auth.user);
 
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", darkMode);
-  }, [darkMode]);
-
   return (
-    <nav className="h-16 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-sm">
+    <nav className="sticky top-0 z-50 h-16 border-b bg-background/90 backdrop-blur-sm">
+      <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Link to="/" className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-[13px] font-semibold tracking-tight text-primary-foreground">
             BD
           </div>
-          <span className="font-semibold text-gray-900 dark:text-white">Bangladesh</span>
+          <span className="text-[15px] font-semibold tracking-tight">
+            Bangladesh <span className="font-normal text-muted-foreground">Registry</span>
+          </span>
         </Link>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Toggle theme"
+            onClick={() => setTheme(dark ? "light" : "dark")}
+            className="h-9 w-9 text-muted-foreground"
           >
-            {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
+            {dark ? <Sun size={17} /> : <Moon size={17} />}
+          </Button>
           {user ? (
-            <Link
-              to={user.isSuperAdmin ? "/dashboard/super-admin/profile" : "/dashboard/admin/profile"}
-              className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
-            >
-              Dashboard
-            </Link>
+            <Button asChild size="sm" className="h-9 px-4">
+              <Link
+                to={user.isSuperAdmin ? "/dashboard/super-admin/profile" : "/dashboard/admin/profile"}
+              >
+                Dashboard
+              </Link>
+            </Button>
           ) : (
-            <Link
-              to="/sign-in"
-              className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
-            >
-              Sign In
-            </Link>
+            <Button asChild size="sm" className="h-9 px-4">
+              <Link to="/sign-in">Sign In</Link>
+            </Button>
           )}
         </div>
       </div>

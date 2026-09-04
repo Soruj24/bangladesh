@@ -10,52 +10,53 @@ const AdminProfile = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Profile</h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">Your account information</p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">Administration</p>
+        <h1 className="text-xl font-semibold tracking-tight">Profile</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Your account information</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-1 border-0 shadow-sm dark:bg-gray-900/50">
+        <Card className="lg:col-span-1 border bg-card shadow-none">
           <CardContent className="pt-6">
             <div className="flex flex-col items-center text-center">
-              <div className="w-24 h-24 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
-                <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+              <div className="w-24 h-24 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4">
+                <span className="text-3xl font-bold">
                   {user?.name?.charAt(0)?.toUpperCase()}
                 </span>
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{user?.name}</h2>
-              <p className="text-gray-500 dark:text-gray-400 mt-1">{user?.email}</p>
-              <Badge className="mt-3 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+              <h2 className="text-xl font-semibold text-foreground">{user?.name}</h2>
+              <p className="text-sm text-muted-foreground mt-1">{user?.email}</p>
+              <Badge variant="success" className="mt-3">
                 <Shield className="h-3 w-3 mr-1" /> Admin
               </Badge>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2 border-0 shadow-sm dark:bg-gray-900/50">
-          <CardHeader>
-            <CardTitle className="text-lg">Account Details</CardTitle>
+        <Card className="lg:col-span-2 border bg-card shadow-none">
+          <CardHeader className="p-5">
+            <CardTitle className="text-[15px] font-semibold tracking-tight">Account Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-              <User className="h-5 w-5 text-gray-400" />
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted">
+              <User className="h-5 w-5 text-muted-foreground" />
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Full Name</p>
-                <p className="font-medium text-gray-900 dark:text-white">{user?.name}</p>
+                <p className="text-sm text-muted-foreground">Full Name</p>
+                <p className="font-medium text-foreground">{user?.name}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-              <Mail className="h-5 w-5 text-gray-400" />
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted">
+              <Mail className="h-5 w-5 text-muted-foreground" />
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Email Address</p>
-                <p className="font-medium text-gray-900 dark:text-white">{user?.email}</p>
+                <p className="text-sm text-muted-foreground">Email Address</p>
+                <p className="font-medium text-foreground">{user?.email}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-              <Shield className="h-5 w-5 text-gray-400" />
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted">
+              <Shield className="h-5 w-5 text-muted-foreground" />
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Role</p>
-                <p className="font-medium text-gray-900 dark:text-white">Administrator</p>
+                <p className="text-sm text-muted-foreground">Role</p>
+                <p className="font-medium text-foreground">Administrator</p>
               </div>
             </div>
           </CardContent>

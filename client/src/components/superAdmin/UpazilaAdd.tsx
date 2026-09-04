@@ -58,12 +58,12 @@ const UpazilaAdd = () => {
     }
   };
 
-  if (loadingDistricts) return <div className="flex items-center gap-2 text-sm text-gray-500"><Loader2 className="h-4 w-4 animate-spin" /> Loading districts...</div>;
+  if (loadingDistricts) return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading districts...</div>;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
-        <Label className="text-sm">Select District</Label>
+        <Label className="text-sm font-medium">Select District</Label>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" role="combobox" className="w-full justify-between mt-1 h-10">
@@ -99,11 +99,11 @@ const UpazilaAdd = () => {
         </Popover>
       </div>
       <div>
-        <Label htmlFor="upa-name" className="text-sm">Name</Label>
+        <Label htmlFor="upa-name" className="text-sm font-medium">Name</Label>
         <Input id="upa-name" placeholder="e.g. Savar" {...register("name")} className="mt-1 h-10" />
-        {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>}
+        {errors.name && <p className="text-xs text-destructive mt-1">{errors.name.message}</p>}
       </div>
-      <Button type="submit" size="sm" disabled={isLoading}>
+      <Button type="submit" disabled={isLoading}>
         {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Upazila"}
       </Button>
     </form>

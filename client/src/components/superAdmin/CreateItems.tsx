@@ -8,69 +8,70 @@ import VillageAdd from "./VillageAdd";
 
 const CreateItems = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create Items</h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">Add new geographic entities to the hierarchy</p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">Geography</p>
+        <h1 className="text-xl font-semibold tracking-tight">Create Items</h1>
+        <p className="text-sm text-muted-foreground mt-1">Add new geographic entities to the hierarchy</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border-0 shadow-sm dark:bg-gray-900/50">
-          <CardHeader className="flex flex-row items-center gap-3 space-y-0 pb-4">
-            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-              <Globe className="h-5 w-5 text-blue-600" />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Card className="border bg-card shadow-none">
+          <CardHeader className="flex flex-row items-center gap-3 space-y-0">
+            <div className="rounded-md bg-primary/10 p-2 text-primary">
+              <Globe className="h-5 w-5" />
             </div>
-            <CardTitle className="text-lg">Division</CardTitle>
+            <CardTitle className="text-[15px] font-semibold tracking-tight">Division</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-5">
             <DivisionAdd />
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-sm dark:bg-gray-900/50">
-          <CardHeader className="flex flex-row items-center gap-3 space-y-0 pb-4">
-            <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20">
-              <MapPin className="h-5 w-5 text-emerald-600" />
+        <Card className="border bg-card shadow-none">
+          <CardHeader className="flex flex-row items-center gap-3 space-y-0">
+            <div className="rounded-md bg-primary/10 p-2 text-primary">
+              <MapPin className="h-5 w-5" />
             </div>
-            <CardTitle className="text-lg">District</CardTitle>
+            <CardTitle className="text-[15px] font-semibold tracking-tight">District</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-5">
             <DistrictAdd />
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-sm dark:bg-gray-900/50">
-          <CardHeader className="flex flex-row items-center gap-3 space-y-0 pb-4">
-            <div className="p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20">
-              <Building2 className="h-5 w-5 text-amber-600" />
+        <Card className="border bg-card shadow-none">
+          <CardHeader className="flex flex-row items-center gap-3 space-y-0">
+            <div className="rounded-md bg-primary/10 p-2 text-primary">
+              <Building2 className="h-5 w-5" />
             </div>
-            <CardTitle className="text-lg">Upazila</CardTitle>
+            <CardTitle className="text-[15px] font-semibold tracking-tight">Upazila</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-5">
             <UpazilaAdd />
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-sm dark:bg-gray-900/50">
-          <CardHeader className="flex flex-row items-center gap-3 space-y-0 pb-4">
-            <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-900/20">
-              <Users className="h-5 w-5 text-purple-600" />
+        <Card className="border bg-card shadow-none">
+          <CardHeader className="flex flex-row items-center gap-3 space-y-0">
+            <div className="rounded-md bg-primary/10 p-2 text-primary">
+              <Users className="h-5 w-5" />
             </div>
-            <CardTitle className="text-lg">Union</CardTitle>
+            <CardTitle className="text-[15px] font-semibold tracking-tight">Union</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-5">
             <UnionAdd />
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-sm dark:bg-gray-900/50 lg:col-span-2">
-          <CardHeader className="flex flex-row items-center gap-3 space-y-0 pb-4">
-            <div className="p-2 rounded-lg bg-rose-50 dark:bg-rose-900/20">
-              <Home className="h-5 w-5 text-rose-600" />
+        <Card className="border bg-card shadow-none lg:col-span-2">
+          <CardHeader className="flex flex-row items-center gap-3 space-y-0">
+            <div className="rounded-md bg-primary/10 p-2 text-primary">
+              <Home className="h-5 w-5" />
             </div>
-            <CardTitle className="text-lg">Village</CardTitle>
+            <CardTitle className="text-[15px] font-semibold tracking-tight">Village</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-5">
             <VillageAdd />
           </CardContent>
         </Card>

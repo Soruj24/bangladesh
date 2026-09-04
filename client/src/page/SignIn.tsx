@@ -76,26 +76,26 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-teal-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-600 text-white mb-4">
-            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
+      <div className="w-full max-w-[400px]">
+        <div className="mb-7 text-center">
+          <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-md bg-primary text-primary-foreground">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Bangladesh</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">Administrative Hierarchy System</p>
+          <h1 className="text-xl font-semibold tracking-tight">Bangladesh Registry</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Sign in to your account</p>
         </div>
 
-        <Card className="border-0 shadow-xl dark:shadow-2xl dark:bg-gray-900/50 dark:backdrop-blur">
-          <CardHeader className="space-y-1 pb-6">
-            <CardTitle className="text-2xl font-semibold text-center">Welcome back</CardTitle>
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-center">Welcome back</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium">
+              <div className="space-y-1.5">
+                <Label htmlFor="email">
                   Email
                 </Label>
                 <Input
@@ -103,15 +103,14 @@ const SignIn = () => {
                   type="email"
                   placeholder="you@example.com"
                   {...register("email")}
-                  className="h-11"
                 />
                 {errors.email && (
-                  <p className="text-sm text-red-500">{errors.email.message}</p>
+                  <p className="text-xs text-destructive">{errors.email.message}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium">
+              <div className="space-y-1.5">
+                <Label htmlFor="password">
                   Password
                 </Label>
                 <div className="relative">
@@ -120,22 +119,23 @@ const SignIn = () => {
                     type={passwordVisible ? "text" : "password"}
                     placeholder="Enter your password"
                     {...register("password")}
-                    className="h-11 pr-10"
+                    className="pr-10"
                   />
                   <button
                     type="button"
+                    aria-label="Toggle password visibility"
                     onClick={() => setPasswordVisible(!passwordVisible)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors duration-150 hover:text-foreground"
                   >
-                    {passwordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {passwordVisible ? <EyeOff size={17} /> : <Eye size={17} />}
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-sm text-red-500">{errors.password.message}</p>
+                  <p className="text-xs text-destructive">{errors.password.message}</p>
                 )}
               </div>
 
-              <Button type="submit" className="w-full h-11 bg-emerald-600 hover:bg-emerald-700" disabled={isLoading}>
+              <Button type="submit" className="h-10 w-full" disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -147,10 +147,10 @@ const SignIn = () => {
               </Button>
             </form>
           </CardContent>
-          <CardFooter className="justify-center pb-6">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+          <CardFooter className="justify-center">
+            <p className="text-sm text-muted-foreground">
               Don&apos;t have an account?{" "}
-              <Link to="/sign-up" className="text-emerald-600 hover:text-emerald-700 font-medium">
+              <Link to="/sign-up" className="font-medium text-primary hover:underline">
                 Sign up
               </Link>
             </p>

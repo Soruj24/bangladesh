@@ -83,25 +83,25 @@ const SignUp: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-teal-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-600 text-white mb-4">
-            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
+      <div className="w-full max-w-[400px]">
+        <div className="mb-7 text-center">
+          <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-md bg-primary text-primary-foreground">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Bangladesh</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">Create your account</p>
+          <h1 className="text-xl font-semibold tracking-tight">Bangladesh Registry</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Create your account</p>
         </div>
 
-        <Card className="border-0 shadow-xl dark:shadow-2xl dark:bg-gray-900/50 dark:backdrop-blur">
-          <CardHeader className="space-y-1 pb-6">
-            <CardTitle className="text-2xl font-semibold text-center">Get started</CardTitle>
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-center">Get started</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="flex flex-col items-center mb-2">
+              <div className="mb-1 flex flex-col items-center">
                 <input
                   type="file"
                   accept="image/*"
@@ -110,89 +110,87 @@ const SignUp: React.FC = () => {
                   {...register("image")}
                   onChange={handleImageChange}
                 />
-                <label htmlFor="image" className="cursor-pointer group">
+                <label htmlFor="image" className="group cursor-pointer">
                   <div className="relative">
                     {selectedImage ? (
                       <img
                         src={selectedImage}
                         alt="Selected"
-                        className="w-20 h-20 rounded-full object-cover border-2 border-emerald-500"
+                        className="h-20 w-20 rounded-full border-2 border-primary object-cover"
                       />
                     ) : (
-                      <div className="w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 group-hover:border-emerald-500 transition-colors">
-                        <Upload className="w-6 h-6 text-gray-400" />
+                      <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-dashed border-input bg-muted transition-colors duration-150 group-hover:border-primary">
+                        <Upload className="h-6 w-6 text-muted-foreground" />
                       </div>
                     )}
                   </div>
                 </label>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm font-medium">Name</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="name">Name</Label>
                 <Input
                   type="text"
                   id="name"
                   placeholder="Your name"
-                  className="h-11"
                   {...register("name")}
                 />
                 {errors.name && (
-                  <p className="text-sm text-red-500">{errors.name.message}</p>
+                  <p className="text-xs text-destructive">{errors.name.message}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="email">Email</Label>
                 <Input
                   type="email"
                   id="email"
                   placeholder="you@example.com"
-                  className="h-11"
                   {...register("email")}
                 />
                 {errors.email && (
-                  <p className="text-sm text-red-500">{errors.email.message}</p>
+                  <p className="text-xs text-destructive">{errors.email.message}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="password">Password</Label>
                 <div className="relative">
                   <Input
                     type={passwordVisible ? "text" : "password"}
                     id="password"
                     placeholder="Enter your password"
-                    className="h-11 pr-10"
+                    className="pr-10"
                     {...register("password")}
                   />
                   <button
                     type="button"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    aria-label="Toggle password visibility"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors duration-150 hover:text-foreground"
                     onClick={() => setPasswordVisible(!passwordVisible)}
                   >
-                    {passwordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {passwordVisible ? <EyeOff size={17} /> : <Eye size={17} />}
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-sm text-red-500">{errors.password.message}</p>
+                  <p className="text-xs text-destructive">{errors.password.message}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm Password</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <Input
                   type={passwordVisible ? "text" : "password"}
                   id="confirmPassword"
                   placeholder="Confirm your password"
-                  className="h-11"
                   {...register("confirmPassword")}
                 />
                 {errors.confirmPassword && (
-                  <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
+                  <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
                 )}
               </div>
 
-              <Button type="submit" className="w-full h-11 bg-emerald-600 hover:bg-emerald-700" disabled={isLoading}>
+              <Button type="submit" className="h-10 w-full" disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -204,10 +202,10 @@ const SignUp: React.FC = () => {
               </Button>
             </form>
           </CardContent>
-          <div className="text-center pb-6">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+          <div className="pb-5 text-center">
+            <p className="text-sm text-muted-foreground">
               Already have an account?{" "}
-              <Link to="/sign-in" className="text-emerald-600 hover:text-emerald-700 font-medium">
+              <Link to="/sign-in" className="font-medium text-primary hover:underline">
                 Sign in
               </Link>
             </p>

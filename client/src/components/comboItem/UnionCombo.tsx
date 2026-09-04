@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/popover";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { RootState } from "@/app/store";
 import { useGetUnionsQuery } from "@/services/unionsApi";
 import { setUnionId, setUnionName } from "@/features/geoSlice";
@@ -42,14 +42,14 @@ const UnionCombo = () => {
 
   return (
     <div>
-      <p className="text-sm my-4 font-medium leading-none">Select Union</p>
+      <p className="mb-1.5 block text-sm font-medium">Select Union</p>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="justify-between w-full"
+            className="w-full justify-between font-normal"
           >
             {selectedUnion
               ? unionData?.unions?.find(
@@ -59,12 +59,12 @@ const UnionCombo = () => {
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="p-0 w-full">
+        <PopoverContent className="w-full p-0">
           <Command>
-            <CommandInput placeholder="Search union..." />
+            <CommandInput placeholder="Search union..." className="h-9" />
             <CommandList>
               {unionLoading ? (
-                <p className="p-4 text-sm">Loading unions...</p>
+                <p className="p-4 text-sm text-muted-foreground">Loading unions...</p>
               ) : unionData?.unions?.length ? (
                 <CommandGroup>
                   {unionData.unions.map(

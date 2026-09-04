@@ -39,64 +39,62 @@ const UserProfile = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-          <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-            <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+        <button className="flex items-center gap-2 rounded-md px-3 py-2 transition-colors duration-150 hover:bg-accent">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+            <span className="text-sm font-medium text-primary">
               {user?.name?.charAt(0)?.toUpperCase()}
             </span>
           </div>
-          <div className="text-left hidden sm:block">
-            <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.name}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="hidden text-left sm:block">
+            <p className="text-sm font-medium leading-tight">{user?.name}</p>
+            <p className="text-xs text-muted-foreground">
               {user?.isSuperAdmin ? "Super Admin" : user?.isAdmin ? "Admin" : "User"}
             </p>
           </div>
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 mt-2">
+      <DropdownMenuContent className="mt-2 w-56" align="end">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           {user?.isSuperAdmin && (
             <>
-              <Link to="/dashboard/super-admin/profile">
-                <DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/dashboard/super-admin/profile">
                   <Crown className="mr-2 h-4 w-4" /> Super Admin Profile
-                </DropdownMenuItem>
-              </Link>
-              <Link to="/dashboard/super-admin/create">
-                <DropdownMenuItem>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/dashboard/super-admin/create">
                   <Settings className="mr-2 h-4 w-4" /> Create Items
-                </DropdownMenuItem>
-              </Link>
+                </Link>
+              </DropdownMenuItem>
             </>
           )}
           {user?.isAdmin && (
             <>
-              <Link to="/dashboard/admin/profile">
-                <DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/dashboard/admin/profile">
                   <Shield className="mr-2 h-4 w-4" /> Admin Profile
-                </DropdownMenuItem>
-              </Link>
-              <Link to="/dashboard/admin/all-users">
-                <DropdownMenuItem>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/dashboard/admin/all-users">
                   <User className="mr-2 h-4 w-4" /> All Users
-                </DropdownMenuItem>
-              </Link>
-              <Link to="/dashboard/admin/add-admin-users">
-                <DropdownMenuItem>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/dashboard/admin/add-admin-users">
                   <Settings className="mr-2 h-4 w-4" /> Add Population
-                </DropdownMenuItem>
-              </Link>
+                </Link>
+              </DropdownMenuItem>
             </>
           )}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <div onClick={handleLogout}>
-          <DropdownMenuItem className="text-red-600">
-            <LogOut className="mr-2 h-4 w-4" /> Log out
-          </DropdownMenuItem>
-        </div>
+        <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+          <LogOut className="mr-2 h-4 w-4" /> Log out
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

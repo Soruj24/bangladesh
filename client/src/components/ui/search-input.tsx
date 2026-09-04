@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Search, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SearchInputProps {
   value: string;
@@ -8,6 +9,8 @@ interface SearchInputProps {
   placeholder?: string;
   debounceMs?: number;
   className?: string;
+  disabled?: boolean;
+  id?: string;
 }
 
 export function SearchInput({
@@ -16,6 +19,8 @@ export function SearchInput({
   placeholder = "Search...",
   debounceMs = 300,
   className,
+  disabled,
+  id,
 }: SearchInputProps) {
   const [localValue, setLocalValue] = useState(value);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -50,20 +55,24 @@ export function SearchInput({
   }, []);
 
   return (
-    <div className={`relative ${className ?? ""}`}>
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+    <div className={cn("relative", className)}>
+      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
       <Input
+        id={id}
         type="text"
         value={localValue}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="pl-10 pr-9 h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-sm focus-visible:ring-emerald-500"
+        disabled={disabled}
+        className="h-10 bg-background pl-10 pr-9 text-sm"
       />
       {localValue && (
         <button
+          type="button"
+          aria-label="Clear search"
           onClick={handleClear}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors duration-150 hover:text-foreground"
         >
           <X className="h-4 w-4" />
         </button>

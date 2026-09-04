@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/popover";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { useGetUpazilasQuery } from "@/services/upozilaApi";
 import { setUpazilaId, setUpazilaName } from "@/features/geoSlice";
 import { RootState } from "@/app/store";
@@ -37,26 +37,27 @@ const UpazilaCombo = () => {
   const [value, setValue] = useState("");
   const dispatch = useDispatch();
 
-  const upazilaList = (upazilaData as { upazila?: { _id: string; name: string; value: string; label: string }[] })?.upazila || [];
+  const upazilaList = (upazilaData as { upazila?: { _id: string; name: string }[] })?.upazila || [];
+  const selectedName = upazilaList.find((u) => u._id === value)?.name;
 
   return (
     <div>
-      <p className="text-sm font-medium leading-none">Select Upazila</p>
+      <p className="mb-1.5 block text-sm font-medium">Select Upazila</p>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="justify-between w-full"
+            className="w-full justify-between font-normal"
           >
             {value
-              ? upazilaList.find((u) => u.value === value)?.label
+              ? selectedName ?? "Select Upazila..."
               : "Select Upazila..."}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="p-0 w-full">
+        <PopoverContent className="w-full p-0">
           <Command>
             <CommandInput placeholder="Search upazila..." className="h-9" />
             <CommandList>
@@ -66,8 +67,8 @@ const UpazilaCombo = () => {
                   <CommandItem
                     key={upazila._id}
                     value={upazila.name}
-                    onSelect={(currentValue) => {
-                      setValue(currentValue === value ? "" : currentValue);
+                    onSelect={() => {
+                      setValue((prev) => (prev === upazila._id ? "" : upazila._id));
                       dispatch(setUpazilaId(upazila._id));
                       dispatch(setUpazilaName(upazila.name));
                       setOpen(false);
@@ -76,7 +77,7 @@ const UpazilaCombo = () => {
                     <Check
                       className={cn(
                         "mr-2 h-4 w-4",
-                        value === upazila.value ? "opacity-100" : "opacity-0"
+                        value === upazila._id ? "opacity-100" : "opacity-0"
                       )}
                     />
                     {upazila.name}

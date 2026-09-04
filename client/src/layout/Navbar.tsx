@@ -14,14 +14,14 @@ const Navbar = () => {
     }, [darkMode]);
 
     return (
-        <div className="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
-            <nav className="flex justify-between items-center p-4 shadow-md">
+        <div className="bg-card text-card-foreground border-b">
+            <nav className="flex justify-between items-center p-4">
                 <div className="text-xl font-semibold"> <Link to='/'>Bangladesh</Link> </div>
                 <div className="flex items-center gap-4">
                     <UserProfile />
                     <button
                         onClick={() => setDarkMode(!darkMode)}
-                        className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+                        className="p-2 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                     >
                         {darkMode ? <Sun size={20} /> : <Moon size={20} />}
                     </button>

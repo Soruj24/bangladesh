@@ -98,67 +98,68 @@ const AddAdminUsers = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Add Population User</h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">Register a new person in the system</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Admin</p>
+        <h1 className="mt-1 text-xl font-semibold tracking-tight">Add Population User</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Register a new person in the system</p>
       </div>
 
-      <Card className="border-0 shadow-sm dark:bg-gray-900/50">
-        <CardContent className="pt-6">
+      <Card className="border shadow-none">
+        <CardContent className="p-5">
           <FormProvider {...formMethods}>
             <form onSubmit={formMethods.handleSubmit(onSubmit)} className="space-y-6" encType="multipart/form-data">
               <div className="flex flex-col items-center">
                 <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
                 <button type="button" onClick={() => fileInputRef.current?.click()} className="relative group">
                   {imagePreview ? (
-                    <img src={imagePreview} alt="Preview" className="w-24 h-24 rounded-full object-cover border-2 border-emerald-500" />
+                    <img src={imagePreview} alt="Preview" className="w-24 h-24 rounded-full object-cover ring-1 ring-border" />
                   ) : (
-                    <div className="w-24 h-24 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 group-hover:border-emerald-500 transition-colors">
-                      <Upload className="w-6 h-6 text-gray-400" />
+                    <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center border border-dashed border-input group-hover:border-primary transition-colors">
+                      <Upload className="w-6 h-6 text-muted-foreground" />
                     </div>
                   )}
                 </button>
-                <p className="text-sm text-gray-500 mt-2">Click to upload photo</p>
+                <p className="mt-2 text-sm text-muted-foreground">Click to upload photo</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField name="name" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel className="text-sm font-medium">Name</FormLabel>
                     <FormControl><Input placeholder="Enter name" {...field} className="h-10" /></FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs text-destructive" />
                   </FormItem>
                 )} />
                 <FormField name="email" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel className="text-sm font-medium">Email</FormLabel>
                     <FormControl><Input placeholder="Enter email" {...field} className="h-10" /></FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs text-destructive" />
                   </FormItem>
                 )} />
                 <FormField name="tag" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tag</FormLabel>
+                    <FormLabel className="text-sm font-medium">Tag</FormLabel>
                     <FormControl><Input placeholder="Enter tag" {...field} className="h-10" /></FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs text-destructive" />
                   </FormItem>
                 )} />
                 <FormField name="phone" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone</FormLabel>
+                    <FormLabel className="text-sm font-medium">Phone</FormLabel>
                     <FormControl><Input placeholder="Enter phone" {...field} className="h-10" /></FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs text-destructive" />
                   </FormItem>
                 )} />
                 <FormField name="bio" render={({ field }) => (
                   <FormItem className="md:col-span-2">
-                    <FormLabel>Bio</FormLabel>
+                    <FormLabel className="text-sm font-medium">Bio</FormLabel>
                     <FormControl><Textarea placeholder="Enter bio" {...field} className="min-h-[80px]" /></FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs text-destructive" />
                   </FormItem>
                 )} />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <DivisionCombo />
                 <DistrictCombo />
                 <UpazilaCombo />
@@ -166,7 +167,7 @@ const AddAdminUsers = () => {
                 <VillageCombo />
               </div>
 
-              <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700" disabled={isLoading}>
+              <Button type="submit" disabled={isLoading}>
                 {isLoading ? (
                   <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Adding...</>
                 ) : (
