@@ -19,6 +19,12 @@
     --accent-foreground: 20 14.3% 4.1%;
     --destructive: 0 72.2% 50.6%;
     --destructive-foreground: 0 0% 98%;
+    --success: 161 94% 24%;
+    --success-foreground: 0 0% 100%;
+    --warning: 32 95% 44%;
+    --warning-foreground: 0 0% 100%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
     --border: 20 5.9% 90%;
     --input: 20 5.9% 83%;
     --ring: 161 94% 24%;
@@ -54,6 +60,12 @@
     --accent-foreground: 60 9.1% 97.8%;
     --destructive: 0 62.8% 45.6%;
     --destructive-foreground: 60 9.1% 97.8%;
+    --success: 160 84% 60%;
+    --success-foreground: 20 14.3% 4.1%;
+    --warning: 43 96% 64%;
+    --warning-foreground: 20 14.3% 4.1%;
+    --info: 199 95% 74%;
+    --info-foreground: 20 14.3% 4.1%;
     --border: 12 6.5% 18%;
     --input: 12 6.5% 24%;
     --ring: 160 84.1% 60.4%;
@@ -93,6 +105,25 @@
     outline: 2px solid hsl(var(--ring) / 0.6);
     outline-offset: 2px;
   }
+  /* Consistent disabled state foundation */
+  :disabled {
+    cursor: not-allowed;
+  }
+  /* Consistent hover pacing foundation */
+  a,
+  button {
+    transition-property: color, background-color, border-color, opacity;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
   /* Slim ledger scrollbars */
   * {
     scrollbar-width: thin;
@@ -114,5 +145,48 @@
 @layer utilities {
   .tabular {
     font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  /* Unified typography */
+  .eyebrow {
+    @apply text-xs font-medium uppercase tracking-wider text-muted-foreground;
+  }
+  .page-title {
+    @apply mt-1 text-xl font-semibold tracking-tight;
+  }
+  .page-sub {
+    @apply mt-1 text-sm text-muted-foreground;
+  }
+  .section-title {
+    @apply text-[15px] font-semibold tracking-tight;
+  }
+  .field-error {
+    @apply text-xs text-destructive;
+  }
+  /* Semantic status dots — hierarchy without boxes */
+  .status-dot {
+    @apply inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground;
+  }
+  .status-dot-success {
+    @apply bg-success;
+  }
+  .status-dot-warning {
+    @apply bg-warning;
+  }
+  .status-dot-error {
+    @apply bg-destructive;
+  }
+  .status-dot-info {
+    @apply bg-info;
+  }
+  /* Hairline divider list — replaces stacked boxes inside cards */
+  .ledger-row {
+    @apply flex items-center gap-3 border-t py-3.5 first:border-t-0 first:pt-0 last:pb-0;
+  }
+  /* Consistent loading shimmer block */
+  .loading-block {
+    @apply animate-pulse rounded-md bg-muted;
   }
 }

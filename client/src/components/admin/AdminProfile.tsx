@@ -10,58 +10,56 @@ const AdminProfile = () => {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">Administration</p>
-        <h1 className="text-xl font-semibold tracking-tight">Profile</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Your account information</p>
+        <p className="eyebrow">Administration</p>
+        <h1 className="page-title">Profile</h1>
+        <p className="page-sub">Your account information</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-1 border bg-card shadow-none">
-          <CardContent className="pt-6">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-24 h-24 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4">
-                <span className="text-3xl font-bold">
-                  {user?.name?.charAt(0)?.toUpperCase()}
-                </span>
-              </div>
-              <h2 className="text-xl font-semibold text-foreground">{user?.name}</h2>
-              <p className="text-sm text-muted-foreground mt-1">{user?.email}</p>
-              <Badge variant="success" className="mt-3">
-                <Shield className="h-3 w-3 mr-1" /> Admin
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="lg:col-span-2 border bg-card shadow-none">
-          <CardHeader className="p-5">
-            <CardTitle className="text-[15px] font-semibold tracking-tight">Account Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted">
-              <User className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm text-muted-foreground">Full Name</p>
-                <p className="font-medium text-foreground">{user?.name}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted">
-              <Mail className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm text-muted-foreground">Email Address</p>
-                <p className="font-medium text-foreground">{user?.email}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted">
-              <Shield className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm text-muted-foreground">Role</p>
-                <p className="font-medium text-foreground">Administrator</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex items-center gap-4">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <span className="text-xl font-semibold">
+            {user?.name?.charAt(0)?.toUpperCase()}
+          </span>
+        </div>
+        <div className="min-w-0">
+          <h2 className="truncate text-lg font-semibold tracking-tight text-foreground">{user?.name}</h2>
+          <p className="truncate text-sm tabular text-muted-foreground">{user?.email}</p>
+          <Badge variant="success" className="mt-1.5">
+            <Shield className="mr-1 h-3 w-3" /> Admin
+          </Badge>
+        </div>
       </div>
+
+      <Card className="border bg-card shadow-none">
+        <CardHeader className="p-5 pb-3">
+          <CardTitle className="section-title">Account Details</CardTitle>
+        </CardHeader>
+        <CardContent className="px-5 pb-5 pt-0">
+          <div className="divide-y divide-border">
+            <div className="ledger-row">
+              <User className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground">Full Name</p>
+                <p className="truncate text-sm font-medium text-foreground">{user?.name}</p>
+              </div>
+            </div>
+            <div className="ledger-row">
+              <Mail className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground">Email Address</p>
+                <p className="truncate text-sm font-medium tabular text-foreground">{user?.email}</p>
+              </div>
+            </div>
+            <div className="ledger-row">
+              <Shield className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <div>
+                <p className="text-xs text-muted-foreground">Role</p>
+                <p className="text-sm font-medium text-foreground">Administrator</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
