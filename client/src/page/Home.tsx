@@ -180,14 +180,14 @@ const Home = () => {
           aria-label="Registry totals"
         >
           {ledgerStats.map((stat) => (
-            <div key={stat.label} className="bg-card px-5 py-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <div key={stat.label} className="min-w-0 bg-card px-4 py-4 sm:px-5">
+              <p className="truncate text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 {stat.label}
               </p>
               {loadingStats ? (
                 <Skeleton className="mt-2 h-7 w-14" />
               ) : (
-                <p className="mt-1 text-2xl font-semibold tabular tracking-tight">
+                <p className="mt-1 break-words text-xl font-semibold tabular tracking-tight xl:text-2xl">
                   {stat.value}
                 </p>
               )}
@@ -355,7 +355,11 @@ const Home = () => {
         )}
 
         {popPagination && popPagination.totalPages > 1 && (
-          <Pagination className="mt-7">
+          <div className="mt-7 space-y-3">
+            <p className="text-center text-xs tabular text-muted-foreground sm:hidden" aria-live="polite">
+              Page {popPage} of {popPagination.totalPages}
+            </p>
+          <Pagination>
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
@@ -366,7 +370,7 @@ const Home = () => {
                 />
               </PaginationItem>
               {popPageWindow().map((page) => (
-                <PaginationItem key={page}>
+                <PaginationItem key={page} className="hidden sm:block">
                   <PaginationLink
                     href="#"
                     isActive={popPage === page}
@@ -379,10 +383,10 @@ const Home = () => {
               ))}
               {popPagination.totalPages > 5 && popPage < popPagination.totalPages - 2 && (
                 <>
-                  <PaginationItem>
+                  <PaginationItem className="hidden sm:block">
                     <PaginationEllipsis />
                   </PaginationItem>
-                  <PaginationItem>
+                  <PaginationItem className="hidden sm:block">
                     <PaginationLink
                       href="#"
                       onClick={(e) => goToPopPage(e, popPagination.totalPages)}
@@ -403,6 +407,7 @@ const Home = () => {
               </PaginationItem>
             </PaginationContent>
           </Pagination>
+          </div>
         )}
       </section>
 

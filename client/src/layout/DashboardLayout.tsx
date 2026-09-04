@@ -199,10 +199,10 @@ const DashboardLayout = () => {
               {roleLabel} · Civil Registry
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="text-right">
-              <p className="text-sm font-medium leading-tight">{user?.name}</p>
-              <p className="text-xs tabular text-muted-foreground">{user?.email}</p>
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="hidden min-w-0 min-[400px]:block">
+              <p className="truncate text-sm font-medium leading-tight">{user?.name}</p>
+              <p className="truncate text-xs tabular text-muted-foreground">{user?.email}</p>
             </div>
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
               <span className="text-sm font-medium text-primary">

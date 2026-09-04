@@ -1,7 +1,5 @@
-"use client";
-
 import { useState } from "react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -79,20 +77,17 @@ const SignIn = () => {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-[400px]">
         <div className="mb-7 text-center">
-          <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-md bg-primary text-primary-foreground">
+          <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-md bg-primary text-primary-foreground" aria-hidden="true">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
             </svg>
           </div>
-          <h1 className="text-xl font-semibold tracking-tight">Bangladesh Registry</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Sign in to your account</p>
+          <h1 className="text-xl font-semibold tracking-tight">Welcome back</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Sign in to continue to the registry</p>
         </div>
 
         <Card>
-          <CardHeader className="pb-4">
-            <CardTitle className="text-center">Welcome back</CardTitle>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="pt-5">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="email">
@@ -102,10 +97,13 @@ const SignIn = () => {
                   id="email"
                   type="email"
                   placeholder="you@example.com"
+                  autoComplete="email"
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? "email-error" : undefined}
                   {...register("email")}
                 />
                 {errors.email && (
-                  <p className="text-xs text-destructive">{errors.email.message}</p>
+                  <p id="email-error" role="alert" className="field-error">{errors.email.message}</p>
                 )}
               </div>
 
@@ -118,28 +116,32 @@ const SignIn = () => {
                     id="password"
                     type={passwordVisible ? "text" : "password"}
                     placeholder="Enter your password"
+                    autoComplete="current-password"
+                    aria-invalid={!!errors.password}
+                    aria-describedby={errors.password ? "password-error" : undefined}
                     {...register("password")}
                     className="pr-10"
                   />
                   <button
                     type="button"
-                    aria-label="Toggle password visibility"
+                    aria-label={passwordVisible ? "Hide password" : "Show password"}
+                    aria-pressed={passwordVisible}
                     onClick={() => setPasswordVisible(!passwordVisible)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors duration-150 hover:text-foreground"
                   >
-                    {passwordVisible ? <EyeOff size={17} /> : <Eye size={17} />}
+                    {passwordVisible ? <EyeOff size={17} aria-hidden="true" /> : <Eye size={17} aria-hidden="true" />}
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-xs text-destructive">{errors.password.message}</p>
+                  <p id="password-error" role="alert" className="field-error">{errors.password.message}</p>
                 )}
               </div>
 
               <Button type="submit" className="h-10 w-full" disabled={isLoading}>
                 {isLoading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                    Signing in…
                   </>
                 ) : (
                   "Sign In"

@@ -292,7 +292,7 @@ const AllUsers = () => {
                         />
                       </PaginationItem>
                       {pageWindow().map((page) => (
-                        <PaginationItem key={page}>
+                        <PaginationItem key={page} className="hidden sm:block">
                           <PaginationLink
                             href="#"
                             isActive={currentPage === page}
@@ -305,10 +305,10 @@ const AllUsers = () => {
                       ))}
                       {totalPages > 5 && currentPage < totalPages - 2 && (
                         <>
-                          <PaginationItem>
+                          <PaginationItem className="hidden sm:block">
                             <PaginationEllipsis />
                           </PaginationItem>
-                          <PaginationItem>
+                          <PaginationItem className="hidden sm:block">
                             <PaginationLink
                               href="#"
                               onClick={(e) => goToPage(e, totalPages)}

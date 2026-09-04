@@ -13,12 +13,12 @@ const PublicNavbar = () => {
   return (
     <nav className="sticky top-0 z-50 h-16 border-b bg-background/90 backdrop-blur-sm">
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link to="/" className="flex items-center gap-2.5">
+        <Link to="/" className="flex min-w-0 items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-[13px] font-semibold tracking-tight text-primary-foreground">
             BD
           </div>
-          <span className="text-[15px] font-semibold tracking-tight">
-            Bangladesh <span className="font-normal text-muted-foreground">Registry</span>
+          <span className="truncate text-[15px] font-semibold tracking-tight">
+            Bangladesh <span className="hidden font-normal text-muted-foreground min-[400px]:inline">Registry</span>
           </span>
         </Link>
         <div className="flex items-center gap-2">
