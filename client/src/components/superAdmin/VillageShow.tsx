@@ -2,12 +2,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
+import { SearchInput } from "@/components/ui/search-input";
+import { DataPagination } from "@/components/ui/data-pagination";
+import { usePaginatedList } from "@/hooks/use-paginated-list";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { useDeleteVillageMutation, useGetAllVillagesQuery, useUpdateVillageMutation } from "@/services/villageApi";
-import { AlertTriangle, Loader2, Pencil, Trash2, TreePine } from "lucide-react";
+import { AlertTriangle, Loader2, Pencil, SearchX, Trash2, TreePine } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const VillageShow = () => {
@@ -16,6 +19,24 @@ const VillageShow = () => {
   const [deleteVillage] = useDeleteVillageMutation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [current, setCurrent] = useState<{ _id: string; name: string } | null>(null);
+
+  const villageData = data as { villagesWithOutUnion?: { _id: string; name: string }[] } | undefined;
+  const villages = villageData?.villagesWithOutUnion ?? [];
+
+  const {
+    search,
+    setSearch,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    totalItems,
+    totalPages,
+    pageItems,
+    rangeStart,
+    rangeEnd,
+    isSearching,
+  } = usePaginatedList(villages);
 
   const handleDelete = async (id: string) => {
     const res = await deleteVillage(id);
@@ -92,8 +113,6 @@ const VillageShow = () => {
     </div>
   );
 
-  const villageData = data as { villagesWithOutUnion?: { _id: string; name: string }[] } | undefined;
-
   return (
     <div className="animate-enter space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-2">
@@ -101,12 +120,29 @@ const VillageShow = () => {
           <p className="eyebrow">Geography</p>
           <h1 className="page-title">Villages</h1>
           <p className="page-sub tabular" aria-live="polite">
-            {(villageData?.villagesWithOutUnion?.length ?? 0)} records
+            {totalItems} records
           </p>
         </div>
       </div>
 
-      {!villageData?.villagesWithOutUnion?.length ? (
+      {villages.length > 0 && (
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <SearchInput
+            id="village-search"
+            value={search}
+            onChange={setSearch}
+            placeholder="Search villages..."
+            className="w-full sm:max-w-xs"
+          />
+          <p className="text-xs tabular text-muted-foreground" aria-live="polite">
+            {totalItems === 0
+              ? "No matches"
+              : `Showing ${rangeStart}–${rangeEnd} of ${totalItems}`}
+          </p>
+        </div>
+      )}
+
+      {!villages.length ? (
         <Card className="border bg-card shadow-none">
           <CardContent className="flex flex-col items-center justify-center px-5 py-14 text-center">
             <div className="mb-4 rounded-full bg-muted p-3.5">
@@ -121,14 +157,29 @@ const VillageShow = () => {
             </Button>
           </CardContent>
         </Card>
+      ) : isSearching && pageItems.length === 0 ? (
+        <Card className="border bg-card shadow-none">
+          <CardContent className="flex flex-col items-center justify-center px-5 py-14 text-center">
+            <div className="mb-4 rounded-full bg-muted p-3.5">
+              <SearchX className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
+            </div>
+            <h2 className="section-title">No results found</h2>
+            <p className="mb-5 mt-1 max-w-sm text-sm text-muted-foreground">
+              Nothing matches &ldquo;{search.trim()}&rdquo;. Try a different keyword.
+            </p>
+            <Button variant="outline" size="sm" onClick={() => setSearch("")}>
+              Clear search
+            </Button>
+          </CardContent>
+        </Card>
       ) : (
         <Card className="overflow-hidden border bg-card shadow-none">
           <CardContent className="p-0">
             <ul className="divide-y divide-border">
-              {villageData?.villagesWithOutUnion?.map((village, index) => (
+              {pageItems?.map((village, index) => (
                 <li key={village._id} className="flex items-center gap-3 px-4 py-2.5 sm:px-5">
                   <span className="w-7 shrink-0 text-xs tabular text-muted-foreground">
-                    {String(index + 1).padStart(2, "0")}
+                    {String((page - 1) * pageSize + index + 1).padStart(2, "0")}
                   </span>
                   <span className="min-w-0 flex-1 truncate text-sm font-medium">
                     {village.name}
@@ -150,6 +201,16 @@ const VillageShow = () => {
                 </li>
               ))}
             </ul>
+            <DataPagination
+              page={page}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              rangeStart={rangeStart}
+              rangeEnd={rangeEnd}
+              onPageChange={setPage}
+              pageSize={pageSize}
+              onPageSizeChange={setPageSize}
+            />
           </CardContent>
         </Card>
       )}

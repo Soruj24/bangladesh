@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { RootState } from "@/app/store";
@@ -12,15 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SearchInput } from "@/components/ui/search-input";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import { DataPagination } from "@/components/ui/data-pagination";
 import {
   Users,
   MapPin,
@@ -34,12 +26,24 @@ const ITEMS_PER_PAGE = 12;
 const Home = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const [popPage, setPopPage] = useState(1);
+  const [popPageSize, setPopPageSize] = useState(ITEMS_PER_PAGE);
   const [popSearch, setPopSearch] = useState("");
+  const popSectionRef = useRef<HTMLDivElement>(null);
   const { data: statsData, isLoading: loadingStats } = useGetStatsQuery();
   const { data: divisionsData, isLoading: loadingDiv } = useGetPublicDivisionsQuery();
-  const { data: populationData, isLoading: loadingPop } = useGetPopulationsQuery({ page: popPage, limit: ITEMS_PER_PAGE, search: popSearch });
+  const { data: populationData, isLoading: loadingPop } = useGetPopulationsQuery({ page: popPage, limit: popPageSize, search: popSearch.trim() });
   const populationUsers = (populationData as unknown as { users?: { id: string; name: string; email: string; image: string; division: string }[] })?.users ?? [];
   const popPagination = (populationData as unknown as { pagination?: { totalUsers: number; totalPages: number; currentPage: number; hasNextPage: boolean; hasPreviousPage: boolean } })?.pagination;
+
+  const popTotal = popPagination?.totalUsers ?? 0;
+  const popTotalPages = Math.max(popPagination?.totalPages ?? 1, 1);
+  const popRangeStart = popTotal === 0 ? 0 : (popPage - 1) * popPageSize + 1;
+  const popRangeEnd = Math.min(popPage * popPageSize, popTotal);
+
+  // Clamp page when results shrink (e.g. search narrows to fewer pages)
+  useEffect(() => {
+    if (popPagination && popPage > popTotalPages) setPopPage(popTotalPages);
+  }, [popPagination, popPage, popTotalPages]);
 
   const stats = statsData?.payload;
   const divisions = divisionsData?.payload?.divisions ?? [];
@@ -62,18 +66,19 @@ const Home = () => {
     { level: "05", label: "Village", value: stats?.villages },
   ];
 
-  const goToPopPage = (e: React.MouseEvent, page: number) => {
-    e.preventDefault();
-    if (!popPagination) return;
-    if (page < 1 || page > popPagination.totalPages || page === popPage) return;
+  const handlePopPageChange = (page: number) => {
     setPopPage(page);
+    popSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const popPageWindow = () => {
-    if (!popPagination) return [];
-    const count = Math.min(5, popPagination.totalPages);
-    const start = Math.max(1, Math.min(popPage - 2, popPagination.totalPages - 4));
-    return Array.from({ length: count }, (_, i) => start + i).filter((p) => p <= popPagination.totalPages);
+  const handlePopSearch = (v: string) => {
+    setPopSearch(v);
+    setPopPage(1);
+  };
+
+  const handlePopPageSize = (size: number) => {
+    setPopPageSize(size);
+    setPopPage(1);
   };
 
   const dashboardPath = user?.isSuperAdmin
@@ -243,13 +248,13 @@ const Home = () => {
       </section>
 
       {/* Population */}
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8">
+      <section ref={popSectionRef} className="mx-auto max-w-7xl scroll-mt-20 px-4 py-12 sm:px-6 sm:py-14 lg:px-8">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="eyebrow">Records</p>
             <h2 className="page-title">Registered Population</h2>
             <p className="page-sub tabular" aria-live="polite">
-              {stats?.population ?? populationUsers.length} records across Bangladesh
+              {popTotal > 0 ? popTotal : (stats?.population ?? populationUsers.length)} records across Bangladesh
             </p>
           </div>
           {user && (
@@ -261,16 +266,24 @@ const Home = () => {
           )}
         </div>
 
-        <label htmlFor="population-search" className="sr-only">
-          Search population records
-        </label>
-        <SearchInput
-          id="population-search"
-          value={popSearch}
-          onChange={(v) => { setPopSearch(v); setPopPage(1); }}
-          placeholder="Search by name, email, phone or tag..."
-          className="mb-5 max-w-md"
-        />
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="w-full sm:max-w-md">
+            <label htmlFor="population-search" className="sr-only">
+              Search population records
+            </label>
+            <SearchInput
+              id="population-search"
+              value={popSearch}
+              onChange={handlePopSearch}
+              placeholder="Search by name, email, phone or tag..."
+            />
+          </div>
+          <p className="text-xs tabular text-muted-foreground" aria-live="polite">
+            {popTotal === 0
+              ? "No records"
+              : `Showing ${popRangeStart}–${popRangeEnd} of ${popTotal}`}
+          </p>
+        </div>
 
         {loadingPop ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" aria-label="Loading population records">
@@ -334,7 +347,7 @@ const Home = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => { setPopSearch(""); setPopPage(1); }}
+                onClick={() => handlePopSearch("")}
               >
                 Clear Search
               </Button>
@@ -354,59 +367,20 @@ const Home = () => {
           </Card>
         )}
 
-        {popPagination && popPagination.totalPages > 1 && (
-          <div className="mt-7 space-y-3">
-            <p className="text-center text-xs tabular text-muted-foreground sm:hidden" aria-live="polite">
-              Page {popPage} of {popPagination.totalPages}
-            </p>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={(e) => goToPopPage(e, popPage - 1)}
-                  aria-disabled={!popPagination.hasPreviousPage}
-                  className={!popPagination.hasPreviousPage ? "pointer-events-none opacity-50" : undefined}
-                />
-              </PaginationItem>
-              {popPageWindow().map((page) => (
-                <PaginationItem key={page} className="hidden sm:block">
-                  <PaginationLink
-                    href="#"
-                    isActive={popPage === page}
-                    onClick={(e) => goToPopPage(e, page)}
-                    className="tabular"
-                  >
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              {popPagination.totalPages > 5 && popPage < popPagination.totalPages - 2 && (
-                <>
-                  <PaginationItem className="hidden sm:block">
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                  <PaginationItem className="hidden sm:block">
-                    <PaginationLink
-                      href="#"
-                      onClick={(e) => goToPopPage(e, popPagination.totalPages)}
-                      className="tabular"
-                    >
-                      {popPagination.totalPages}
-                    </PaginationLink>
-                  </PaginationItem>
-                </>
-              )}
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={(e) => goToPopPage(e, popPage + 1)}
-                  aria-disabled={!popPagination.hasNextPage}
-                  className={!popPagination.hasNextPage ? "pointer-events-none opacity-50" : undefined}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+        {popPagination && popTotalPages > 1 && (
+          <div className="mt-7">
+            <DataPagination
+              page={popPage}
+              totalPages={popTotalPages}
+              totalItems={popTotal}
+              rangeStart={popRangeStart}
+              rangeEnd={popRangeEnd}
+              onPageChange={handlePopPageChange}
+              itemLabel="records"
+              pageSize={popPageSize}
+              onPageSizeChange={handlePopPageSize}
+              pageSizeOptions={[8, 12, 16, 24]}
+            />
           </div>
         )}
       </section>

@@ -2,12 +2,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
+import { SearchInput } from "@/components/ui/search-input";
+import { DataPagination } from "@/components/ui/data-pagination";
+import { usePaginatedList } from "@/hooks/use-paginated-list";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { useDeleteDistrictMutation, useGetAllDistrictsQuery, useUpdateDistrictMutation } from "@/services/districtApi";
-import { AlertTriangle, Loader2, MapPin, Pencil, Trash2 } from "lucide-react";
+import { AlertTriangle, Loader2, MapPin, Pencil, SearchX, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const DistrictShow = () => {
@@ -18,6 +21,21 @@ const DistrictShow = () => {
   const [current, setCurrent] = useState<{ _id: string; name: string } | null>(null);
 
   const districts = data?.payload?.district ?? [];
+
+  const {
+    search,
+    setSearch,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    totalItems,
+    totalPages,
+    pageItems,
+    rangeStart,
+    rangeEnd,
+    isSearching,
+  } = usePaginatedList(districts);
 
   const handleDelete = async (id: string) => {
     const res = await deleteDistrict({ districtId: id });
@@ -101,10 +119,27 @@ const DistrictShow = () => {
           <p className="eyebrow">Geography</p>
           <h1 className="page-title">Districts</h1>
           <p className="page-sub tabular" aria-live="polite">
-            {districts.length} {districts.length === 1 ? "record" : "records"}
+            {totalItems} {totalItems === 1 ? "record" : "records"}
           </p>
         </div>
       </div>
+
+      {districts.length > 0 && (
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <SearchInput
+            id="district-search"
+            value={search}
+            onChange={setSearch}
+            placeholder="Search districts..."
+            className="w-full sm:max-w-xs"
+          />
+          <p className="text-xs tabular text-muted-foreground" aria-live="polite">
+            {totalItems === 0
+              ? "No matches"
+              : `Showing ${rangeStart}–${rangeEnd} of ${totalItems}`}
+          </p>
+        </div>
+      )}
 
       {districts.length === 0 ? (
         <Card className="border bg-card shadow-none">
@@ -121,14 +156,29 @@ const DistrictShow = () => {
             </Button>
           </CardContent>
         </Card>
+      ) : isSearching && pageItems.length === 0 ? (
+        <Card className="border bg-card shadow-none">
+          <CardContent className="flex flex-col items-center justify-center px-5 py-14 text-center">
+            <div className="mb-4 rounded-full bg-muted p-3.5">
+              <SearchX className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
+            </div>
+            <h2 className="section-title">No results found</h2>
+            <p className="mb-5 mt-1 max-w-sm text-sm text-muted-foreground">
+              Nothing matches &ldquo;{search.trim()}&rdquo;. Try a different keyword.
+            </p>
+            <Button variant="outline" size="sm" onClick={() => setSearch("")}>
+              Clear search
+            </Button>
+          </CardContent>
+        </Card>
       ) : (
         <Card className="overflow-hidden border bg-card shadow-none">
           <CardContent className="p-0">
             <ul className="divide-y divide-border">
-              {districts.map((district, index) => (
+              {pageItems.map((district, index) => (
                 <li key={district._id} className="flex items-center gap-3 px-4 py-2.5 sm:px-5">
                   <span className="w-7 shrink-0 text-xs tabular text-muted-foreground">
-                    {String(index + 1).padStart(2, "0")}
+                    {String((page - 1) * pageSize + index + 1).padStart(2, "0")}
                   </span>
                   <span className="min-w-0 flex-1 truncate text-sm font-medium">
                     {district.name}
@@ -150,6 +200,16 @@ const DistrictShow = () => {
                 </li>
               ))}
             </ul>
+            <DataPagination
+              page={page}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              rangeStart={rangeStart}
+              rangeEnd={rangeEnd}
+              onPageChange={setPage}
+              pageSize={pageSize}
+              onPageSizeChange={setPageSize}
+            />
           </CardContent>
         </Card>
       )}
